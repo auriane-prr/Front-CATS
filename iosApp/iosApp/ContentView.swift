@@ -6,19 +6,22 @@
 //
 
 import SwiftUI
+import shared
 
 struct ContentView: View {
+    private let loginViewModelFactory: LoginViewModelFactory
+
+    init() {
+        let repository = LoginRepository() // Instanciation du LoginRepository partagé
+        self.loginViewModelFactory = LoginViewModelFactory(repository: repository)
+    }
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+        LoginPage(viewModelFactory: loginViewModelFactory)
     }
 }
 
 #Preview {
     ContentView()
 }
+
