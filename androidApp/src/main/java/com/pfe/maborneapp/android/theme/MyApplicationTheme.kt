@@ -1,4 +1,4 @@
-package com.pfe.maborneapp.android
+package com.pfe.maborneapp.android.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape

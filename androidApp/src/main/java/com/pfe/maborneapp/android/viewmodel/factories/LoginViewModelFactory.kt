@@ -1,8 +1,9 @@
-package com.pfe.maborneapp.android
+package com.pfe.maborneapp.android.viewmodel.factories
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.pfe.maborneapp.LoginRepository
+import com.pfe.maborneapp.android.viewmodel.LoginViewModel
+import com.pfe.maborneapp.repositories.LoginRepository
 
 class LoginViewModelFactory(private val loginRepository: LoginRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

@@ -3,7 +3,9 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinSerialization)
 }
+
 
 kotlin {
     android {
@@ -33,6 +35,8 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.0")
+                implementation(libs.kotlinx.serialization.json) // Ajout de kotlinx-serialization-json
             }
         }
         val commonTest by getting {
@@ -44,11 +48,15 @@ kotlin {
             dependencies {
                 implementation(libs.androidx.navigation.common)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+                implementation(libs.kotlinx.serialization.json) // Ajout pour Android
             }
         }
         val androidUnitTest by getting
         val iosMain by creating {
             dependsOn(commonMain)
+            dependencies {
+                implementation(libs.kotlinx.serialization.json) // Ajout pour iOS
+            }
         }
         val iosArm64Main by getting {
             dependsOn(iosMain)
@@ -58,6 +66,7 @@ kotlin {
         }
     }
 }
+
 
 android {
     namespace = "com.pfe.maborneapp"

@@ -1,4 +1,4 @@
-package com.pfe.maborneapp
+package com.pfe.maborneapp.repositories
 
 class LoginRepository {
     fun authenticate(email: String, password: String): String {
