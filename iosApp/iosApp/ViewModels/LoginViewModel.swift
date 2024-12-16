@@ -6,22 +6,33 @@
 //
 
 import Foundation
-import shared 
+import shared
 
 class LoginViewModel: ObservableObject {
     private let repository: LoginRepository
 
-    // Propriétés observables pour la Vue
     @Published var loginMessage: String = ""
     @Published var userRole: String = ""
 
-    init(repository: LoginRepository) {
-        self.repository = repository
+    init() {
+        let client = HttpClientFactoryImpl().create()
+        self.repository = LoginRepository(client: client)
     }
 
-    // Méthode pour gérer la connexion
-    func login(email: String, password: String) {
-        loginMessage = repository.authenticate(email: email, password: password)
-        userRole = email.contains("admin") ? "admin" : "user"
+    func login(email: String) {
+        Task { @MainActor in // Exécution sur le Main Thread
+            do {
+                let user = try await repository.login(email: email)
+                if let user = user {
+                    self.userRole = user.role
+                    self.loginMessage = "Connexion réussie !"
+                } else {
+                    self.loginMessage = "Email incorrect ou erreur serveur."
+                }
+            } catch {
+                self.loginMessage = "Erreur : \(error.localizedDescription)"
+            }
+        }
     }
 }
+

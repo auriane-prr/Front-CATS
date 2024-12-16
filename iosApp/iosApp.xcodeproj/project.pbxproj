@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8C1ADEE72D0C3ABD008F38BA /* shared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C1ADEE62D0C3ABD008F38BA /* shared.xcframework */; };
-		8C1ADEE82D0C3ABD008F38BA /* shared.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8C1ADEE62D0C3ABD008F38BA /* shared.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		8C50995C2D10673000813F4B /* shared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C50995B2D10673000813F4B /* shared.xcframework */; };
+		8C50995D2D10673000813F4B /* shared.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8C50995B2D10673000813F4B /* shared.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,13 +29,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		8C1ADEE92D0C3ABD008F38BA /* Embed Frameworks */ = {
+		8C1215CE2D10580400AE7DC0 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				8C1ADEE82D0C3ABD008F38BA /* shared.xcframework in Embed Frameworks */,
+				8C50995D2D10673000813F4B /* shared.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -43,7 +43,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		8C1ADEE62D0C3ABD008F38BA /* shared.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = shared.xcframework; path = ../shared/build/xcframework/shared.xcframework; sourceTree = "<group>"; };
+		8C50995B2D10673000813F4B /* shared.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = shared.xcframework; path = ../shared/build/xcframework/shared.xcframework; sourceTree = "<group>"; };
 		8C9A27852D0B2F2000228F43 /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C9A27952D0B2F2200228F43 /* iosAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C9A279F2D0B2F2200228F43 /* iosAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -72,7 +72,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8C1ADEE72D0C3ABD008F38BA /* shared.xcframework in Frameworks */,
+				8C50995C2D10673000813F4B /* shared.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -117,7 +117,7 @@
 		8C9A27B22D0B2FC400228F43 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				8C1ADEE62D0C3ABD008F38BA /* shared.xcframework */,
+				8C50995B2D10673000813F4B /* shared.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -132,7 +132,7 @@
 				8C9A27812D0B2F2000228F43 /* Sources */,
 				8C9A27822D0B2F2000228F43 /* Frameworks */,
 				8C9A27832D0B2F2000228F43 /* Resources */,
-				8C1ADEE92D0C3ABD008F38BA /* Embed Frameworks */,
+				8C1215CE2D10580400AE7DC0 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);

@@ -16,7 +16,7 @@ import io.ktor.client.*
 fun LoginPage(navController: NavHostController, client: HttpClient) {
     Log.e("DEBUG", "LoginPage: Composable affiché")
 
-    val viewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(client))
+    val viewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory())
 
     var mail by remember { mutableStateOf("") }
     val loginMessage by viewModel.loginMessage.collectAsState()

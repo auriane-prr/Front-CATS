@@ -7,7 +7,7 @@ plugins {
 }
 
 kotlin {
-    androidTarget { // Utilise androidTarget
+    androidTarget {
         compilations.all {
             compileTaskProvider.configure {
                 compilerOptions {
@@ -62,11 +62,14 @@ kotlin {
             dependsOn(commonMain)
             dependencies {
                 implementation(libs.kotlinx.serialization.json)
+                implementation("io.ktor:ktor-client-darwin:2.3.0") // Client HTTP pour iOS
             }
         }
+
         val iosArm64Main by getting {
             dependsOn(iosMain)
         }
+
         val iosSimulatorArm64Main by getting {
             dependsOn(iosMain)
         }

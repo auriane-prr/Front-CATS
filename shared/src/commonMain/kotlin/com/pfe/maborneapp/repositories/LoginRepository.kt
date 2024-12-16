@@ -7,31 +7,20 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.json.Json
 
-private val json = Json {
-    ignoreUnknownKeys = true
-}
-
 class LoginRepository(private val client: HttpClient) {
+    private val json = Json { ignoreUnknownKeys = true }
+
     suspend fun login(email: String): User? {
         try {
-            val requestBody = """{"mail":"$email"}"""
-            println("DEBUG - LoginRepository: Corps de la requête = $requestBody")
-
             val response: HttpResponse = client.post("https://back-cats.onrender.com/auth/login") {
                 contentType(ContentType.Application.Json)
-                setBody(requestBody)
+                setBody("""{"mail":"$email"}""")
             }
-            println("DEBUG - LoginRepository: Réponse brute = ${response.bodyAsText()}")
-
             if (response.status == HttpStatusCode.OK) {
-                val user = json.decodeFromString<User>(response.bodyAsText()) // Utilise la configuration
-                println("DEBUG - LoginRepository: Utilisateur récupéré = $user")
-                return user
-            } else {
-                println("DEBUG - LoginRepository: Code HTTP non OK = ${response.status}")
+                return json.decodeFromString(User.serializer(), response.bodyAsText())
             }
         } catch (e: Exception) {
-            println("DEBUG - LoginRepository: Exception capturée = ${e.message}")
+            println("Erreur dans LoginRepository : ${e.message}")
         }
         return null
     }
