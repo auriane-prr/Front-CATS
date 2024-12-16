@@ -4,9 +4,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class User(
-    val id: String,
     val mail: String,
-    val motDePasse: String,
     val role: String,
-    val voitures: List<String>
-)
+    val voitures: List<String>? = null,
+    val motDePasse: String? = null
+) {
+
+    fun isAdmin(): Boolean {
+        return role == "Admin"
+    }
+}

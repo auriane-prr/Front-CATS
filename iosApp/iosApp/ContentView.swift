@@ -12,7 +12,7 @@ struct ContentView: View {
     private let loginViewModelFactory: LoginViewModelFactory
 
     init() {
-        let repository = LoginRepository() // Instanciation du LoginRepository partagé
+        let repository = LoginRepository()
         self.loginViewModelFactory = LoginViewModelFactory(repository: repository)
     }
 

@@ -6,9 +6,8 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
 }
 
-
 kotlin {
-    android {
+    androidTarget { // Utilise androidTarget
         compilations.all {
             compileTaskProvider.configure {
                 compilerOptions {
@@ -36,7 +35,12 @@ kotlin {
                 implementation(kotlin("stdlib"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.0")
-                implementation(libs.kotlinx.serialization.json) // Ajout de kotlinx-serialization-json
+                implementation(libs.kotlinx.serialization.json)
+                implementation("io.ktor:ktor-client-core:2.3.0")
+                implementation("io.ktor:ktor-client-json:2.3.0")
+                implementation("io.ktor:ktor-client-content-negotiation:2.3.0")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.0")
+                implementation("io.ktor:ktor-client-logging:2.3.0")
             }
         }
         val commonTest by getting {
@@ -48,14 +52,16 @@ kotlin {
             dependencies {
                 implementation(libs.androidx.navigation.common)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
-                implementation(libs.kotlinx.serialization.json) // Ajout pour Android
+                implementation(libs.kotlinx.serialization.json)
+                implementation("io.ktor:ktor-client-okhttp:2.3.0")
             }
         }
         val androidUnitTest by getting
+
         val iosMain by creating {
             dependsOn(commonMain)
             dependencies {
-                implementation(libs.kotlinx.serialization.json) // Ajout pour iOS
+                implementation(libs.kotlinx.serialization.json)
             }
         }
         val iosArm64Main by getting {
@@ -66,7 +72,6 @@ kotlin {
         }
     }
 }
-
 
 android {
     namespace = "com.pfe.maborneapp"
@@ -79,7 +84,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
-
 
 tasks.register("assembleXCFramework") {
     dependsOn("linkDebugFrameworkIosArm64", "linkDebugFrameworkIosSimulatorArm64", "build")

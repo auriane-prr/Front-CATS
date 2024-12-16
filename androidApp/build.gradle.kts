@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlinSerialization) // Plugin pour Kotlin Serialization
 }
 
 android {
@@ -51,20 +52,35 @@ android {
 }
 
 dependencies {
+    // Projet partagé (Shared module)
     implementation(projects.shared)
+
+    // Compose
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     implementation(libs.androidx.activity.compose)
     debugImplementation(libs.compose.ui.tooling)
 
-    // Ajout des dépendances nécessaires
-    implementation(project(":shared"))
+    // Navigation
     implementation("androidx.navigation:navigation-compose:2.6.0")
+
+    // ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+
+    // Core KTX
     implementation("androidx.core:core-ktx:1.12.0")
+
+    // Tests
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    // Ktor client (pour Android)
+    implementation("io.ktor:ktor-client-core:2.3.0")
+    implementation("io.ktor:ktor-client-okhttp:2.3.0") // Utilise OkHttp pour les requêtes HTTP
+    implementation("io.ktor:ktor-client-logging:2.3.0") // Logs des requêtes
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.0") // Plugin pour JSON
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.0") // Kotlinx JSON Serialization
 }
