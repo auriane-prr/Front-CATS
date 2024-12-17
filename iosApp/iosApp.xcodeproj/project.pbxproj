@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8C50995C2D10673000813F4B /* shared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C50995B2D10673000813F4B /* shared.xcframework */; };
-		8C50995D2D10673000813F4B /* shared.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8C50995B2D10673000813F4B /* shared.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		8CB2A0692D1192C600067B1C /* shared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CB2A0682D1192C600067B1C /* shared.xcframework */; };
+		8CB2A06A2D1192C600067B1C /* shared.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8CB2A0682D1192C600067B1C /* shared.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,7 +35,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				8C50995D2D10673000813F4B /* shared.xcframework in Embed Frameworks */,
+				8CB2A06A2D1192C600067B1C /* shared.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -43,15 +43,28 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		8C50995B2D10673000813F4B /* shared.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = shared.xcframework; path = ../shared/build/xcframework/shared.xcframework; sourceTree = "<group>"; };
 		8C9A27852D0B2F2000228F43 /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C9A27952D0B2F2200228F43 /* iosAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C9A279F2D0B2F2200228F43 /* iosAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8CB2A0682D1192C600067B1C /* shared.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = shared.xcframework; path = ../shared/build/xcframework/shared.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		8CB2A06C2D11950300067B1C /* Exceptions for "iosApp" folder in "iosApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 8C9A27842D0B2F2000228F43 /* iosApp */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		8C9A27872D0B2F2000228F43 /* iosApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				8CB2A06C2D11950300067B1C /* Exceptions for "iosApp" folder in "iosApp" target */,
+			);
 			path = iosApp;
 			sourceTree = "<group>";
 		};
@@ -72,7 +85,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8C50995C2D10673000813F4B /* shared.xcframework in Frameworks */,
+				8CB2A0692D1192C600067B1C /* shared.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -117,7 +130,7 @@
 		8C9A27B22D0B2FC400228F43 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				8C50995B2D10673000813F4B /* shared.xcframework */,
+				8CB2A0682D1192C600067B1C /* shared.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -430,6 +443,7 @@
 				DEVELOPMENT_TEAM = AHJK582Z2S;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iosApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -459,6 +473,7 @@
 				DEVELOPMENT_TEAM = AHJK582Z2S;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iosApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

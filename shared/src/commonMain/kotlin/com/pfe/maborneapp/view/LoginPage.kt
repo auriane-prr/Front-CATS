@@ -1,6 +1,6 @@
-package com.pfe.maborneapp.android.view
+package com.pfe.maborneapp.view
 
-import android.util.Log
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -8,13 +8,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.pfe.maborneapp.android.viewmodel.LoginViewModel
-import com.pfe.maborneapp.android.viewmodel.factories.LoginViewModelFactory
+import com.pfe.maborneapp.viewmodel.LoginViewModel
+import com.pfe.maborneapp.viewmodel.factories.LoginViewModelFactory
 import io.ktor.client.*
 
 @Composable
-fun LoginPage(navController: NavHostController, client: HttpClient) {
-    Log.e("DEBUG", "LoginPage: Composable affiché")
+fun LoginPage(navController: NavHostController) {
+    println("DEBUG, LoginPage: Composable affiché")
 
     val viewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory())
 
@@ -22,12 +22,12 @@ fun LoginPage(navController: NavHostController, client: HttpClient) {
     val loginMessage by viewModel.loginMessage.collectAsState()
     val userRole by viewModel.userRole.collectAsState()
 
-    Log.e("DEBUG", "LoginPage: loginMessage=$loginMessage, userRole=$userRole")
+    println("DEBUG,LoginPage: loginMessage=$loginMessage, userRole=$userRole")
 
     LaunchedEffect(userRole) {
         if (userRole.isNotEmpty()) {
             val route = if (userRole == "Admin") "adminHome" else "userHome"
-            Log.e("DEBUG", "LoginPage: Navigation vers $route")
+            println("DEBUG,LoginPage: Navigation vers $route")
             navController.navigate(route) {
                 popUpTo("login") { inclusive = true }
             }
@@ -52,7 +52,7 @@ fun LoginPage(navController: NavHostController, client: HttpClient) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
-                        Log.e("DEBUG", "LoginPage: Bouton cliqué, mail=$mail")
+                        println("DEBUG, LoginPage: Bouton cliqué, mail=$mail")
                         viewModel.login(mail)
                     },
                     modifier = Modifier.fillMaxWidth(),

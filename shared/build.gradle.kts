@@ -1,9 +1,11 @@
+import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.compose.compiler)
 }
 
 kotlin {
@@ -30,9 +32,8 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {
+        @OptIn(ExperimentalComposeLibrary::class) val commonMain by getting {
             dependencies {
-                implementation(kotlin("stdlib"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.0")
                 implementation(libs.kotlinx.serialization.json)
@@ -41,6 +42,15 @@ kotlin {
                 implementation("io.ktor:ktor-client-content-negotiation:2.3.0")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.0")
                 implementation("io.ktor:ktor-client-logging:2.3.0")
+
+                implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
+                implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
+
+                implementation(compose.foundation)
+                implementation(compose.material3)
+                implementation(compose.ui)
+                implementation(compose.materialIconsExtended)
+                implementation(compose.components.resources)
             }
         }
         val commonTest by getting {
@@ -54,25 +64,29 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
                 implementation(libs.kotlinx.serialization.json)
                 implementation("io.ktor:ktor-client-okhttp:2.3.0")
+
             }
         }
-        val androidUnitTest by getting
 
+        val iosArm64Main by getting
+        val iosSimulatorArm64Main by getting
         val iosMain by creating {
             dependsOn(commonMain)
+            iosArm64Main.dependsOn(this)
+            iosSimulatorArm64Main.dependsOn(this)
             dependencies {
                 implementation(libs.kotlinx.serialization.json)
                 implementation("io.ktor:ktor-client-darwin:2.3.0") // Client HTTP pour iOS
             }
         }
-
+/*
         val iosArm64Main by getting {
             dependsOn(iosMain)
         }
 
         val iosSimulatorArm64Main by getting {
             dependsOn(iosMain)
-        }
+        }*/
     }
 }
 
@@ -86,6 +100,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+}
+dependencies {
+    implementation(libs.androidx.navigation.runtime.ktx)
 }
 
 tasks.register("assembleXCFramework") {

@@ -1,4 +1,4 @@
-package org.pfe.maborne
+package com.pfe.maborneapp
 
 import androidx.compose.ui.window.ComposeUIViewController
 
