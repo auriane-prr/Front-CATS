@@ -14,9 +14,13 @@ class LoginViewModel(private val repository: LoginRepository) : ViewModel() {
     private val _userRole = MutableStateFlow("")
     val userRole: StateFlow<String> = _userRole
 
+    private val _isLoading = MutableStateFlow(false) // Loader ajouté ici
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     fun login(email: String) {
-        println("DEBUG,LoginViewModel: Début de login avec email=$email")
+        println("DEBUG, LoginViewModel: Début de login avec email=$email")
         viewModelScope.launch {
+            _isLoading.value = true // Activer le loader
             try {
                 val user = repository.login(email)
                 if (user != null) {
@@ -30,6 +34,8 @@ class LoginViewModel(private val repository: LoginRepository) : ViewModel() {
             } catch (e: Exception) {
                 println("DEBUG, LoginViewModel: Exception capturée - ${e.message}")
                 _loginMessage.value = "Erreur : ${e.message}"
+            } finally {
+                _isLoading.value = false // Désactiver le loader
             }
         }
     }

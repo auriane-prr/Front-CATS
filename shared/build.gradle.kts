@@ -33,6 +33,7 @@ kotlin {
 
     sourceSets {
         @OptIn(ExperimentalComposeLibrary::class) val commonMain by getting {
+            resources.srcDirs("src/commonMain/resources")
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.0")
@@ -59,6 +60,7 @@ kotlin {
             }
         }
         val androidMain by getting {
+            resources.srcDirs("src/commonMain/resources")
             dependencies {
                 implementation(libs.androidx.navigation.common)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
@@ -72,6 +74,7 @@ kotlin {
         val iosSimulatorArm64Main by getting
         val iosMain by creating {
             dependsOn(commonMain)
+            resources.srcDirs("src/commonMain/resources")
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
@@ -79,14 +82,10 @@ kotlin {
                 implementation("io.ktor:ktor-client-darwin:2.3.0") // Client HTTP pour iOS
             }
         }
-/*
-        val iosArm64Main by getting {
-            dependsOn(iosMain)
-        }
+    }
 
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
-        }*/
+    tasks.withType<Copy> {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 }
 
