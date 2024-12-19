@@ -32,7 +32,7 @@ fun LoginPage(navController: NavHostController) {
 
     LaunchedEffect(userRole) {
         if (userRole.isNotEmpty()) {
-            val route = if (userRole == "Admin") "adminHome" else "userHome"
+            val route = if (userRole == "Admin") "adminHome" else "userHome/$mail"
             println("DEBUG,LoginPage: Navigation vers $route")
             navController.navigate(route) {
                 popUpTo("login") { inclusive = true }

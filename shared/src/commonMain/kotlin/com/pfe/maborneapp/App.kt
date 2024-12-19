@@ -6,9 +6,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.pfe.maborneapp.android.view.admin.AdminHomePage
-import com.pfe.maborneapp.android.view.user.UserHomePage
+import com.pfe.maborneapp.view.admin.AdminHomePage
+import com.pfe.maborneapp.view.user.UserHomePage
 import com.pfe.maborneapp.view.LoginPage
+import com.pfe.maborneapp.view.user.ReservationPage
+import com.pfe.maborneapp.view.user.ProfilPage
 
 
 @Composable
@@ -27,6 +29,18 @@ fun AppNavigation(navController: NavHostController) {
     NavHost(navController, startDestination = "login") {
         composable("login") { LoginPage(navController) }
         composable("adminHome") { AdminHomePage() }
-        composable("userHome") { UserHomePage() }
+        composable("userHome/{email}") { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            UserHomePage(navController, email)
+        }
+        composable("reservations/{email}") { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            ReservationPage(navController, email)
+        }
+        composable("profil/{email}") { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            ProfilPage(navController, email)
+        }
+
     }
 }

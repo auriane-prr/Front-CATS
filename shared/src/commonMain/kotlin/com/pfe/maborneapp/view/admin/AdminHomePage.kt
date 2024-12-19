@@ -1,4 +1,4 @@
-package com.pfe.maborneapp.android.view.admin
+package com.pfe.maborneapp.view.admin
 
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.Text
