@@ -9,6 +9,6 @@ object ImageProvider {
     @OptIn(ExperimentalResourceApi::class)
     @Composable
     fun loadLogo(): Painter {
-        return painterResource("logo.png")
+        return painterResource("images/logo.png")
     }
 }

@@ -1,21 +1,20 @@
-package com.pfe.maborneapp.viewmodel.factories
+package com.pfe.maborneapp.viewmodel.factories.user
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.pfe.maborneapp.utils.HttpClientFactoryImpl
-import com.pfe.maborneapp.viewmodel.LoginViewModel
-import com.pfe.maborneapp.repositories.LoginRepository
+import com.pfe.maborneapp.repositories.CarteRepository
+import com.pfe.maborneapp.viewmodel.user.CarteViewModel
 import kotlin.reflect.KClass
 
-
-class LoginViewModelFactory : ViewModelProvider.Factory {
+class CarteViewModelFactory : ViewModelProvider.Factory {
     private val client = HttpClientFactoryImpl().create() // Création du client via la factory
 
     override fun <T : ViewModel> create(modelClass: KClass<T>, extras: CreationExtras): T {
-        if (modelClass == LoginViewModel::class) {
-            return LoginViewModel(LoginRepository(client)) as T
+        if (modelClass == CarteViewModel::class) {
+            return CarteViewModel(CarteRepository(client)) as T
         }
-            throw IllegalArgumentException("Unknown ViewModel")
+        throw IllegalArgumentException("Unknown ViewModel")
     }
 }

@@ -4,8 +4,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,21 +11,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.compose.ui.zIndex
-import com.pfe.maborneapp.view.user.components.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pfe.maborneapp.models.Carte
+import com.pfe.maborneapp.view.user.components.NetworkImage
+import com.pfe.maborneapp.viewmodel.user.CarteViewModel
+import com.pfe.maborneapp.viewmodel.factories.user.CarteViewModelFactory
+import com.pfe.maborneapp.view.user.components.Menu
 
 @Composable
 fun UserHomePage(navController: NavHostController, userEmail: String) {
+    // Initialisation du ViewModel avec la factory
+    val carteViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
+    val cartes by carteViewModel.cartes.collectAsState()
+    val selectedCarteImageUrl by carteViewModel.selectedCarteImageUrl.collectAsState()
 
-    val cities = listOf("CA - Montpellier Sud", "CA - Lyon Centre", "CA - Paris Nord")
-    var isMenuOpen by remember { mutableStateOf(false) }
     val greenColor = Color(0xFF045C3C)
+    var isMenuOpen by remember { mutableStateOf(false) }
+    var selectedCarteId by remember { mutableStateOf("") }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         content = { padding ->
-            Box {
-                // Contenu principal
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
                 Column(
                     modifier = Modifier
                         .padding(padding)
@@ -45,31 +52,54 @@ fun UserHomePage(navController: NavHostController, userEmail: String) {
                             text = "Bonjour $userEmail",
                             style = MaterialTheme.typography.titleLarge,
                             color = greenColor,
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                    modifier = Modifier
+                                    .padding(horizontal = 16.dp, vertical = 8.dp)
                         )
                     }
 
-                    // Sélecteur de ville
-                    DropdownMenu(cities = cities)
-
-                    // Rectangle pour la carte
                     Spacer(modifier = Modifier.height(16.dp))
+
+                    // Dropdown Menu pour sélectionner une carte
+                    CarteDropdownMenu(
+                        cartes = cartes,
+                        selectedCarteId = selectedCarteId,
+                        onCarteSelected = { carteId ->
+                            selectedCarteId = carteId
+                            carteViewModel.selectCarte(carteId) // Met à jour l'image sélectionnée
+                        }
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Affichage de l'image de la carte sélectionnée
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(300.dp)
+                            .height(400.dp)
                             .background(Color.LightGray, RoundedCornerShape(16.dp)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "Carte à venir",
-                            color = Color.Gray
-                        )
+                        if (selectedCarteImageUrl != null) {
+                            NetworkImage(
+                                imageUrl = selectedCarteImageUrl,
+                                contentDescription = "Carte Image",
+                                modifier = Modifier
+                                    .width(300.dp) // Taille fixe pour tester
+                                    .height(200.dp)
+                            )
+
+                        } else {
+                            Text(
+                                text = "Sélectionnez une carte",
+                                color = Color.Gray
+                            )
+                        }
                     }
 
-                    // Rectangle pour les légendes
+
                     Spacer(modifier = Modifier.height(16.dp))
+
+                    // Rectangle pour les légendes
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -98,10 +128,12 @@ fun UserHomePage(navController: NavHostController, userEmail: String) {
 }
 
 @Composable
-fun DropdownMenu(cities: List<String>) {
+fun CarteDropdownMenu(
+    cartes: List<Carte>, // Liste des cartes récupérées
+    selectedCarteId: String, // ID de la carte sélectionnée
+    onCarteSelected: (String) -> Unit // Callback pour gérer la sélection d'une carte
+) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedCity by remember { mutableStateOf(cities.first()) }
-
     val greenColor = Color(0xFF045C3C)
 
     Box(
@@ -118,17 +150,19 @@ fun DropdownMenu(cities: List<String>) {
             ),
             border = BorderStroke(1.dp, greenColor)
         ) {
-            Text(text = selectedCity, color = greenColor)
+            val selectedCarteName = cartes.find { it.id == selectedCarteId }?.nom ?: "Sélectionnez une carte"
+            Text(text = selectedCarteName, color = greenColor)
         }
+
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            cities.forEach { city ->
+            cartes.forEach { carte ->
                 DropdownMenuItem(
-                    text = { Text(city) },
+                    text = { Text(carte.nom) },
                     onClick = {
-                        selectedCity = city
+                        onCarteSelected(carte.id)
                         expanded = false
                     }
                 )

@@ -47,6 +47,11 @@ kotlin {
                 implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
                 implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
 
+                implementation("org.jetbrains.skiko:skiko:0.7.75")
+                implementation("org.jetbrains.compose.foundation:foundation:1.5.0")
+                implementation("org.jetbrains.compose.ui:ui-graphics:1.5.0")
+
+
                 implementation(compose.foundation)
                 implementation(compose.material3)
                 implementation(compose.ui)
@@ -79,7 +84,8 @@ kotlin {
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
                 implementation(libs.kotlinx.serialization.json)
-                implementation("io.ktor:ktor-client-darwin:2.3.0") // Client HTTP pour iOS
+                implementation("io.ktor:ktor-client-darwin:2.3.0")
+
             }
         }
     }
@@ -102,6 +108,7 @@ android {
 }
 dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.ui.graphics.android)
 }
 
 tasks.register("assembleXCFramework") {
