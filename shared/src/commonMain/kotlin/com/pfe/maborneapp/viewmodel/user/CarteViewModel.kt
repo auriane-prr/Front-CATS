@@ -47,5 +47,3 @@ class CarteViewModel(private val repository: CarteRepository) : ViewModel() {
     }
 
 }
-
-

@@ -37,16 +37,11 @@ fun NetworkImage(imageUrl: String?, contentDescription: String, modifier: Modifi
         }
 
         if (imageBitmap != null) {
-            Box(
-                modifier = modifier
-                    .background(Color.Red) // Couleur pour tester l'espace
-            ) {
-                Image(
-                    bitmap = imageBitmap!!,
-                    contentDescription = contentDescription,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
+            Image(
+                bitmap = imageBitmap!!,
+                contentDescription = contentDescription,
+                modifier = Modifier.fillMaxSize()
+            )
         } else {
             Box(
                 contentAlignment = Alignment.Center,
