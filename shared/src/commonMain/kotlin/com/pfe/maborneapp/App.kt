@@ -10,6 +10,8 @@ import com.pfe.maborneapp.utils.HttpClientFactoryImpl
 import com.pfe.maborneapp.view.admin.AdminHomePage
 import com.pfe.maborneapp.view.user.UserHomePage
 import com.pfe.maborneapp.view.LoginPage
+import com.pfe.maborneapp.view.admin.AdminSignalementPage
+import com.pfe.maborneapp.view.admin.AdminStatistiquePage
 import com.pfe.maborneapp.view.user.ReservationPage
 import com.pfe.maborneapp.view.user.ProfilPage
 
@@ -29,7 +31,10 @@ fun AppNavigation(navController: NavHostController) {
     println("DEBUG, AppNavigation: Chargement de la navigation")
     NavHost(navController, startDestination = "login") {
         composable("login") { LoginPage(navController) }
-        composable("adminHome") { AdminHomePage() }
+        // Pages Admin
+        composable("adminHome") { AdminHomePage(navController) }
+        composable("adminSignalement") { AdminSignalementPage(navController) }
+        composable("adminStatistique") { AdminStatistiquePage(navController) }
         composable("userHome/{email}") { backStackEntry ->
             val email = backStackEntry.arguments?.getString("email") ?: ""
             UserHomePage(navController, email)
