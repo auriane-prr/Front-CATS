@@ -69,7 +69,7 @@ fun UserHomePage(navController: NavHostController, userEmail: String) {
                         contentDescription = "Carte Image",
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f) // Prend tout l'espace vertical restant
+                            .fillMaxHeight(0.7f) // Utilisez un ratio fixe pour donner 70% de la hauteur de l'écran à l'image
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))

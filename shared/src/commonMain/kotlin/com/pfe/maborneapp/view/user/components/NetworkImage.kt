@@ -38,24 +38,18 @@ fun NetworkImage(imageUrl: String?, contentDescription: String, modifier: Modifi
         }
 
         imageBitmap?.let {
-            val aspectRatio = it.width.toFloat() / it.height.toFloat()
-            println("DEBUG, Rendu de l'image avec aspectRatio : $aspectRatio")
-
             Box(
                 modifier = modifier
-                    .fillMaxWidth()
-                    .aspectRatio(aspectRatio),
+                    .fillMaxWidth() // Occupe toute la largeur de l'écran
+                    .aspectRatio(it.width.toFloat() / it.height.toFloat()), // Maintient le ratio original
                 contentAlignment = Alignment.Center
             ) {
                 Image(
                     bitmap = it,
                     contentDescription = contentDescription,
-                    modifier = Modifier
-                        .fillMaxWidth() // Occupe toute la largeur de l'écran
-                        .aspectRatio(1f), // Ajustez l'aspect ratio si nécessaire
-                    contentScale = ContentScale.Fit // Permet à l'image de s'adapter sans être coupée
+                    modifier = Modifier.fillMaxWidth(),
+                    contentScale = ContentScale.Fit // S'assure que l'image est affichée en entier
                 )
-
             }
         } ?: run {
             Box(

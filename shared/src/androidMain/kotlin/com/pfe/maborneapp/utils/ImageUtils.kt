@@ -9,13 +9,10 @@ import java.io.InputStream
 import java.net.URL
 
 actual suspend fun loadImageBitmap(url: String): ImageBitmap {
-    println("DEBUG, loadImageBitmap - Début du téléchargement global : ${System.currentTimeMillis()}")
+    println("DEBUG, loadImageBitmap - Début du téléchargement de l'image")
 
-    // Variable pour mesurer le temps de téléchargement
-    val startTime = System.currentTimeMillis()
-
-    // Utilisation de withContext(Dispatchers.IO) pour gérer les opérations bloquantes
-    val inputStream: InputStream? = withContext(Dispatchers.IO) {
+    // Téléchargement de l'image en utilisant un flux
+    val inputStream: InputStream = withContext(Dispatchers.IO) {
         try {
             URL(url).openStream()
         } catch (e: Exception) {
@@ -24,30 +21,23 @@ actual suspend fun loadImageBitmap(url: String): ImageBitmap {
         }
     }
 
-    // Log de la durée du téléchargement
-    println("DEBUG, Temps de téléchargement : ${System.currentTimeMillis() - startTime} ms")
-
     return try {
-        val options = BitmapFactory.Options().apply {
-            inSampleSize = 2 // Divise la résolution par 2
-        }
-        // Décodage de l'image en bitmap
-        val bitmap = BitmapFactory.decodeStream(inputStream, null, options)
+        // Décodage de l'image sans redimensionnement
+        val bitmap = BitmapFactory.decodeStream(inputStream)
         if (bitmap == null || bitmap.width == 0 || bitmap.height == 0) {
             throw Exception("Bitmap invalide ou vide après le téléchargement")
         }
-        println("DEBUG, Dimensions de l'image : ${bitmap.width}x${bitmap.height}")
-        println("DEBUG, loadImageBitmap - Fin du téléchargement global : ${System.currentTimeMillis()}")
+        println("DEBUG, Dimensions de l'image téléchargée : ${bitmap.width}x${bitmap.height}")
 
-        // Conversion en ImageBitmap
+        // Conversion en ImageBitmap pour Jetpack Compose
         bitmap.asImageBitmap()
     } catch (e: Exception) {
         println("Erreur dans loadImageBitmap : ${e.message}")
         throw e
     } finally {
-        // Fermeture du InputStream dans le contexte IO
+        // Fermeture du InputStream
         withContext(Dispatchers.IO) {
-            inputStream?.close()
+            inputStream.close()
         }
         println("DEBUG, InputStream fermé.")
     }
