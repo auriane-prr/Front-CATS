@@ -26,7 +26,6 @@ class LoginViewModel(private val repository: LoginRepository) : ViewModel() {
                 if (user != null) {
                     println("DEBUG, LoginViewModel: Utilisateur récupéré - $user")
                     _userRole.value = if (user.isAdmin()) "Admin" else "User"
-                    _loginMessage.value = "Connexion réussie !"
                 } else {
                     println("DEBUG, LoginViewModel: Échec de connexion, utilisateur null")
                     _loginMessage.value = "Email incorrect ou erreur serveur."
