@@ -40,16 +40,16 @@ fun NetworkImage(imageUrl: String?, contentDescription: String, modifier: Modifi
         imageBitmap?.let {
             Box(
                 modifier = modifier
-                    .fillMaxWidth() // Occupe toute la largeur de l'écran
-                    .aspectRatio(it.width.toFloat() / it.height.toFloat()), // Maintient le ratio original
+                    .fillMaxWidth(), // Occupe toute la largeur de l'écran
                 contentAlignment = Alignment.Center
             ) {
                 Image(
                     bitmap = it,
                     contentDescription = contentDescription,
-                    modifier = Modifier.fillMaxWidth(),
-                    contentScale = ContentScale.Fit // S'assure que l'image est affichée en entier
+                    modifier = Modifier.fillMaxSize(), // Ajustez la taille en fonction de vos besoins
+                    contentScale = ContentScale.Fit // Affiche l'image telle quelle, sans redimensionnement
                 )
+
             }
         } ?: run {
             Box(

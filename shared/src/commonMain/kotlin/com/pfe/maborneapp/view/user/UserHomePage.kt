@@ -25,6 +25,8 @@ fun UserHomePage(navController: NavHostController, userEmail: String) {
 
     val greenColor = Color(0xFF045C3C)
 
+    var isMenuOpen by remember { mutableStateOf(false) }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         content = {
@@ -69,7 +71,7 @@ fun UserHomePage(navController: NavHostController, userEmail: String) {
                         contentDescription = "Carte Image",
                         modifier = Modifier
                             .fillMaxWidth()
-                            .fillMaxHeight(0.7f) // Utilisez un ratio fixe pour donner 70% de la hauteur de l'écran à l'image
+                            .fillMaxSize()
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -93,8 +95,8 @@ fun UserHomePage(navController: NavHostController, userEmail: String) {
                 // Menu avec gestion de l'icône
                 Menu(
                     navController = navController,
-                    isMenuOpen = false,
-                    onToggleMenu = {},
+                    isMenuOpen = isMenuOpen,
+                    onToggleMenu = { isMenuOpen = !isMenuOpen },
                     currentPage = "home",
                     userEmail = userEmail
                 )
