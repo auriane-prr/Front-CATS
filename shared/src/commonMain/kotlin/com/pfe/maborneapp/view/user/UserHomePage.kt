@@ -65,19 +65,19 @@ fun UserHomePage(navController: NavHostController, userEmail: String) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Affichage de l'image de la carte par défaut
                     NetworkImage(
                         imageUrl = selectedCarteImageUrl,
                         contentDescription = "Carte Image",
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxSize()
+                            .fillMaxWidth() // Largeur maximale avec padding
+                            .padding(horizontal = 16.dp) // Ajout d'un padding
                     )
+
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     /*
-                    // Rectangle pour les légendes
+                    // Rectangle pour les bornes
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -86,7 +86,7 @@ fun UserHomePage(navController: NavHostController, userEmail: String) {
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Légendes à venir",
+                            text = "Bornes à venir",
                             color = Color.Gray
                         )
                     }*/

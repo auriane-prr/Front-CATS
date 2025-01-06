@@ -1,5 +1,6 @@
 package com.pfe.maborneapp.utils
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -11,34 +12,51 @@ import java.net.URL
 actual suspend fun loadImageBitmap(url: String): ImageBitmap {
     println("DEBUG, loadImageBitmap - Début du téléchargement de l'image")
 
-    // Téléchargement de l'image en utilisant un flux
-    val inputStream: InputStream = withContext(Dispatchers.IO) {
+    // Téléchargement et redimensionnement de l'image
+    return withContext(Dispatchers.IO) {
+        val inputStream: InputStream = URL(url).openStream()
         try {
-            URL(url).openStream()
-        } catch (e: Exception) {
-            println("Erreur lors de l'ouverture du flux : ${e.message}")
-            throw e
-        }
-    }
+            // Options pour redimensionner
+            val options = BitmapFactory.Options().apply {
+                inJustDecodeBounds = true // Ne charge que les dimensions
+            }
+            BitmapFactory.decodeStream(inputStream, null, options)
 
-    return try {
-        // Décodage de l'image sans redimensionnement
-        val bitmap = BitmapFactory.decodeStream(inputStream)
-        if (bitmap == null || bitmap.width == 0 || bitmap.height == 0) {
-            throw Exception("Bitmap invalide ou vide après le téléchargement")
-        }
-        println("DEBUG, Dimensions de l'image téléchargée : ${bitmap.width}x${bitmap.height}")
+            // Dimensions cibles pour le redimensionnement
+            val targetWidth = 1024
+            val targetHeight = 1024
+            options.inSampleSize = calculateInSampleSize(options, targetWidth, targetHeight)
+            options.inJustDecodeBounds = false // Charger l'image complète
 
-        // Conversion en ImageBitmap pour Jetpack Compose
-        bitmap.asImageBitmap()
-    } catch (e: Exception) {
-        println("Erreur dans loadImageBitmap : ${e.message}")
-        throw e
-    } finally {
-        // Fermeture du InputStream
-        withContext(Dispatchers.IO) {
+            val resizedBitmap = BitmapFactory.decodeStream(URL(url).openStream(), null, options)
+                ?: throw Exception("Bitmap non valide ou introuvable")
+            println("DEBUG, Dimensions redimensionnées : ${resizedBitmap.width}x${resizedBitmap.height}")
+
+            resizedBitmap.asImageBitmap()
+        } finally {
             inputStream.close()
         }
-        println("DEBUG, InputStream fermé.")
     }
+}
+
+// Calcul de l'échantillonnage pour redimensionner
+private fun calculateInSampleSize(
+    options: BitmapFactory.Options,
+    reqWidth: Int,
+    reqHeight: Int
+): Int {
+    val (height: Int, width: Int) = options.outHeight to options.outWidth
+    var inSampleSize = 1
+
+    if (height > reqHeight || width > reqWidth) {
+        val halfHeight = height / 2
+        val halfWidth = width / 2
+
+        // Réduction de l'image tant qu'elle dépasse les dimensions cibles
+        while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
+            inSampleSize *= 2
+        }
+    }
+    println("DEBUG, inSampleSize calculé : $inSampleSize")
+    return inSampleSize
 }
