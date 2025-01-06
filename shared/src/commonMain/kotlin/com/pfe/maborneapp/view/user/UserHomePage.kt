@@ -1,6 +1,8 @@
 package com.pfe.maborneapp.view.user
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -10,14 +12,20 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pfe.maborneapp.view.components.NetworkImage
+import com.pfe.maborneapp.view.user.components.BorneList
 import com.pfe.maborneapp.viewmodel.CarteViewModel
 import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
 import com.pfe.maborneapp.view.user.components.Menu
+import com.pfe.maborneapp.viewmodel.factories.user.BorneViewModelFactory
+import com.pfe.maborneapp.viewmodel.user.BorneViewModel
 
 @Composable
 fun UserHomePage(navController: NavHostController, userEmail: String) {
     val carteViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
     val selectedCarteImageUrl by carteViewModel.selectedCarteImageUrl.collectAsState()
+
+    val borneViewModel: BorneViewModel = viewModel(factory = BorneViewModelFactory())
+    val bornes by borneViewModel.bornes.collectAsState()
 
     val greenColor = Color(0xFF045C3C)
 
@@ -38,7 +46,7 @@ fun UserHomePage(navController: NavHostController, userEmail: String) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                            .padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
@@ -72,20 +80,11 @@ fun UserHomePage(navController: NavHostController, userEmail: String) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    /*
-                    // Rectangle pour les bornes
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(100.dp)
-                            .background(Color.LightGray, RoundedCornerShape(16.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Bornes à venir",
-                            color = Color.Gray
-                        )
-                    }*/
+                    bornes?.let {
+                        BorneList(bornes = it)
+                    } ?: run {
+                        Text(text = "Chargement des bornes...")
+                    }
                 }
 
                 // Menu avec gestion de l'icône
