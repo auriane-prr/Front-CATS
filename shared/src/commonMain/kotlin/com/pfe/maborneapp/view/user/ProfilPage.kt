@@ -1,20 +1,12 @@
 package com.pfe.maborneapp.view.user
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.compose.ui.zIndex
-import com.pfe.maborneapp.view.user.components.*
+import com.pfe.maborneapp.view.user.components.Menu
 
 @Composable
 fun ProfilPage(navController: NavHostController, userEmail: String) {

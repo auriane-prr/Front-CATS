@@ -1,8 +1,7 @@
-package com.pfe.maborneapp.viewmodel.user
+package com.pfe.maborneapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pfe.maborneapp.models.Carte
 import com.pfe.maborneapp.repositories.CarteRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

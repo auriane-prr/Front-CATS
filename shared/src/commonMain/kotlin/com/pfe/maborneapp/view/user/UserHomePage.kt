@@ -1,9 +1,6 @@
 package com.pfe.maborneapp.view.user
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -12,10 +9,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.pfe.maborneapp.models.Carte
-import com.pfe.maborneapp.view.user.components.NetworkImage
-import com.pfe.maborneapp.viewmodel.user.CarteViewModel
-import com.pfe.maborneapp.viewmodel.factories.user.CarteViewModelFactory
+import com.pfe.maborneapp.view.components.NetworkImage
+import com.pfe.maborneapp.viewmodel.CarteViewModel
+import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
 import com.pfe.maborneapp.view.user.components.Menu
 
 @Composable

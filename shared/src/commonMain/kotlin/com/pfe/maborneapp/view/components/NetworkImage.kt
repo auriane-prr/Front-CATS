@@ -1,4 +1,4 @@
-package com.pfe.maborneapp.view.user.components
+package com.pfe.maborneapp.view.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
