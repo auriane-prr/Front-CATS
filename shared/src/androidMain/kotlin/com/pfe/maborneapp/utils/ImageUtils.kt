@@ -1,6 +1,6 @@
 package com.pfe.maborneapp.utils
 
-import android.graphics.Bitmap
+import android.content.Context
 import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -9,35 +9,44 @@ import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.net.URL
 
+lateinit var appContext: Context // Fournir le contexte de l'application
+
 actual suspend fun loadImageBitmap(url: String): ImageBitmap {
-    println("DEBUG, loadImageBitmap - Début du téléchargement de l'image")
+    println("DEBUG, loadImageBitmap - Chargement de l'image : $url")
 
-    // Téléchargement et redimensionnement de l'image
     return withContext(Dispatchers.IO) {
-        val inputStream: InputStream = URL(url).openStream()
-        try {
-            // Options pour redimensionner
-            val options = BitmapFactory.Options().apply {
-                inJustDecodeBounds = true // Ne charge que les dimensions
-            }
-            BitmapFactory.decodeStream(inputStream, null, options)
-
-            // Dimensions cibles pour le redimensionnement
-            val targetWidth = 1024
-            val targetHeight = 1024
-            options.inSampleSize = calculateInSampleSize(options, targetWidth, targetHeight)
-            options.inJustDecodeBounds = false // Charger l'image complète
-
-            val resizedBitmap = BitmapFactory.decodeStream(URL(url).openStream(), null, options)
-                ?: throw Exception("Bitmap non valide ou introuvable")
-            println("DEBUG, Dimensions redimensionnées : ${resizedBitmap.width}x${resizedBitmap.height}")
-
-            resizedBitmap.asImageBitmap()
-        } finally {
+        if (url.startsWith("res://")) {
+            // Chargement depuis les ressources partagées (assets)
+            val resourceName = url.removePrefix("res://")
+            val inputStream = appContext.assets.open("images/logo.png")
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+                ?: throw Exception("Ressource introuvable : $resourceName")
             inputStream.close()
+            bitmap.asImageBitmap()
+        } else {
+            // Logique existante pour charger depuis le backend
+            val inputStream: InputStream = URL(url).openStream()
+            try {
+                val options = BitmapFactory.Options().apply {
+                    inJustDecodeBounds = true
+                }
+                BitmapFactory.decodeStream(inputStream, null, options)
+
+                val targetWidth = 1024
+                val targetHeight = 1024
+                options.inSampleSize = calculateInSampleSize(options, targetWidth, targetHeight)
+                options.inJustDecodeBounds = false
+
+                val resizedBitmap = BitmapFactory.decodeStream(URL(url).openStream(), null, options)
+                    ?: throw Exception("Bitmap non valide ou introuvable")
+                resizedBitmap.asImageBitmap()
+            } finally {
+                inputStream.close()
+            }
         }
     }
 }
+
 
 // Calcul de l'échantillonnage pour redimensionner
 private fun calculateInSampleSize(
