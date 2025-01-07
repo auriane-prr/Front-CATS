@@ -10,7 +10,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.pfe.maborneapp.view.admin.components.AdminMenu
 import com.pfe.maborneapp.view.admin.components.SignalementList
-import com.pfe.maborneapp.viewmodel.admin.SignalementViewModel
+import com.pfe.maborneapp.viewmodel.SignalementViewModel
 import com.pfe.maborneapp.viewmodel.factories.SignalementViewModelFactory
 
 @Composable

@@ -1,8 +1,6 @@
 package com.pfe.maborneapp.view.user
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,12 +14,12 @@ import com.pfe.maborneapp.view.user.components.BorneList
 import com.pfe.maborneapp.viewmodel.CarteViewModel
 import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
 import com.pfe.maborneapp.view.user.components.Menu
-import com.pfe.maborneapp.viewmodel.factories.user.BorneViewModelFactory
-import com.pfe.maborneapp.viewmodel.factories.user.SignalementViewModelFactory
+import com.pfe.maborneapp.viewmodel.factories.BorneViewModelFactory
+import com.pfe.maborneapp.viewmodel.factories.SignalementViewModelFactory
 import com.pfe.maborneapp.viewmodel.factories.user.UserViewModelFactory
-import com.pfe.maborneapp.viewmodel.user.BorneViewModel
+import com.pfe.maborneapp.viewmodel.BorneViewModel
 import com.pfe.maborneapp.viewmodel.user.UserViewModel
-import com.pfe.maborneapp.viewmodel.user.SignalementViewModel
+import com.pfe.maborneapp.viewmodel.SignalementViewModel
 
 @Composable
 fun UserHomePage(navController: NavHostController, userId: String) {

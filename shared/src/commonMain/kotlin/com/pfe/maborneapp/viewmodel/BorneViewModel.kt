@@ -1,4 +1,4 @@
-package com.pfe.maborneapp.viewmodel.user
+package com.pfe.maborneapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

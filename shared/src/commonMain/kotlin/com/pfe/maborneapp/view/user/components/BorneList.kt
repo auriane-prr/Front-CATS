@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.pfe.maborneapp.models.Borne
 import com.pfe.maborneapp.view.components.Alert
-import com.pfe.maborneapp.viewmodel.user.SignalementViewModel
+import com.pfe.maborneapp.viewmodel.SignalementViewModel
 
 @Composable
 fun BorneList(

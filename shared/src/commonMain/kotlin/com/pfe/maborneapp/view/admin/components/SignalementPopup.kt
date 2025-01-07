@@ -27,9 +27,7 @@ fun SignalementPopup(signalement: Signalement, onDismiss: () -> Unit) {
             ) {
                 Text(text = "Borne : ${signalement.borne.numero}")
                 Text(text = "Motif : ${signalement.motif}")
-                Text(text = "Date : ${signalement.date}")
                 Text(text = "Utilisateur : ${signalement.user.mail}")
-                Text(text = "Coordonnées : (${signalement.borne.coord_x}, ${signalement.borne.coord_y})")
                 Text(text = "Type de borne : ${signalement.borne.typeBorne.nom}")
                 Text(text = "Carte : ${signalement.borne.carte.nom}")
             }

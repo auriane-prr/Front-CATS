@@ -14,8 +14,8 @@ import com.pfe.maborneapp.view.admin.components.AdminMenu
 import com.pfe.maborneapp.view.admin.components.BorneListAdmin
 import com.pfe.maborneapp.viewmodel.CarteViewModel
 import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
-import com.pfe.maborneapp.viewmodel.factories.user.BorneViewModelFactory
-import com.pfe.maborneapp.viewmodel.user.BorneViewModel
+import com.pfe.maborneapp.viewmodel.factories.BorneViewModelFactory
+import com.pfe.maborneapp.viewmodel.BorneViewModel
 
 @Composable
 fun AdminHomePage(navController: NavHostController) {

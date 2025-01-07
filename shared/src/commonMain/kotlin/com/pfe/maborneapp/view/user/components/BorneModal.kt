@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pfe.maborneapp.models.Borne
 import com.pfe.maborneapp.view.components.Alert
-import com.pfe.maborneapp.viewmodel.user.SignalementViewModel
+import com.pfe.maborneapp.viewmodel.SignalementViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -126,9 +126,9 @@ fun BorneModal(
                             onClick = {
                                 if (reportReason.text.isNotBlank()) {
                                     signalementViewModel.signalerBorne(
-                                        borneId = selectedBorne.id,
-                                        userId = userId,
-                                        motif = reportReason.text,
+                                        borneId = selectedBorne.id, // ID de la borne
+                                        userId = userId,           // ID de l'utilisateur
+                                        motif = reportReason.text, // Motif saisi par l'utilisateur
                                         onSuccess = {
                                             isSuccess = true
                                             alertMessage = "Votre signalement a bien été pris en compte."
