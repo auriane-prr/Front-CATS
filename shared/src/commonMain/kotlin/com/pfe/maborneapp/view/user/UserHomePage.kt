@@ -17,19 +17,32 @@ import com.pfe.maborneapp.viewmodel.CarteViewModel
 import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
 import com.pfe.maborneapp.view.user.components.Menu
 import com.pfe.maborneapp.viewmodel.factories.user.BorneViewModelFactory
+import com.pfe.maborneapp.viewmodel.factories.user.SignalementViewModelFactory
+import com.pfe.maborneapp.viewmodel.factories.user.UserViewModelFactory
 import com.pfe.maborneapp.viewmodel.user.BorneViewModel
+import com.pfe.maborneapp.viewmodel.user.UserViewModel
+import com.pfe.maborneapp.viewmodel.user.SignalementViewModel
 
 @Composable
-fun UserHomePage(navController: NavHostController, userEmail: String) {
+fun UserHomePage(navController: NavHostController, userId: String) {
+    val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory())
+    val userEmail by userViewModel.userEmail.collectAsState()
+
     val carteViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
     val selectedCarteImageUrl by carteViewModel.selectedCarteImageUrl.collectAsState()
 
     val borneViewModel: BorneViewModel = viewModel(factory = BorneViewModelFactory())
     val bornes by borneViewModel.bornes.collectAsState()
 
-    val greenColor = Color(0xFF045C3C)
+    val signalementViewModel: SignalementViewModel = viewModel(factory = SignalementViewModelFactory())
 
+    val greenColor = Color(0xFF045C3C)
     var isMenuOpen by remember { mutableStateOf(false) }
+
+    // Fetch email on component load
+    LaunchedEffect(userId) {
+        userViewModel.fetchUserEmail(userId)
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -51,7 +64,7 @@ fun UserHomePage(navController: NavHostController, userEmail: String) {
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Bonjour $userEmail",
+                            text = if (userEmail.isNotEmpty()) "Bonjour $userEmail" else "Chargement...",
                             style = MaterialTheme.typography.titleLarge,
                             color = greenColor,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
@@ -73,15 +86,18 @@ fun UserHomePage(navController: NavHostController, userEmail: String) {
                         imageUrl = selectedCarteImageUrl,
                         contentDescription = "Carte Image",
                         modifier = Modifier
-                            .fillMaxWidth() // Largeur maximale avec padding
-                            .padding(horizontal = 16.dp) // Ajout d'un padding
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
                     )
-
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     bornes?.let {
-                        BorneList(bornes = it)
+                        BorneList(
+                            bornes = it,
+                            userId = userId,
+                            signalementViewModel = signalementViewModel
+                        )
                     } ?: run {
                         Text(text = "Chargement des bornes...")
                     }
@@ -93,7 +109,7 @@ fun UserHomePage(navController: NavHostController, userEmail: String) {
                     isMenuOpen = isMenuOpen,
                     onToggleMenu = { isMenuOpen = !isMenuOpen },
                     currentPage = "home",
-                    userEmail = userEmail
+                    userId = userId
                 )
             }
         }

@@ -15,16 +15,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.pfe.maborneapp.models.Borne
+import com.pfe.maborneapp.view.components.Alert
+import com.pfe.maborneapp.viewmodel.user.SignalementViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BorneList(bornes: List<Borne>, modifier: Modifier = Modifier) {
-    // État pour suivre la borne sélectionnée et afficher la modale
+fun BorneList(
+    bornes: List<Borne>,
+    userId: String,
+    signalementViewModel: SignalementViewModel,
+    modifier: Modifier = Modifier
+) {
     var selectedBorne by remember { mutableStateOf<Borne?>(null) }
+    var showAlert by remember { mutableStateOf(false) } // État pour afficher l'alerte
+    var alertMessage by remember { mutableStateOf("") }
 
     Text(
         text = "Bornes :",
-        style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
+        style = MaterialTheme.typography.titleMedium,
         modifier = modifier
             .padding(horizontal = 16.dp)
     )
@@ -34,25 +41,30 @@ fun BorneList(bornes: List<Borne>, modifier: Modifier = Modifier) {
             .padding(16.dp)
             .background(
                 color = Color.White,
-                shape = RoundedCornerShape(16.dp) // Coins arrondis
+                shape = RoundedCornerShape(16.dp)
             )
             .border(
                 width = 2.dp,
-                color = Color(0xFF045C3C), // Contour vert
+                color = Color(0xFF045C3C),
                 shape = RoundedCornerShape(16.dp)
             )
-            .padding(16.dp) // Padding interne
+            .padding(16.dp)
     ) {
-
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Liste des bornes
         bornes.forEachIndexed { index, borne ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { selectedBorne = borne } // Rendre l'élément cliquable
-                    .padding(vertical = 8.dp), // Padding vertical pour chaque ligne
+                    .clickable {
+                        if (borne.status == "HS" || borne.status == "Signalée") {
+                            alertMessage = "Désolé, cette borne est momentanément indisponible, vous ne pouvez pas la réserver ni la signaler."
+                            showAlert = true
+                        } else {
+                            selectedBorne = borne
+                        }
+                    }
+                    .padding(vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Pastille de couleur
@@ -61,10 +73,10 @@ fun BorneList(bornes: List<Borne>, modifier: Modifier = Modifier) {
                         .size(16.dp)
                         .background(
                             color = when (borne.status) {
-                                "Disponible" -> Color(0xFF045C3C) // Vert foncé
+                                "Disponible" -> Color(0xFF045C3C)
                                 "Occupée" -> Color.Red
                                 "HS" -> Color.Gray
-                                "Signalée" -> Color(0xFFFFB512) // Jaune-orange
+                                "Signalée" -> Color(0xFFFFB512)
                                 else -> Color.Transparent
                             },
                             shape = CircleShape
@@ -75,22 +87,20 @@ fun BorneList(bornes: List<Borne>, modifier: Modifier = Modifier) {
                 // Texte du statut
                 Text(
                     text = "Borne ${borne.numero} - ${borne.status}",
-                    style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.weight(1f) // Prend tout l'espace disponible sauf le chevron
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f)
                 )
 
-                // Chevron à la fin
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
                     contentDescription = "Chevron",
-                    tint = Color(0xFF045C3C) // Vert foncé pour correspondre au style
+                    tint = Color(0xFF045C3C)
                 )
             }
 
-            // Ajouter une ligne de séparation sauf après le dernier élément
             if (index < bornes.size - 1) {
                 Divider(
-                    color = Color(0xFF045C3C).copy(alpha = 0.2f), // Ligne de séparation légèrement transparente
+                    color = Color(0xFF045C3C).copy(alpha = 0.2f),
                     thickness = 1.dp,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
@@ -98,11 +108,23 @@ fun BorneList(bornes: List<Borne>, modifier: Modifier = Modifier) {
         }
     }
 
+    // Affichage de la modale si une borne est sélectionnée
     if (selectedBorne != null) {
         BorneModal(
             selectedBorne = selectedBorne,
+            userId = userId,
+            signalementViewModel = signalementViewModel,
             onClose = { selectedBorne = null }
         )
     }
 
+    // Affichage de l'alerte si nécessaire
+    if (showAlert) {
+        Alert(
+            show = true,
+            isSuccess = false, // Une alerte d'erreur
+            message = alertMessage,
+            onDismiss = { showAlert = false }
+        )
+    }
 }

@@ -7,12 +7,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.compose.ui.Alignment
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pfe.maborneapp.viewmodel.factories.user.UserViewModelFactory
+import com.pfe.maborneapp.viewmodel.user.UserViewModel
 
 @Composable
 fun Menu(
@@ -20,8 +26,15 @@ fun Menu(
     isMenuOpen: Boolean,
     onToggleMenu: () -> Unit,
     currentPage: String,
-    userEmail: String
+    userId: String
 ) {
+    val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory())
+    val userEmail by userViewModel.userEmail.collectAsState()
+
+    LaunchedEffect(userId) {
+        userViewModel.fetchUserEmail(userId)
+    }
+
     val greenColor = Color(0xFF045C3C)
     val menuBackgroundColor = Color(0xFFBDD3D0)
 
@@ -44,7 +57,7 @@ fun Menu(
                     Spacer(modifier = Modifier.height(32.dp))
 
                     // Accueil
-                    TextButton(onClick = { navController.navigate("userHome/$userEmail") }) {
+                    TextButton(onClick = { navController.navigate("userHome/$userId") }) {
                         Text(
                             text = "Accueil",
                             style = MaterialTheme.typography.bodyLarge,
@@ -54,7 +67,7 @@ fun Menu(
                     Divider(color = greenColor, thickness = 1.dp)
 
                     // Réservations
-                    TextButton(onClick = { navController.navigate("reservations/$userEmail") }) {
+                    TextButton(onClick = { navController.navigate("reservations/$userId") }) {
                         Text(
                             text = "Réservations",
                             style = MaterialTheme.typography.bodyLarge,
@@ -64,7 +77,7 @@ fun Menu(
                     Divider(color = greenColor, thickness = 1.dp)
 
                     // Profil
-                    TextButton(onClick = { navController.navigate("profil/$userEmail") }) {
+                    TextButton(onClick = { navController.navigate("profil/$userId") }) {
                         Text(
                             text = "Profil",
                             style = MaterialTheme.typography.bodyLarge,

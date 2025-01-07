@@ -35,18 +35,17 @@ fun AppNavigation(navController: NavHostController) {
         composable("adminHome") { AdminHomePage(navController) }
         composable("adminSignalement") { AdminSignalementPage(navController) }
         composable("adminStatistique") { AdminStatistiquePage(navController) }
-        composable("userHome/{email}") { backStackEntry ->
-            val email = backStackEntry.arguments?.getString("email") ?: ""
-            UserHomePage(navController, email)
+        composable("userHome/{userId}") { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId") ?: ""
+            UserHomePage(navController, userId)
         }
-        composable("reservations/{email}") { backStackEntry ->
-            val email = backStackEntry.arguments?.getString("email") ?: ""
-            ReservationPage(navController, email)
+        composable("reservations/{userId}") { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId") ?: ""
+            ReservationPage(navController, userId)
         }
-        composable("profil/{email}") { backStackEntry ->
-            val email = backStackEntry.arguments?.getString("email") ?: ""
-            ProfilPage(navController, email)
+        composable("profil/{userId}") { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId") ?: ""
+            ProfilPage(navController, userId)
         }
-
     }
 }

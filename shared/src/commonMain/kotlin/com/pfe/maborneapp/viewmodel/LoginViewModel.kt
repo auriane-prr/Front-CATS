@@ -11,30 +11,30 @@ class LoginViewModel(private val repository: LoginRepository) : ViewModel() {
     private val _loginMessage = MutableStateFlow("")
     val loginMessage: StateFlow<String> = _loginMessage
 
+    private val _userId = MutableStateFlow("")
+    val userId: StateFlow<String> = _userId // Ajout de l'ID utilisateur
+
     private val _userRole = MutableStateFlow("")
     val userRole: StateFlow<String> = _userRole
 
-    private val _isLoading = MutableStateFlow(false) // Loader ajouté ici
+    private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
     fun login(email: String) {
-        println("DEBUG, LoginViewModel: Début de login avec email=$email")
         viewModelScope.launch {
-            _isLoading.value = true // Activer le loader
+            _isLoading.value = true
             try {
                 val user = repository.login(email)
                 if (user != null) {
-                    println("DEBUG, LoginViewModel: Utilisateur récupéré - $user")
                     _userRole.value = if (user.isAdmin()) "Admin" else "User"
+                    _userId.value = user._id // Stocker l'ID utilisateur
                 } else {
-                    println("DEBUG, LoginViewModel: Échec de connexion, utilisateur null")
                     _loginMessage.value = "Email incorrect ou erreur serveur."
                 }
             } catch (e: Exception) {
-                println("DEBUG, LoginViewModel: Exception capturée - ${e.message}")
                 _loginMessage.value = "Erreur : ${e.message}"
             } finally {
-                _isLoading.value = false // Désactiver le loader
+                _isLoading.value = false
             }
         }
     }

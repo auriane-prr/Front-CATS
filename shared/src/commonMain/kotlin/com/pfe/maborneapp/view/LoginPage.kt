@@ -35,8 +35,8 @@ fun LoginPage(navController: NavHostController) {
 
     LaunchedEffect(userRole) {
         if (userRole.isNotEmpty()) {
-            val route = if (userRole == "Admin") "adminHome" else "userHome/$mail"
-            println("DEBUG,LoginPage: Navigation vers $route")
+            val userId = viewModel.userId.value
+            val route = if (userRole == "Admin") "adminHome" else "userHome/$userId"
             navController.navigate(route) {
                 popUpTo("login") { inclusive = true }
             }
