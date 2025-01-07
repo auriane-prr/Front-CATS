@@ -7,23 +7,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.pfe.maborneapp.view.components.NetworkImage
+import com.pfe.maborneapp.view.admin.components.AdminMenu
+import com.pfe.maborneapp.view.admin.components.BorneListAdmin
 import com.pfe.maborneapp.viewmodel.CarteViewModel
 import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
-import com.pfe.maborneapp.view.admin.components.AdminMenu
+import com.pfe.maborneapp.viewmodel.factories.user.BorneViewModelFactory
+import com.pfe.maborneapp.viewmodel.user.BorneViewModel
 
 @Composable
 fun AdminHomePage(navController: NavHostController) {
     val carteViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
     val selectedCarteImageUrl by carteViewModel.selectedCarteImageUrl.collectAsState()
 
+    val borneViewModel: BorneViewModel = viewModel(factory = BorneViewModelFactory())
+    val bornes by borneViewModel.bornes.collectAsState()
+
     var isMenuOpen by remember { mutableStateOf(false) }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
-        content = { padding ->
+        content = {
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -69,6 +75,13 @@ fun AdminHomePage(navController: NavHostController) {
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
+
+                    // Liste des bornes
+                    bornes?.let {
+                        BorneListAdmin(bornes = it)
+                    } ?: run {
+                        Text(text = "Chargement des bornes...")
+                    }
                 }
 
                 // Menu Admin
