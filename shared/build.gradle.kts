@@ -105,6 +105,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    sourceSets["main"].assets.srcDirs("src/commonMain/resources")
 }
 dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)

@@ -14,6 +14,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.ImageBitmap
+import com.pfe.maborneapp.utils.loadImageBitmap
 
 @Composable
 fun LoginPage(navController: NavHostController) {
@@ -51,6 +54,21 @@ fun LoginPage(navController: NavHostController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
+
+                // Ajouter une image en haut de la page
+                val logoImage by produceState<ImageBitmap?>(initialValue = null) {
+                    value = loadImageBitmap("res://images/logo")
+                }
+
+                logoImage?.let {
+                    Image(
+                        bitmap = it,
+                        contentDescription = "Logo",
+                        modifier = Modifier
+                            .size(150.dp)
+                            .padding(bottom = 16.dp)
+                    )
+                }
 
                 // Champ d'email
                 OutlinedTextField(
