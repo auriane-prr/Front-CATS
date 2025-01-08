@@ -53,9 +53,8 @@ fun LoginPage(navController: NavHostController) {
                     .padding(horizontal = 32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(8.dp))
 
-                // Ajouter une image en haut de la page
+                // Affichage du logo
                 val logoImage by produceState<ImageBitmap?>(initialValue = null) {
                     value = loadImageBitmap("res://images/logo")
                 }
@@ -65,7 +64,22 @@ fun LoginPage(navController: NavHostController) {
                         bitmap = it,
                         contentDescription = "Logo",
                         modifier = Modifier
-                            .size(150.dp)
+                            .size(200.dp)
+                    )
+                }
+
+                // Affichage de l'image
+                val loginImage by produceState<ImageBitmap?>(initialValue = null) {
+                    value = loadImageBitmap("res://images/loginImage")
+                }
+
+                loginImage?.let {
+                    Image(
+                        bitmap = it,
+                        contentDescription = "Login Illustration",
+                        modifier = Modifier
+                            .height(400.dp)
+                            .aspectRatio(it.width.toFloat() / it.height.toFloat())
                             .padding(bottom = 16.dp)
                     )
                 }

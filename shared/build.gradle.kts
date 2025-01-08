@@ -85,6 +85,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlinx.serialization.json)
                 implementation("io.ktor:ktor-client-darwin:2.3.0")
+                implementation("org.jetbrains.skiko:skiko:0.7.75")
 
             }
         }

@@ -17,12 +17,16 @@ actual suspend fun loadImageBitmap(url: String): ImageBitmap {
     return withContext(Dispatchers.IO) {
         if (url.startsWith("res://")) {
             // Chargement depuis les ressources partagées (assets)
-            val resourceName = url.removePrefix("res://")
-            val inputStream = appContext.assets.open("images/logo.png")
-            val bitmap = BitmapFactory.decodeStream(inputStream)
-                ?: throw Exception("Ressource introuvable : $resourceName")
-            inputStream.close()
-            bitmap.asImageBitmap()
+            val resourceName = url.removePrefix("res://images/")
+            val assetPath = "images/$resourceName.png" // Chemin dans le dossier assets
+            val inputStream = appContext.assets.open(assetPath)
+            try {
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+                    ?: throw Exception("Ressource introuvable : $assetPath")
+                bitmap.asImageBitmap()
+            } finally {
+                inputStream.close()
+            }
         } else {
             // Logique existante pour charger depuis le backend
             val inputStream: InputStream = URL(url).openStream()
@@ -46,7 +50,6 @@ actual suspend fun loadImageBitmap(url: String): ImageBitmap {
         }
     }
 }
-
 
 // Calcul de l'échantillonnage pour redimensionner
 private fun calculateInSampleSize(
