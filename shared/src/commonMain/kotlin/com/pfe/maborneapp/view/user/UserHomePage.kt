@@ -30,7 +30,7 @@ fun UserHomePage(navController: NavHostController, userId: String) {
     val selectedCarteImageUrl by carteViewModel.selectedCarteImageUrl.collectAsState()
 
     val borneViewModel: BorneViewModel = viewModel(factory = BorneViewModelFactory())
-    val bornes by borneViewModel.bornes.collectAsState()
+    val etatBornes by borneViewModel.etatBornes.collectAsState()
 
     val signalementViewModel: SignalementViewModel = viewModel(factory = SignalementViewModelFactory())
 
@@ -90,15 +90,16 @@ fun UserHomePage(navController: NavHostController, userId: String) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    bornes?.let {
+                    etatBornes?.let {
                         BorneList(
-                            bornes = it,
+                            etatBornes = it,
                             userId = userId,
                             signalementViewModel = signalementViewModel
                         )
                     } ?: run {
                         Text(text = "Chargement des bornes...")
                     }
+
                 }
 
                 // Menu avec gestion de l'icône

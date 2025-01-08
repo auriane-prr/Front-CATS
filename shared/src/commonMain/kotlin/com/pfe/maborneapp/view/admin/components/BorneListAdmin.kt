@@ -15,10 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.pfe.maborneapp.models.Borne
+import com.pfe.maborneapp.models.EtatBornes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BorneListAdmin(bornes: List<Borne>, modifier: Modifier = Modifier) {
+fun BorneListAdmin(etatBornes: EtatBornes, modifier: Modifier = Modifier) {
     // État pour suivre la borne sélectionnée et afficher la modale
     var selectedBorne by remember { mutableStateOf<Borne?>(null) }
 
@@ -46,8 +47,9 @@ fun BorneListAdmin(bornes: List<Borne>, modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Liste des bornes
-        bornes.forEachIndexed { index, borne ->
+        // Afficher toutes les bornes des différents états
+        val allBornes = etatBornes.disponible + etatBornes.occupee + etatBornes.hs + etatBornes.signalee
+        allBornes.forEachIndexed { index, borne ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -87,7 +89,7 @@ fun BorneListAdmin(bornes: List<Borne>, modifier: Modifier = Modifier) {
                 )
             }
 
-            if (index < bornes.size - 1) {
+            if (index < allBornes.size - 1) {
                 Divider(
                     color = Color(0xFF045C3C).copy(alpha = 0.2f),
                     thickness = 1.dp,

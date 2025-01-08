@@ -26,3 +26,11 @@ data class CarteInfo(
     val nom: String,
     val carte: String
 )
+
+@Serializable
+data class EtatBornes(
+    val disponible: List<Borne>,
+    val occupee: List<Borne>,
+    val hs: List<Borne>,
+    val signalee: List<Borne>
+)

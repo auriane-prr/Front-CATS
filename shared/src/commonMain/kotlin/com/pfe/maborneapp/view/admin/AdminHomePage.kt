@@ -12,6 +12,7 @@ import androidx.navigation.NavHostController
 import com.pfe.maborneapp.view.components.NetworkImage
 import com.pfe.maborneapp.view.admin.components.AdminMenu
 import com.pfe.maborneapp.view.admin.components.BorneListAdmin
+import com.pfe.maborneapp.view.user.components.BorneList
 import com.pfe.maborneapp.viewmodel.CarteViewModel
 import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
 import com.pfe.maborneapp.viewmodel.factories.BorneViewModelFactory
@@ -23,7 +24,7 @@ fun AdminHomePage(navController: NavHostController) {
     val selectedCarteImageUrl by carteViewModel.selectedCarteImageUrl.collectAsState()
 
     val borneViewModel: BorneViewModel = viewModel(factory = BorneViewModelFactory())
-    val bornes by borneViewModel.bornes.collectAsState()
+    val etatBornes by borneViewModel.etatBornes.collectAsState()
 
     var isMenuOpen by remember { mutableStateOf(false) }
 
@@ -77,8 +78,8 @@ fun AdminHomePage(navController: NavHostController) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Liste des bornes
-                    bornes?.let {
-                        BorneListAdmin(bornes = it)
+                    etatBornes?.let {
+                        BorneListAdmin(etatBornes = it)
                     } ?: run {
                         Text(text = "Chargement des bornes...")
                     }
