@@ -112,6 +112,7 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.ui.graphics.android)
     implementation(libs.androidx.ui.android)
+    implementation(libs.androidx.foundation.android)
 }
 
 tasks.register("assembleXCFramework") {

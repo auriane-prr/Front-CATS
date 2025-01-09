@@ -7,8 +7,8 @@ import kotlinx.serialization.Serializable
 data class Borne(
     @SerialName("_id") val id: String,
     val status: String,
-    val coord_x: Int,
-    val coord_y: Int,
+    val coord_x: Int?,
+    val coord_y: Int?,
     val numero: Int,
     val typeBorne: TypeBorne,
     val carte: CarteInfo

@@ -1,6 +1,8 @@
 package com.pfe.maborneapp.view.admin
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,14 +40,14 @@ fun AdminHomePage(navController: NavHostController) {
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
                 ) {
                     // Header
-                    Row(
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                            .padding(vertical = 8.dp), // Ajuste uniquement le padding vertical
+                        contentAlignment = Alignment.Center // Centre le contenu dans la Box
                     ) {
                         Text(
                             text = "Bienvenue sur le tableau de bord administrateur",
@@ -54,6 +56,7 @@ fun AdminHomePage(navController: NavHostController) {
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                         )
                     }
+
 
                     Spacer(modifier = Modifier.height(16.dp))
 
