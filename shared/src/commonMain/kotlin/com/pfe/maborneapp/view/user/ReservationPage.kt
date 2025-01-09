@@ -18,7 +18,6 @@ import com.pfe.maborneapp.viewmodel.user.UserViewModel
 @Composable
 fun ReservationPage(navController: NavHostController, userId: String) {
     val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory())
-    //val userEmail by userViewModel.userEmail.collectAsState()
     val reservationViewModel: ReservationViewModel = viewModel(factory = ReservationViewModelFactory())
     val reservations by reservationViewModel.reservations.collectAsState()
 
@@ -29,6 +28,7 @@ fun ReservationPage(navController: NavHostController, userId: String) {
     }
 
     var isMenuOpen by remember { mutableStateOf(false) }
+    var showReservationModal by remember { mutableStateOf(false) } // État de la modale
     val greenColor = Color(0xFF045C3C)
 
     Scaffold(
@@ -62,7 +62,6 @@ fun ReservationPage(navController: NavHostController, userId: String) {
 
                     // Liste des réservations
                     reservations?.let { resList ->
-                        println("DEBUG: État des réservations dans la page : $resList")
                         if (resList.isEmpty()) {
                             Text(text = "Aucune réservation trouvée.")
                         } else {
@@ -70,16 +69,16 @@ fun ReservationPage(navController: NavHostController, userId: String) {
                                 ReservationCard(reservation = reservation)
                             }
                         }
-                    } ?: run {
-                        println("DEBUG: Réservations en cours de chargement...")
-                        Text(text = "Chargement des réservations...")
-                    }
+                    } ?: Text(text = "Chargement des réservations...")
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Bouton nouvelle réservation
                     Button(
-                        onClick = { /* Ajoutez ici la logique pour une nouvelle réservation */ },
+                        onClick = {
+                            println("DEBUG: Bouton 'Nouvelle réservation' cliqué")
+                            showReservationModal = true
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp),
@@ -98,7 +97,19 @@ fun ReservationPage(navController: NavHostController, userId: String) {
                     userId = userId
                 )
             }
+
+            // Affichage de la modale si l'état est activé
+            if (showReservationModal) {
+                ReservationModal(
+                    reservationViewModel = reservationViewModel,
+                    userId = userId,
+                    onClose = { showReservationModal = false }, // Ferme la modale
+                    onReservationSuccess = {
+                        // Recharge les réservations après succès
+                        reservationViewModel.fetchReservations(userId)
+                    }
+                )
+            }
         }
     )
 }
-
