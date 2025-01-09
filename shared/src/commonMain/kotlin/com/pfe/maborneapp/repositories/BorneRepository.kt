@@ -14,12 +14,16 @@ class BorneRepository(private val client: HttpClient) {
     suspend fun fetchBornesByEtat(): EtatBornes? {
         try {
             val response = client.get("https://back-cats.onrender.com/borne/etat")
+            println("DEBUG, Réponse brute : ${response.bodyAsText()}")
             if (response.status == HttpStatusCode.OK) {
                 return json.decodeFromString(EtatBornes.serializer(), response.bodyAsText())
+            } else {
+                println("DEBUG, Statut HTTP inattendu : ${response.status}")
             }
         } catch (e: Exception) {
-            println("Erreur dans fetchBornesByEtat : ${e.message}")
+            println("DEBUG, Erreur dans fetchBornesByEtat : ${e.message}")
         }
         return null
     }
+
 }

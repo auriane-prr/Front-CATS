@@ -19,8 +19,18 @@ class BorneViewModel(private val repository: BorneRepository) : ViewModel() {
 
     private fun fetchBornesByEtat() {
         viewModelScope.launch {
-            val fetchedEtatBornes = repository.fetchBornesByEtat()
-            _etatBornes.value = fetchedEtatBornes
+            try {
+                val fetchedEtatBornes = repository.fetchBornesByEtat()
+                if (fetchedEtatBornes != null) {
+                    println("DEBUG, Bornes chargées avec succès : $fetchedEtatBornes")
+                    _etatBornes.value = fetchedEtatBornes
+                } else {
+                    println("DEBUG, Aucune donnée retournée par le backend.")
+                }
+            } catch (e: Exception) {
+                println("DEBUG, Erreur lors du chargement des bornes : ${e.message}")
+            }
         }
     }
+
 }

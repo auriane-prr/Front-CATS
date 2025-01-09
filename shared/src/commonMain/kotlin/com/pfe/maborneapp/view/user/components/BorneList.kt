@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.pfe.maborneapp.models.*
 import com.pfe.maborneapp.view.components.Alert
 import com.pfe.maborneapp.viewmodel.SignalementViewModel
@@ -31,7 +34,6 @@ fun BorneList(
     var showAlert by remember { mutableStateOf(false) }
     var alertMessage by remember { mutableStateOf("") }
 
-    // Combine toutes les bornes en une seule liste
     val allBornes = listOf(
         etatBornes.disponible.map { it to "Disponible" },
         etatBornes.occupee.map { it to "Occupée" },
@@ -39,19 +41,18 @@ fun BorneList(
         etatBornes.signalee.map { it to "Signalée" }
     ).flatten()
 
-    // Texte du titre
     Text(
         text = "Bornes :",
-        style = MaterialTheme.typography.titleMedium,
+        fontSize = 20.sp,
         modifier = modifier.padding(horizontal = 16.dp)
     )
 
-    // Conteneur défilable
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState()) // Activation du défilement
+    Spacer(modifier = Modifier.height(16.dp)) // Espace entre la carte et la liste
+
+    // Conteneur avec bordure verte
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
             .background(
                 color = Color.White,
                 shape = RoundedCornerShape(16.dp)
@@ -61,71 +62,70 @@ fun BorneList(
                 color = Color(0xFF045C3C),
                 shape = RoundedCornerShape(16.dp)
             )
-            .padding(16.dp)
+            .padding(16.dp) // Padding interne pour le contenu
     ) {
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Afficher chaque borne
-        allBornes.forEachIndexed { index, (borne, label) ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        if (label == "Hors Service" || label == "Signalée") {
-                            alertMessage =
-                                "Désolé, cette borne est momentanément indisponible, vous ne pouvez pas la réserver ni la signaler."
-                            showAlert = true
-                        } else {
-                            selectedBorne = borne
-                        }
-                    }
-                    .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Pastille de couleur
-                Box(
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth() // Scroll vertical activé uniquement si nécessaire
+        ) {
+            itemsIndexed(allBornes) { index, (borne, label) ->
+                Row(
                     modifier = Modifier
-                        .size(16.dp)
-                        .background(
-                            color = when (label) {
-                                "Disponible" -> Color(0xFF37A756)
-                                "Occupée" -> Color.Red
-                                "Hors Service" -> Color.Gray
-                                "Signalée" -> Color(0xFFFFB512)
-                                else -> Color.Transparent
-                            },
-                            shape = CircleShape
-                        )
-                )
-                Spacer(modifier = Modifier.width(8.dp))
+                        .fillMaxWidth()
+                        .clickable {
+                            if (label == "Hors Service" || label == "Signalée") {
+                                alertMessage =
+                                    "Désolé, cette borne est momentanément indisponible, vous ne pouvez pas la signaler."
+                                showAlert = true
+                            } else {
+                                selectedBorne = borne
+                            }
+                        }
+                        .padding(vertical = 8.dp), // Espacement vertical entre les items
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(16.dp)
+                            .background(
+                                color = when (label) {
+                                    "Disponible" -> Color(0xFF37A756)
+                                    "Occupée" -> Color.Red
+                                    "Hors Service" -> Color.Gray
+                                    "Signalée" -> Color(0xFFFFB512)
+                                    else -> Color.Transparent
+                                },
+                                shape = CircleShape
+                            )
+                    )
 
-                // Texte du statut et numéro de borne
-                Text(
-                    text = "Borne ${borne.numero} - $label",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.weight(1f)
-                )
+                    Spacer(modifier = Modifier.width(16.dp)) // Espace entre la pastille et le texte
 
-                Icon(
-                    imageVector = Icons.Default.ChevronRight,
-                    contentDescription = "Chevron",
-                    tint = Color(0xFF045C3C)
-                )
-            }
+                    Text(
+                        text = "Borne ${borne.numero} - $label",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.weight(1f),
+                        fontSize = 16.sp
+                    )
 
-            if (index < allBornes.size - 1) {
-                Divider(
-                    color = Color(0xFF045C3C).copy(alpha = 0.2f),
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = "Chevron",
+                        tint = Color(0xFF045C3C)
+                    )
+                }
+
+                if (index < allBornes.size - 1) {
+                    Divider(
+                        color = Color(0xFF045C3C).copy(alpha = 0.2f),
+                        thickness = 1.dp
+                    )
+                }
             }
         }
     }
 
-    // Modale de borne
     if (selectedBorne != null) {
-        BorneModal(
+        SignalementModal(
             selectedBorne = selectedBorne,
             userId = userId,
             signalementViewModel = signalementViewModel,
@@ -133,7 +133,6 @@ fun BorneList(
         )
     }
 
-    // Alerte d'indisponibilité
     if (showAlert) {
         Alert(
             show = true,

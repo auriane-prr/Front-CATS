@@ -47,7 +47,7 @@ fun AdminHomePage(navController: NavHostController) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp), // Ajuste uniquement le padding vertical
-                        contentAlignment = Alignment.Center // Centre le contenu dans la Box
+                        contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = "Bienvenue sur le tableau de bord administrateur",

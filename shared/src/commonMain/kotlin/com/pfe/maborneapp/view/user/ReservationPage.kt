@@ -9,17 +9,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.pfe.maborneapp.view.user.components.Menu
+import com.pfe.maborneapp.view.user.components.*
+import com.pfe.maborneapp.viewmodel.factories.user.ReservationViewModelFactory
 import com.pfe.maborneapp.viewmodel.factories.user.UserViewModelFactory
+import com.pfe.maborneapp.viewmodel.user.ReservationViewModel
 import com.pfe.maborneapp.viewmodel.user.UserViewModel
 
 @Composable
 fun ReservationPage(navController: NavHostController, userId: String) {
     val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory())
-    val userEmail by userViewModel.userEmail.collectAsState()
+    //val userEmail by userViewModel.userEmail.collectAsState()
+    val reservationViewModel: ReservationViewModel = viewModel(factory = ReservationViewModelFactory())
+    val reservations by reservationViewModel.reservations.collectAsState()
 
     LaunchedEffect(userId) {
+        println("DEBUG: Lancement de fetchReservations pour userId = $userId")
         userViewModel.fetchUserEmail(userId)
+        reservationViewModel.fetchReservations(userId)
     }
 
     var isMenuOpen by remember { mutableStateOf(false) }
@@ -45,7 +51,7 @@ fun ReservationPage(navController: NavHostController, userId: String) {
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = if (userEmail.isNotEmpty()) "Bonjour $userEmail" else "Chargement...",
+                            text = "Mes réservations",
                             style = MaterialTheme.typography.titleLarge,
                             color = greenColor,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
@@ -54,10 +60,33 @@ fun ReservationPage(navController: NavHostController, userId: String) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    Text(
-                        text = "Ceci est la page de réservation",
-                        style = MaterialTheme.typography.titleLarge
-                    )
+                    // Liste des réservations
+                    reservations?.let { resList ->
+                        println("DEBUG: État des réservations dans la page : $resList")
+                        if (resList.isEmpty()) {
+                            Text(text = "Aucune réservation trouvée.")
+                        } else {
+                            resList.forEach { reservation ->
+                                ReservationCard(reservation = reservation)
+                            }
+                        }
+                    } ?: run {
+                        println("DEBUG: Réservations en cours de chargement...")
+                        Text(text = "Chargement des réservations...")
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Bouton nouvelle réservation
+                    Button(
+                        onClick = { /* Ajoutez ici la logique pour une nouvelle réservation */ },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = greenColor)
+                    ) {
+                        Text(text = "Nouvelle réservation", color = Color.White)
+                    }
                 }
 
                 // Menu
@@ -72,3 +101,4 @@ fun ReservationPage(navController: NavHostController, userId: String) {
         }
     )
 }
+

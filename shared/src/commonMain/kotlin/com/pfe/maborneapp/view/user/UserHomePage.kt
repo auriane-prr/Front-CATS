@@ -7,6 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pfe.maborneapp.view.components.NetworkImage
@@ -75,7 +76,8 @@ fun UserHomePage(navController: NavHostController, userId: String) {
                     Text(
                         text = "CATS de Montpellier",
                         style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(horizontal = 16.dp)
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        fontSize = 20.sp,
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -88,18 +90,21 @@ fun UserHomePage(navController: NavHostController, userId: String) {
                             .padding(horizontal = 16.dp)
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(24.dp)) // Espace entre la carte et la liste
 
                     etatBornes?.let {
-                        BorneList(
-                            etatBornes = it,
-                            userId = userId,
-                            signalementViewModel = signalementViewModel
-                        )
+                        if (it.disponible.isEmpty() && it.occupee.isEmpty() && it.hs.isEmpty() && it.signalee.isEmpty()) {
+                            Text(text = "Aucune borne disponible pour le moment.", color = Color.Red)
+                        } else {
+                            BorneList(
+                                etatBornes = it,
+                                userId = userId,
+                                signalementViewModel = signalementViewModel
+                            )
+                        }
                     } ?: run {
                         Text(text = "Chargement des bornes...")
                     }
-
                 }
 
                 // Menu avec gestion de l'icône
@@ -114,4 +119,3 @@ fun UserHomePage(navController: NavHostController, userId: String) {
         }
     )
 }
-

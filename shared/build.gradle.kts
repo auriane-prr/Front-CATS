@@ -50,6 +50,7 @@ kotlin {
                 implementation("org.jetbrains.skiko:skiko:0.7.75")
                 implementation("org.jetbrains.compose.foundation:foundation:1.5.0")
                 implementation("org.jetbrains.compose.ui:ui-graphics:1.5.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
 
                 implementation(compose.foundation)
@@ -113,6 +114,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics.android)
     implementation(libs.androidx.ui.android)
     implementation(libs.androidx.foundation.android)
+    implementation(libs.androidx.core.i18n)
 }
 
 tasks.register("assembleXCFramework") {
