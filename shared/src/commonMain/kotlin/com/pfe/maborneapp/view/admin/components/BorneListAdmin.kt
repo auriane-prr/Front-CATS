@@ -20,7 +20,6 @@ import com.pfe.maborneapp.models.EtatBornes
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BorneListAdmin(etatBornes: EtatBornes, modifier: Modifier = Modifier) {
-    // État pour suivre la borne sélectionnée et afficher la modale
     var selectedBorne by remember { mutableStateOf<Borne?>(null) }
 
     Text(
@@ -44,12 +43,18 @@ fun BorneListAdmin(etatBornes: EtatBornes, modifier: Modifier = Modifier) {
             )
             .padding(16.dp)
     ) {
-
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Afficher toutes les bornes des différents états
-        val allBornes = etatBornes.disponible + etatBornes.occupee + etatBornes.hs + etatBornes.signalee
-        allBornes.forEachIndexed { index, borne ->
+        // Combine toutes les bornes en une seule liste avec des libellés adaptés
+        val allBornes = listOf(
+            etatBornes.disponible.map { it to "Disponible" },
+            etatBornes.occupee.map { it to "Occupée" },
+            etatBornes.hs.map { it to "Hors Service" },
+            etatBornes.signalee.map { it to "Signalée" }
+        ).flatten()
+
+        // Afficher chaque borne
+        allBornes.forEachIndexed { index, (borne, label) ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -62,11 +67,11 @@ fun BorneListAdmin(etatBornes: EtatBornes, modifier: Modifier = Modifier) {
                     modifier = Modifier
                         .size(16.dp)
                         .background(
-                            color = when (borne.status) {
-                                "Disponible" -> Color(0xFF045C3C) // Vert
+                            color = when (label) {
+                                "Disponible" -> Color(0xFF37A756)
                                 "Occupée" -> Color.Red
-                                "HS" -> Color.Gray
-                                "Signalée" -> Color(0xFFFFB512) // Jaune-orange
+                                "Hors Service" -> Color.Gray
+                                "Signalée" -> Color(0xFFFFB512)
                                 else -> Color.Transparent
                             },
                             shape = CircleShape
@@ -74,9 +79,9 @@ fun BorneListAdmin(etatBornes: EtatBornes, modifier: Modifier = Modifier) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
 
-                // Texte du statut
+                // Texte du statut et numéro de borne
                 Text(
-                    text = "Borne ${borne.numero} - ${borne.status}",
+                    text = "Borne ${borne.numero} - $label",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.weight(1f)
                 )
