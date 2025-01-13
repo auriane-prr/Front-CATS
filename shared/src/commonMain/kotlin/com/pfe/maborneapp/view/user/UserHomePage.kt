@@ -121,7 +121,7 @@ fun UserHomePage(navController: NavHostController, userId: String, carteId: Stri
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator(
-                                color = greenColor,
+                                color = darkModeColorTitle,
                                 modifier = Modifier.size(48.dp)
                             )
                         }
