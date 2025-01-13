@@ -23,14 +23,14 @@ import com.pfe.maborneapp.view.user.ProfilPage
 @Composable
 fun App(context: Any? = null) {
     AppTheme {
-    // Initialisation du cache
-    LaunchedEffect(context) {
-        if (context != null) {
-            ImageCache.initialize(context)
+        // Initialisation du cache
+        LaunchedEffect(context) {
+            if (context != null) {
+                ImageCache.initialize(context)
+            }
         }
-    }
 
-    MaterialTheme {
+        MaterialTheme {
         val navController = rememberNavController()
         AppNavigation(navController)
     } }
