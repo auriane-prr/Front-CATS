@@ -15,8 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.pfe.maborneapp.models.Reservation
+import com.pfe.maborneapp.utils.formatDateOnly
+import com.pfe.maborneapp.utils.formatTimeOnly
 import com.pfe.maborneapp.utils.DarkContainerColor
-import com.pfe.maborneapp.utils.formatDateTime
 
 @Composable
 fun ReservationCard(reservation: Reservation) {
@@ -34,11 +35,15 @@ fun ReservationCard(reservation: Reservation) {
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "${reservation.borne.carte.nom}     -     Borne ${reservation.borne.numero} ",
+                text = "Borne ${reservation.borne.numero}     -     ${reservation.borne.carte.nom}",
                 style = MaterialTheme.typography.titleMedium
             )
+            val startDate = formatDateOnly(reservation.dateDebut)
+            val startTime = formatTimeOnly(reservation.dateDebut)
+            val endTime = formatTimeOnly(reservation.dateFin)
+
             Text(
-                text = "Du ${formatDateTime(reservation.dateDebut)} au ${formatDateTime(reservation.dateFin)} ",
+                text = "Le $startDate de $startTime à $endTime",
                 style = MaterialTheme.typography.bodyMedium
             )
         }

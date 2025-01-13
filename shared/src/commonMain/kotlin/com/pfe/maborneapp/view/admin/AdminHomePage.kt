@@ -24,15 +24,20 @@ import com.pfe.maborneapp.viewmodel.factories.BorneViewModelFactory
 import com.pfe.maborneapp.viewmodel.BorneViewModel
 
 @Composable
-fun AdminHomePage(navController: NavHostController) {
+fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
     val carteViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
     val selectedCarteImageUrl by carteViewModel.selectedCarteImageUrl.collectAsState()
+    val selectedCarteLastModified by carteViewModel.selectedCarteLastModified.collectAsState()
 
     val borneViewModel: BorneViewModel = viewModel(factory = BorneViewModelFactory())
     val etatBornes by borneViewModel.etatBornes.collectAsState()
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
     var isMenuOpen by remember { mutableStateOf(false) }
+
+    LaunchedEffect(carteId) {
+        carteViewModel.fetchCarteDetails(carteId)
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -76,6 +81,7 @@ fun AdminHomePage(navController: NavHostController) {
                     // Affichage de l'image
                     NetworkImage(
                         imageUrl = selectedCarteImageUrl,
+                        lastModified = selectedCarteLastModified,
                         contentDescription = "Carte pour Admin",
                         modifier = Modifier
                             .fillMaxWidth() // Largeur maximale avec padding

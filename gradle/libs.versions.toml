@@ -17,6 +17,8 @@ databindingCompiler = "8.7.3"
 uiAndroid = "1.7.6"
 foundationAndroid = "1.7.6"
 coreI18n = "1.0.0-alpha01"
+material = "1.12.0"
+navigationSafeArgsGenerator = "2.8.5"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -45,6 +47,8 @@ androidx-databinding-compiler = { group = "androidx.databinding", name = "databi
 androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "uiAndroid" }
 androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "foundationAndroid" }
 androidx-core-i18n = { group = "androidx.core", name = "core-i18n", version.ref = "coreI18n" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-navigation-safe-args-generator = { group = "androidx.navigation", name = "navigation-safe-args-generator", version.ref = "navigationSafeArgsGenerator" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

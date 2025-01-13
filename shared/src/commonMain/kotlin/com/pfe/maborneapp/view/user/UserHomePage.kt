@@ -25,16 +25,15 @@ import com.pfe.maborneapp.viewmodel.BorneViewModel
 import com.pfe.maborneapp.viewmodel.user.UserViewModel
 import com.pfe.maborneapp.viewmodel.SignalementViewModel
 
-
 @Composable
-fun UserHomePage(navController: NavHostController, userId: String) {
+fun UserHomePage(navController: NavHostController, userId: String, carteId: String? = null) {
     val darkModeColorTitle = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
-
     val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory())
     val userEmail by userViewModel.userEmail.collectAsState()
 
     val carteViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
     val selectedCarteImageUrl by carteViewModel.selectedCarteImageUrl.collectAsState()
+    val selectedCarteLastModified by carteViewModel.selectedCarteLastModified.collectAsState()
 
     val borneViewModel: BorneViewModel = viewModel(factory = BorneViewModelFactory())
     val etatBornes by borneViewModel.etatBornes.collectAsState()
@@ -44,9 +43,10 @@ fun UserHomePage(navController: NavHostController, userId: String) {
     val greenColor = Color(0xFF045C3C)
     var isMenuOpen by remember { mutableStateOf(false) }
 
-    // Fetch email on component load
-    LaunchedEffect(userId) {
+    // Fetch email and carte details on component load
+    LaunchedEffect(userId, carteId) {
         userViewModel.fetchUserEmail(userId)
+        carteViewModel.fetchCarteDetails(carteId)
     }
 
     Scaffold(
@@ -90,6 +90,7 @@ fun UserHomePage(navController: NavHostController, userId: String) {
 
                     NetworkImage(
                         imageUrl = selectedCarteImageUrl,
+                        lastModified = selectedCarteLastModified,
                         contentDescription = "Carte Image",
                         modifier = Modifier
                             .fillMaxWidth()

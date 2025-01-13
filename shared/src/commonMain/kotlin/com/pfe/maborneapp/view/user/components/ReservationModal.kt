@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.pfe.maborneapp.models.Borne
 import com.pfe.maborneapp.models.Reservation
 import com.pfe.maborneapp.models.User
@@ -36,7 +37,17 @@ fun ReservationModal(
     AlertDialog(
         onDismissRequest = { onClose() },
         title = {
-            Text(text = "Nouvelle réservation", style = MaterialTheme.typography.titleLarge)
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Nouvelle réservation",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(top = 12.dp)
+                )
+            }
         },
         text = {
             Column {

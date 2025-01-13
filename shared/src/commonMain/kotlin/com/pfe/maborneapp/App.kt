@@ -8,8 +8,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.pfe.maborneapp.utils.ImageCache
 import com.pfe.maborneapp.utils.DarkThemeColors
-import com.pfe.maborneapp.utils.HttpClientFactoryImpl
 import com.pfe.maborneapp.utils.LightThemeColors
 import com.pfe.maborneapp.view.admin.AdminHomePage
 import com.pfe.maborneapp.view.user.UserHomePage
@@ -21,12 +21,19 @@ import com.pfe.maborneapp.view.user.ProfilPage
 
 
 @Composable
-fun App() {
+fun App(context: Any? = null) {
     AppTheme {
-        val client = HttpClientFactoryImpl().create()
+    // Initialisation du cache
+    LaunchedEffect(context) {
+        if (context != null) {
+            ImageCache.initialize(context)
+        }
+    }
+
+    MaterialTheme {
         val navController = rememberNavController()
         AppNavigation(navController)
-    }
+    } }
 }
 @Composable
 fun AppTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {

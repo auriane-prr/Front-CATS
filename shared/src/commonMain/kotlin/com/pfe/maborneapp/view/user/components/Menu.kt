@@ -31,7 +31,6 @@ fun Menu(
     userId: String
 ) {
     val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory())
-    val userEmail by userViewModel.userEmail.collectAsState()
 
     LaunchedEffect(userId) {
         userViewModel.fetchUserEmail(userId)
@@ -77,7 +76,7 @@ fun Menu(
                         )
                     }
                     Divider(color = greenColor, thickness = 1.dp)
-
+/*
                     // Profil
                     TextButton(onClick = { navController.navigate("profil/$userId") }) {
                         Text(
@@ -86,7 +85,7 @@ fun Menu(
                             color = if (currentPage == "profil") greenColor else Color.Black
                         )
                     }
-                    Divider(color = greenColor, thickness = 1.dp)
+                    Divider(color = greenColor, thickness = 1.dp)*/
 
                     // Déconnexion
                     TextButton(onClick = {
