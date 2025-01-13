@@ -14,10 +14,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.pfe.maborneapp.utils.DarkContainerColor
 import com.pfe.maborneapp.utils.DarkModeGreen
-import com.pfe.maborneapp.view.components.NetworkImage
 import com.pfe.maborneapp.view.admin.components.AdminMenu
 import com.pfe.maborneapp.view.admin.components.BorneListAdmin
-import com.pfe.maborneapp.view.user.components.BorneList
+import com.pfe.maborneapp.view.components.image.MapView
 import com.pfe.maborneapp.viewmodel.CarteViewModel
 import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
 import com.pfe.maborneapp.viewmodel.factories.BorneViewModelFactory
@@ -49,14 +48,14 @@ fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
                 ) {
                     // Header
-                    Box(
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp), // Ajuste uniquement le padding vertical
-                        contentAlignment = Alignment.Center
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
                             text = "Bienvenue sur le tableau de bord administrateur",
@@ -78,17 +77,13 @@ fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Affichage de l'image
-                    NetworkImage(
+                    MapView(
                         imageUrl = selectedCarteImageUrl,
                         lastModified = selectedCarteLastModified,
-                        contentDescription = "Carte pour Admin",
-                        modifier = Modifier
-                            .fillMaxWidth() // Largeur maximale avec padding
-                            .padding(horizontal = 16.dp) // Ajout d'un padding horizontal
+                        contentDescription = "Carte Image"
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
                     // Liste des bornes
                     etatBornes?.let {

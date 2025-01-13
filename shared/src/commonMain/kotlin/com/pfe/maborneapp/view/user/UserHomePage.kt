@@ -13,7 +13,7 @@ import androidx.navigation.NavHostController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pfe.maborneapp.utils.DarkContainerColor
 import com.pfe.maborneapp.utils.DarkModeGreen
-import com.pfe.maborneapp.view.components.NetworkImage
+import com.pfe.maborneapp.view.components.image.MapView
 import com.pfe.maborneapp.view.user.components.BorneList
 import com.pfe.maborneapp.viewmodel.CarteViewModel
 import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
@@ -40,7 +40,7 @@ fun UserHomePage(navController: NavHostController, userId: String, carteId: Stri
 
     val signalementViewModel: SignalementViewModel = viewModel(factory = SignalementViewModelFactory())
 
-    val greenColor = Color(0xFF045C3C)
+
     var isMenuOpen by remember { mutableStateOf(false) }
 
     // Fetch email and carte details on component load
@@ -88,13 +88,10 @@ fun UserHomePage(navController: NavHostController, userId: String, carteId: Stri
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    NetworkImage(
+                    MapView(
                         imageUrl = selectedCarteImageUrl,
                         lastModified = selectedCarteLastModified,
-                        contentDescription = "Carte Image",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
+                        contentDescription = "Carte Image"
                     )
 
                     Spacer(modifier = Modifier.height(24.dp)) // Espace entre la carte et la liste
