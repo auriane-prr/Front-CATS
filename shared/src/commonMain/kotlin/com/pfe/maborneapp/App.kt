@@ -6,7 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.pfe.maborneapp.utils.HttpClientFactoryImpl
+import com.pfe.maborneapp.utils.ImageCache
 import com.pfe.maborneapp.view.admin.AdminHomePage
 import com.pfe.maborneapp.view.user.UserHomePage
 import com.pfe.maborneapp.view.LoginPage
@@ -15,12 +15,16 @@ import com.pfe.maborneapp.view.admin.AdminStatistiquePage
 import com.pfe.maborneapp.view.user.ReservationPage
 import com.pfe.maborneapp.view.user.ProfilPage
 
-
 @Composable
-fun App() {
-    MaterialTheme {
-        val client = HttpClientFactoryImpl().create()
+fun App(context: Any? = null) {
+    // Initialisation du cache
+    LaunchedEffect(context) {
+        if (context != null) {
+            ImageCache.initialize(context)
+        }
+    }
 
+    MaterialTheme {
         val navController = rememberNavController()
         AppNavigation(navController)
     }

@@ -14,7 +14,7 @@ class MainActivity : ComponentActivity() {
         Log.e("DEBUG", "MainActivity: Lancement de l'application")
         appContext = applicationContext
         setContent {
-            App()
+            App(context = applicationContext)
         }
     }
 }
