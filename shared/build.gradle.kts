@@ -52,7 +52,6 @@ kotlin {
                 implementation("org.jetbrains.compose.ui:ui-graphics:1.5.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
-
                 implementation(compose.foundation)
                 implementation(compose.material3)
                 implementation(compose.ui)
