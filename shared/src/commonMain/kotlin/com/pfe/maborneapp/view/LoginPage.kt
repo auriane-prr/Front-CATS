@@ -19,6 +19,9 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.graphics.ImageBitmap
 import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.utils.loadImageBitmap
+import com.pfe.maborneapp.view.components.Alert
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 @Composable
 fun LoginPage(navController: NavHostController) {
@@ -27,11 +30,12 @@ fun LoginPage(navController: NavHostController) {
     val viewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory())
 
     var mail by remember { mutableStateOf("") }
-    val loginMessage by viewModel.loginMessage.collectAsState()
     val userRole by viewModel.userRole.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    println("DEBUG,LoginPage: loginMessage=$loginMessage, userRole=$userRole")
+    var alertVisible by remember { mutableStateOf(false) }
+    var alertMessage by remember { mutableStateOf("") }
+    var alertIsSuccess by remember { mutableStateOf(true) }
 
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
@@ -48,11 +52,15 @@ fun LoginPage(navController: NavHostController) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         content = { padding ->
+            // Ajout du scroll state
+            val scrollState = rememberScrollState()
+
             Column(
                 modifier = Modifier
                     .padding(top = 12.dp)
                     .fillMaxSize()
-                    .padding(horizontal = 32.dp),
+                    .padding(horizontal = 32.dp)
+                    .verticalScroll(scrollState), // Activation du défilement vertical
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
@@ -113,7 +121,13 @@ fun LoginPage(navController: NavHostController) {
                     )
                 } else {
                     Button(
-                        onClick = { viewModel.login(mail) },
+                        onClick = {
+                            viewModel.login(mail) { message, isSuccess ->
+                                alertMessage = message
+                                alertIsSuccess = isSuccess
+                                alertVisible = true
+                            }
+                        },
                         modifier = Modifier
                             .height(48.dp)
                             .fillMaxWidth(),
@@ -127,15 +141,16 @@ fun LoginPage(navController: NavHostController) {
                     }
                 }
 
-                // Affichage du message d'erreur
-                if (loginMessage.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = loginMessage,
-                        color = Color.Red,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
+                Spacer(modifier = Modifier.height(32.dp))
+            }
+
+            // Alerte
+            if (alertVisible) {
+                Alert(
+                    isSuccess = alertIsSuccess,
+                    message = alertMessage,
+                    onDismiss = { alertVisible = false }
+                )
             }
         }
     )

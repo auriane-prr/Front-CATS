@@ -22,14 +22,12 @@ fun SignalementModal(
     selectedBorne: Borne?,
     userId: String,
     signalementViewModel: SignalementViewModel,
-    onClose: () -> Unit
-
+    onClose: () -> Unit,
+    onRefreshBornes: () -> Unit,
+    showAlert: (String, Boolean) -> Unit
 ) {
     if (selectedBorne != null) {
         var reportReason by remember { mutableStateOf(TextFieldValue("")) }
-        var showAlert by remember { mutableStateOf(false) }
-        var alertMessage by remember { mutableStateOf("") }
-        var isSuccess by remember { mutableStateOf(false) }
         val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
         AlertDialog(
@@ -91,26 +89,22 @@ fun SignalementModal(
                     }
                     Button(
                         onClick = {
-                            if (reportReason.text.isNotBlank()) {
+                            if (reportReason.text.isBlank()) {
+                                showAlert("Veuillez entrer un motif à votre signalement.", false)
+                            } else {
                                 signalementViewModel.signalerBorne(
                                     borneId = selectedBorne.id,
                                     userId = userId,
                                     motif = reportReason.text,
                                     onSuccess = {
-                                        isSuccess = true
-                                        alertMessage = "Votre signalement a bien été pris en compte."
-                                        showAlert = true
+                                        onClose()
+                                        onRefreshBornes()
+                                        showAlert("Votre signalement a bien été pris en compte.", true)
                                     },
                                     onError = { errorMessage ->
-                                        isSuccess = false
-                                        alertMessage = "Erreur : $errorMessage"
-                                        showAlert = true
+                                        showAlert("Erreur : $errorMessage", false)
                                     }
                                 )
-                            } else {
-                                isSuccess = false
-                                alertMessage = "Veuillez entrer un motif à votre signalement."
-                                showAlert = true
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFBDD3D0)),
@@ -122,18 +116,5 @@ fun SignalementModal(
             },
             dismissButton = null
         )
-
-        // Composant d'alerte
-        if (showAlert) {
-            Alert(
-                show = true,
-                isSuccess = isSuccess,
-                message = alertMessage,
-                onDismiss = {
-                    showAlert = false
-                    if (isSuccess) onClose()
-                }
-            )
-        }
     }
 }
