@@ -16,6 +16,8 @@ import com.pfe.maborneapp.viewmodel.factories.user.ReservationViewModelFactory
 import com.pfe.maborneapp.viewmodel.factories.user.UserViewModelFactory
 import com.pfe.maborneapp.viewmodel.user.ReservationViewModel
 import com.pfe.maborneapp.viewmodel.user.UserViewModel
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 @Composable
 fun ReservationPage(navController: NavHostController, userId: String) {
@@ -24,18 +26,18 @@ fun ReservationPage(navController: NavHostController, userId: String) {
     val reservations by reservationViewModel.reservations.collectAsState()
 
     LaunchedEffect(userId) {
-        println("DEBUG: Lancement de fetchReservations pour userId = $userId")
         userViewModel.fetchUserEmail(userId)
         reservationViewModel.fetchReservations(userId)
     }
 
     var isMenuOpen by remember { mutableStateOf(false) }
-    var showReservationModal by remember { mutableStateOf(false) } // État de la modale
+    var showReservationModal by remember { mutableStateOf(false) }
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         content = {
+            val scrollState = rememberScrollState()
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -43,6 +45,7 @@ fun ReservationPage(navController: NavHostController, userId: String) {
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .fillMaxSize()
+                        .verticalScroll(scrollState),
                 ) {
                     // Header
                     Row(
@@ -88,6 +91,7 @@ fun ReservationPage(navController: NavHostController, userId: String) {
                     ) {
                         Text(text = "Nouvelle réservation", color = Color.White)
                     }
+                    Spacer(modifier = Modifier.height(32.dp))
                 }
 
                 // Menu
@@ -105,7 +109,7 @@ fun ReservationPage(navController: NavHostController, userId: String) {
                 ReservationModal(
                     reservationViewModel = reservationViewModel,
                     userId = userId,
-                    onClose = { showReservationModal = false }, // Ferme la modale
+                    onClose = { showReservationModal = false },
                     onReservationSuccess = {
                         // Recharge les réservations après succès
                         reservationViewModel.fetchReservations(userId)

@@ -20,6 +20,8 @@ import androidx.compose.ui.graphics.ImageBitmap
 import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.utils.loadImageBitmap
 import com.pfe.maborneapp.view.components.Alert
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 @Composable
 fun LoginPage(navController: NavHostController) {
@@ -50,11 +52,15 @@ fun LoginPage(navController: NavHostController) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         content = { padding ->
+            // Ajout du scroll state
+            val scrollState = rememberScrollState()
+
             Column(
                 modifier = Modifier
                     .padding(top = 12.dp)
                     .fillMaxSize()
-                    .padding(horizontal = 32.dp),
+                    .padding(horizontal = 32.dp)
+                    .verticalScroll(scrollState), // Activation du défilement vertical
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
@@ -134,6 +140,8 @@ fun LoginPage(navController: NavHostController) {
                         Text("Connexion")
                     }
                 }
+
+                Spacer(modifier = Modifier.height(32.dp))
             }
 
             // Alerte

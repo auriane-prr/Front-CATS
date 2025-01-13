@@ -5,12 +5,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.*
@@ -22,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pfe.maborneapp.models.*
 import com.pfe.maborneapp.utils.DarkModeGreen
-import com.pfe.maborneapp.view.components.Alert
 import com.pfe.maborneapp.viewmodel.BorneViewModel
 import com.pfe.maborneapp.viewmodel.SignalementViewModel
 
@@ -60,10 +55,10 @@ fun BorneList(
             )
             .padding(16.dp)
     ) {
-        LazyColumn(
+        Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            itemsIndexed(allBornes) { index, (borne, label) ->
+            allBornes.forEachIndexed { index, (borne, label) ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()

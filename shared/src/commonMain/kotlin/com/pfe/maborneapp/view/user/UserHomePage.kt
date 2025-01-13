@@ -25,6 +25,8 @@ import com.pfe.maborneapp.viewmodel.user.UserViewModel
 import com.pfe.maborneapp.viewmodel.SignalementViewModel
 import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
 import com.pfe.maborneapp.view.components.Alert
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 @Composable
 fun UserHomePage(navController: NavHostController, userId: String, carteId: String? = null) {
@@ -48,7 +50,6 @@ fun UserHomePage(navController: NavHostController, userId: String, carteId: Stri
     var alertMessage by remember { mutableStateOf("") }
     var alertIsSuccess by remember { mutableStateOf(true) }
 
-    // Fetch email and carte details on component load
     LaunchedEffect(userId, carteId) {
         userViewModel.fetchUserEmail(userId)
         carteViewModel.fetchCarteDetails(carteId)
@@ -58,6 +59,8 @@ fun UserHomePage(navController: NavHostController, userId: String, carteId: Stri
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         content = {
+            val scrollState = rememberScrollState()
+
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -65,6 +68,7 @@ fun UserHomePage(navController: NavHostController, userId: String, carteId: Stri
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .fillMaxSize()
+                        .verticalScroll(scrollState),
                 ) {
                     // Header
                     Row(
@@ -144,6 +148,8 @@ fun UserHomePage(navController: NavHostController, userId: String, carteId: Stri
                             }
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(32.dp))
                 }
 
                 // Alerte
