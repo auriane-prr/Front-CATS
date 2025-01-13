@@ -1,6 +1,7 @@
 package com.pfe.maborneapp.view.user.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -17,6 +18,7 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.compose.ui.Alignment
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.viewmodel.factories.user.UserViewModelFactory
 import com.pfe.maborneapp.viewmodel.user.UserViewModel
 
@@ -34,7 +36,7 @@ fun Menu(
     LaunchedEffect(userId) {
         userViewModel.fetchUserEmail(userId)
     }
-
+    val darkModeColorMenu = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
     val greenColor = Color(0xFF045C3C)
     val menuBackgroundColor = Color(0xFFBDD3D0)
 
@@ -113,7 +115,7 @@ fun Menu(
             Icon(
                 imageVector = Icons.Default.Menu,
                 contentDescription = "Menu",
-                tint = greenColor
+                tint = darkModeColorMenu
             )
         }
     }

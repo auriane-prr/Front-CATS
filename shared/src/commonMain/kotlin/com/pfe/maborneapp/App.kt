@@ -1,12 +1,16 @@
 package com.pfe.maborneapp
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.pfe.maborneapp.utils.DarkThemeColors
 import com.pfe.maborneapp.utils.HttpClientFactoryImpl
+import com.pfe.maborneapp.utils.LightThemeColors
 import com.pfe.maborneapp.view.admin.AdminHomePage
 import com.pfe.maborneapp.view.user.UserHomePage
 import com.pfe.maborneapp.view.LoginPage
@@ -18,12 +22,21 @@ import com.pfe.maborneapp.view.user.ProfilPage
 
 @Composable
 fun App() {
-    MaterialTheme {
+    AppTheme {
         val client = HttpClientFactoryImpl().create()
-
         val navController = rememberNavController()
         AppNavigation(navController)
     }
+}
+@Composable
+fun AppTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
+    val colors = if (darkTheme) DarkThemeColors else LightThemeColors
+
+
+    MaterialTheme(
+        colorScheme = colors,
+        content = content
+    )
 }
 
 @Composable

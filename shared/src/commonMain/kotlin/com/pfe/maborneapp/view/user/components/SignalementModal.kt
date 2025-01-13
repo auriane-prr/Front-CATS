@@ -1,5 +1,6 @@
 package com.pfe.maborneapp.view.user.components
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -11,6 +12,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pfe.maborneapp.models.Borne
+import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.view.components.Alert
 import com.pfe.maborneapp.viewmodel.SignalementViewModel
 
@@ -21,12 +23,14 @@ fun SignalementModal(
     userId: String,
     signalementViewModel: SignalementViewModel,
     onClose: () -> Unit
+
 ) {
     if (selectedBorne != null) {
         var reportReason by remember { mutableStateOf(TextFieldValue("")) }
         var showAlert by remember { mutableStateOf(false) }
         var alertMessage by remember { mutableStateOf("") }
         var isSuccess by remember { mutableStateOf(false) }
+        val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
         AlertDialog(
             onDismissRequest = { onClose() },
@@ -46,7 +50,7 @@ fun SignalementModal(
             text = {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Divider(
-                        color = Color(0xFF045C3C),
+                        color = darkModeColorGreen,
                         modifier = Modifier.padding(vertical = 8.dp),
                         thickness = 1.dp
                     )
@@ -65,8 +69,8 @@ fun SignalementModal(
                             .height(120.dp)
                             .padding(vertical = 8.dp),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = Color(0xFF045C3C),
-                            unfocusedBorderColor = Color(0xFF045C3C)
+                            focusedBorderColor = darkModeColorGreen,
+                            unfocusedBorderColor = darkModeColorGreen
                         )
                     )
                 }

@@ -15,7 +15,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.graphics.ImageBitmap
+import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.utils.loadImageBitmap
 
 @Composable
@@ -31,7 +33,7 @@ fun LoginPage(navController: NavHostController) {
 
     println("DEBUG,LoginPage: loginMessage=$loginMessage, userRole=$userRole")
 
-    val greenColor = Color(0xFF045C3C)
+    val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
     LaunchedEffect(userRole) {
         if (userRole.isNotEmpty()) {
@@ -95,9 +97,9 @@ fun LoginPage(navController: NavHostController) {
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = greenColor,
-                        unfocusedBorderColor = greenColor,
-                        focusedLabelColor = greenColor
+                        focusedBorderColor = darkModeColorGreen,
+                        unfocusedBorderColor = darkModeColorGreen,
+                        focusedLabelColor = darkModeColorGreen
                     )
                 )
 
@@ -106,7 +108,7 @@ fun LoginPage(navController: NavHostController) {
                 // Affichage du loader ou du bouton
                 if (isLoading) {
                     CircularProgressIndicator(
-                        color = greenColor,
+                        color = darkModeColorGreen,
                         modifier = Modifier.size(48.dp)
                     )
                 } else {
@@ -117,7 +119,7 @@ fun LoginPage(navController: NavHostController) {
                             .fillMaxWidth(),
                         enabled = mail.isNotEmpty(),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = greenColor,
+                            containerColor = darkModeColorGreen,
                             contentColor = Color.White
                         )
                     ) {

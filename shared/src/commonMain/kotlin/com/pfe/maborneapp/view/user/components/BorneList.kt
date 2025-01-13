@@ -3,6 +3,7 @@ package com.pfe.maborneapp.view.user.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -20,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pfe.maborneapp.models.*
+import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.view.components.Alert
 import com.pfe.maborneapp.viewmodel.SignalementViewModel
 
@@ -28,11 +30,13 @@ fun BorneList(
     etatBornes: EtatBornes,
     userId: String,
     signalementViewModel: SignalementViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    containerColor: Color,
 ) {
     var selectedBorne by remember { mutableStateOf<Borne?>(null) }
     var showAlert by remember { mutableStateOf(false) }
     var alertMessage by remember { mutableStateOf("") }
+    val darkModeColorTitle = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
     val allBornes = listOf(
         etatBornes.disponible.map { it to "Disponible" },
@@ -54,12 +58,12 @@ fun BorneList(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                color = Color.White,
+                color = containerColor,
                 shape = RoundedCornerShape(16.dp)
             )
             .border(
                 width = 2.dp,
-                color = Color(0xFF045C3C),
+                color = darkModeColorTitle,
                 shape = RoundedCornerShape(16.dp)
             )
             .padding(16.dp) // Padding interne pour le contenu
@@ -110,13 +114,13 @@ fun BorneList(
                     Icon(
                         imageVector = Icons.Default.ChevronRight,
                         contentDescription = "Chevron",
-                        tint = Color(0xFF045C3C)
+                        tint = darkModeColorTitle
                     )
                 }
 
                 if (index < allBornes.size - 1) {
                     Divider(
-                        color = Color(0xFF045C3C).copy(alpha = 0.2f),
+                        color = darkModeColorTitle.copy(alpha = 0.2f),
                         thickness = 1.dp
                     )
                 }

@@ -3,6 +3,7 @@ package com.pfe.maborneapp.view.admin.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,11 +17,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.pfe.maborneapp.models.Borne
 import com.pfe.maborneapp.models.EtatBornes
+import com.pfe.maborneapp.utils.DarkModeGreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BorneListAdmin(etatBornes: EtatBornes, modifier: Modifier = Modifier) {
+fun BorneListAdmin(etatBornes: EtatBornes, modifier: Modifier = Modifier,containerColor: Color,) {
     var selectedBorne by remember { mutableStateOf<Borne?>(null) }
+    val darkModeColorTitle = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
     Text(
         text = "Bornes (Admin) :",
@@ -33,12 +36,12 @@ fun BorneListAdmin(etatBornes: EtatBornes, modifier: Modifier = Modifier) {
         modifier = modifier
             .padding(16.dp)
             .background(
-                color = Color.White,
+                color = containerColor,
                 shape = RoundedCornerShape(16.dp)
             )
             .border(
                 width = 2.dp,
-                color = Color(0xFF045C3C),
+                color = darkModeColorTitle,
                 shape = RoundedCornerShape(16.dp)
             )
             .padding(16.dp)
@@ -90,13 +93,13 @@ fun BorneListAdmin(etatBornes: EtatBornes, modifier: Modifier = Modifier) {
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
                     contentDescription = "Chevron",
-                    tint = Color(0xFF045C3C)
+                    tint = darkModeColorTitle
                 )
             }
 
             if (index < allBornes.size - 1) {
                 Divider(
-                    color = Color(0xFF045C3C).copy(alpha = 0.2f),
+                    color = darkModeColorTitle.copy(alpha = 0.2f),
                     thickness = 1.dp,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
