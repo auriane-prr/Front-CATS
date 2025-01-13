@@ -138,7 +138,8 @@ fun UserHomePage(navController: NavHostController, userId: String, carteId: Stri
                                         alertMessage = message
                                         alertIsSuccess = isSuccess
                                         alertVisible = true
-                                    }
+                                    },
+                                    containerColor = if (isSystemInDarkTheme()) DarkContainerColor else MaterialTheme.colorScheme.surface,
                                 )
                             }
                         }
