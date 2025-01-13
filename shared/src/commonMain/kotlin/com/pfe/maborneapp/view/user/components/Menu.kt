@@ -38,13 +38,13 @@ fun Menu(
     val menuBackgroundColor = Color(0xFFBDD3D0)
 
     Box(
-        modifier = Modifier.fillMaxSize() // Parent qui prend toute la taille de l'écran
+        modifier = Modifier.fillMaxSize()
     ) {
         if (isMenuOpen) {
             Box(
                 modifier = Modifier
-                    .align(Alignment.TopEnd) // Place le menu en haut à droite
-                    .height(250.dp)
+                    .align(Alignment.TopEnd)
+                    .wrapContentHeight()
                     .width(220.dp)
                     .background(menuBackgroundColor, RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))
                     .padding(vertical = 8.dp, horizontal = 12.dp)

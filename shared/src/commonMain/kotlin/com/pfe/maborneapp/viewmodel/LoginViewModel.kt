@@ -8,11 +8,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class LoginViewModel(private val repository: LoginRepository) : ViewModel() {
-    private val _loginMessage = MutableStateFlow("")
-    val loginMessage: StateFlow<String> = _loginMessage
-
     private val _userId = MutableStateFlow("")
-    val userId: StateFlow<String> = _userId // Ajout de l'ID utilisateur
+    val userId: StateFlow<String> = _userId 
 
     private val _userRole = MutableStateFlow("")
     val userRole: StateFlow<String> = _userRole
@@ -20,7 +17,7 @@ class LoginViewModel(private val repository: LoginRepository) : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    fun login(email: String) {
+    fun login(email: String, showAlert: (String, Boolean) -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
@@ -29,10 +26,10 @@ class LoginViewModel(private val repository: LoginRepository) : ViewModel() {
                     _userRole.value = if (user.isAdmin()) "Admin" else "User"
                     _userId.value = user._id // Stocker l'ID utilisateur
                 } else {
-                    _loginMessage.value = "Email incorrect ou erreur serveur."
+                    showAlert("Identifiant incorrect", false)
                 }
             } catch (e: Exception) {
-                _loginMessage.value = "Erreur : ${e.message}"
+                showAlert("Erreur : ${e.message}", false)
             } finally {
                 _isLoading.value = false
             }

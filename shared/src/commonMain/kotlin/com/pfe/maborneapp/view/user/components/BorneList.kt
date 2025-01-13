@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pfe.maborneapp.models.*
 import com.pfe.maborneapp.view.components.Alert
+import com.pfe.maborneapp.viewmodel.BorneViewModel
 import com.pfe.maborneapp.viewmodel.SignalementViewModel
 
 @Composable
@@ -28,11 +29,10 @@ fun BorneList(
     etatBornes: EtatBornes,
     userId: String,
     signalementViewModel: SignalementViewModel,
-    modifier: Modifier = Modifier
+    borneViewModel: BorneViewModel,
+    showAlert: (String, Boolean) -> Unit
 ) {
     var selectedBorne by remember { mutableStateOf<Borne?>(null) }
-    var showAlert by remember { mutableStateOf(false) }
-    var alertMessage by remember { mutableStateOf("") }
 
     val allBornes = listOf(
         etatBornes.disponible.map { it to "Disponible" },
@@ -41,15 +41,6 @@ fun BorneList(
         etatBornes.signalee.map { it to "Signalée" }
     ).flatten()
 
-    Text(
-        text = "Bornes :",
-        fontSize = 20.sp,
-        modifier = modifier.padding(horizontal = 16.dp)
-    )
-
-    Spacer(modifier = Modifier.height(16.dp)) // Espace entre la carte et la liste
-
-    // Conteneur avec bordure verte
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -62,25 +53,23 @@ fun BorneList(
                 color = Color(0xFF045C3C),
                 shape = RoundedCornerShape(16.dp)
             )
-            .padding(16.dp) // Padding interne pour le contenu
+            .padding(16.dp)
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxWidth() // Scroll vertical activé uniquement si nécessaire
+            modifier = Modifier.fillMaxWidth()
         ) {
-            itemsIndexed(allBornes) { index, (borne, label) ->
+            itemsIndexed(allBornes) { _, (borne, label) ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            if (label == "Hors Service" || label == "Signalée") {
-                                alertMessage =
-                                    "Désolé, cette borne est momentanément indisponible, vous ne pouvez pas la signaler."
-                                showAlert = true
-                            } else {
-                                selectedBorne = borne
+                            when (label) {
+                                "Signalée", "Hors Service" -> showAlert("Cette borne est momentanément indisponible.", false)
+                                "Occupée" -> showAlert("Cette borne est déjà occupée.", false)
+                                "Disponible" -> selectedBorne = borne
                             }
                         }
-                        .padding(vertical = 8.dp), // Espacement vertical entre les items
+                        .padding(vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
@@ -98,7 +87,7 @@ fun BorneList(
                             )
                     )
 
-                    Spacer(modifier = Modifier.width(16.dp)) // Espace entre la pastille et le texte
+                    Spacer(modifier = Modifier.width(16.dp))
 
                     Text(
                         text = "Borne ${borne.numero} - $label",
@@ -113,13 +102,6 @@ fun BorneList(
                         tint = Color(0xFF045C3C)
                     )
                 }
-
-                if (index < allBornes.size - 1) {
-                    Divider(
-                        color = Color(0xFF045C3C).copy(alpha = 0.2f),
-                        thickness = 1.dp
-                    )
-                }
             }
         }
     }
@@ -129,16 +111,9 @@ fun BorneList(
             selectedBorne = selectedBorne,
             userId = userId,
             signalementViewModel = signalementViewModel,
-            onClose = { selectedBorne = null }
-        )
-    }
-
-    if (showAlert) {
-        Alert(
-            show = true,
-            isSuccess = false,
-            message = alertMessage,
-            onDismiss = { showAlert = false }
+            onClose = { selectedBorne = null },
+            onRefreshBornes = { borneViewModel.fetchBornesByEtat() },
+            showAlert = showAlert
         )
     }
 }

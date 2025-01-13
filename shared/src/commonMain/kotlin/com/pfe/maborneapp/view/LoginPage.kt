@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.Image
 import androidx.compose.ui.graphics.ImageBitmap
 import com.pfe.maborneapp.utils.loadImageBitmap
+import com.pfe.maborneapp.view.components.Alert
 
 @Composable
 fun LoginPage(navController: NavHostController) {
@@ -25,13 +26,15 @@ fun LoginPage(navController: NavHostController) {
     val viewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory())
 
     var mail by remember { mutableStateOf("") }
-    val loginMessage by viewModel.loginMessage.collectAsState()
     val userRole by viewModel.userRole.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    println("DEBUG,LoginPage: loginMessage=$loginMessage, userRole=$userRole")
+    println("DEBUG,LoginPage: userRole=$userRole")
 
     val greenColor = Color(0xFF045C3C)
+    var alertVisible by remember { mutableStateOf(false) }
+    var alertMessage by remember { mutableStateOf("") }
+    var alertIsSuccess by remember { mutableStateOf(true) }
 
     LaunchedEffect(userRole) {
         if (userRole.isNotEmpty()) {
@@ -111,7 +114,13 @@ fun LoginPage(navController: NavHostController) {
                     )
                 } else {
                     Button(
-                        onClick = { viewModel.login(mail) },
+                        onClick = {
+                            viewModel.login(mail) { message, isSuccess ->
+                                alertMessage = message
+                                alertIsSuccess = isSuccess
+                                alertVisible = true
+                            }
+                        },
                         modifier = Modifier
                             .height(48.dp)
                             .fillMaxWidth(),
@@ -124,16 +133,15 @@ fun LoginPage(navController: NavHostController) {
                         Text("Connexion")
                     }
                 }
+            }
 
-                // Affichage du message d'erreur
-                if (loginMessage.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = loginMessage,
-                        color = Color.Red,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
+            // Alerte
+            if (alertVisible) {
+                Alert(
+                    isSuccess = alertIsSuccess,
+                    message = alertMessage,
+                    onDismiss = { alertVisible = false }
+                )
             }
         }
     )
