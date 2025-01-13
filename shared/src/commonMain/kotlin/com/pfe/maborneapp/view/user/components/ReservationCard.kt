@@ -1,6 +1,7 @@
 package com.pfe.maborneapp.view.user.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,15 +17,17 @@ import androidx.compose.ui.unit.dp
 import com.pfe.maborneapp.models.Reservation
 import com.pfe.maborneapp.utils.formatDateOnly
 import com.pfe.maborneapp.utils.formatTimeOnly
+import com.pfe.maborneapp.utils.DarkContainerColor
 
 @Composable
 fun ReservationCard(reservation: Reservation) {
+    val backgroundColor = if (isSystemInDarkTheme()) DarkContainerColor else Color(0xFFBDD3D0)
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .background(
-                color = Color(0xFFBDD3D0),
+                color = backgroundColor,
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(16.dp),

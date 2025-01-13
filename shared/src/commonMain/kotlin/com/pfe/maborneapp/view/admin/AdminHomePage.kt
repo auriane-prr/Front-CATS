@@ -1,5 +1,6 @@
 package com.pfe.maborneapp.view.admin
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -11,6 +12,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.pfe.maborneapp.utils.DarkContainerColor
+import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.view.components.NetworkImage
 import com.pfe.maborneapp.view.admin.components.AdminMenu
 import com.pfe.maborneapp.view.admin.components.BorneListAdmin
@@ -28,6 +31,7 @@ fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
 
     val borneViewModel: BorneViewModel = viewModel(factory = BorneViewModelFactory())
     val etatBornes by borneViewModel.etatBornes.collectAsState()
+    val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
     var isMenuOpen by remember { mutableStateOf(false) }
 
@@ -57,7 +61,7 @@ fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
                         Text(
                             text = "Bienvenue sur le tableau de bord administrateur",
                             style = MaterialTheme.typography.titleLarge,
-                            color = Color(0xFF045C3C), // Couleur verte
+                            color = darkModeColorGreen,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                         )
                     }
@@ -88,7 +92,7 @@ fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
 
                     // Liste des bornes
                     etatBornes?.let {
-                        BorneListAdmin(etatBornes = it)
+                        BorneListAdmin(etatBornes = it, containerColor = if (isSystemInDarkTheme()) DarkContainerColor else MaterialTheme.colorScheme.surface,)
                     } ?: run {
                         Text(text = "Chargement des bornes...")
                     }

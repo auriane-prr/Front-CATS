@@ -1,12 +1,16 @@
 package com.pfe.maborneapp
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pfe.maborneapp.utils.ImageCache
+import com.pfe.maborneapp.utils.DarkThemeColors
+import com.pfe.maborneapp.utils.LightThemeColors
 import com.pfe.maborneapp.view.admin.AdminHomePage
 import com.pfe.maborneapp.view.user.UserHomePage
 import com.pfe.maborneapp.view.LoginPage
@@ -15,19 +19,31 @@ import com.pfe.maborneapp.view.admin.AdminStatistiquePage
 import com.pfe.maborneapp.view.user.ReservationPage
 import com.pfe.maborneapp.view.user.ProfilPage
 
+
 @Composable
 fun App(context: Any? = null) {
-    // Initialisation du cache
-    LaunchedEffect(context) {
-        if (context != null) {
-            ImageCache.initialize(context)
+    AppTheme {
+        // Initialisation du cache
+        LaunchedEffect(context) {
+            if (context != null) {
+                ImageCache.initialize(context)
+            }
         }
-    }
 
-    MaterialTheme {
+        MaterialTheme {
         val navController = rememberNavController()
         AppNavigation(navController)
-    }
+    } }
+}
+@Composable
+fun AppTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
+    val colors = if (darkTheme) DarkThemeColors else LightThemeColors
+
+
+    MaterialTheme(
+        colorScheme = colors,
+        content = content
+    )
 }
 
 @Composable

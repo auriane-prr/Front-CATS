@@ -2,6 +2,7 @@ package com.pfe.maborneapp.view.user.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -14,6 +15,7 @@ import androidx.compose.ui.unit.sp
 import com.pfe.maborneapp.models.Borne
 import com.pfe.maborneapp.models.Reservation
 import com.pfe.maborneapp.models.User
+import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.viewmodel.user.ReservationViewModel
 
 @Composable
@@ -30,7 +32,7 @@ fun ReservationModal(
     var selectedBorne by remember { mutableStateOf<Borne?>(null) }
     val creationStatus by reservationViewModel.creationStatus.collectAsState()
 
-    val greenColor = Color(0xFF045C3C)
+    val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
     AlertDialog(
         onDismissRequest = { onClose() },
@@ -87,7 +89,7 @@ fun ReservationModal(
                         reservationViewModel.fetchAvailableBornes(start, end)
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = greenColor)
+                    colors = ButtonDefaults.buttonColors(containerColor = darkModeColorGreen)
                 ) {
                     Text(text = "Afficher les bornes disponibles", color = Color.White)
                 }
@@ -107,7 +109,7 @@ fun ReservationModal(
                                 .clickable { selectedBorne = borne }
                                 .padding(vertical = 4.dp)
                                 .background(
-                                    color = if (selectedBorne == borne) greenColor else Color(0xFFE0E0E0),
+                                    color = if (selectedBorne == borne) darkModeColorGreen else Color(0xFFE0E0E0),
                                     shape = RoundedCornerShape(4.dp)
                                 )
                                 .padding(8.dp),
@@ -148,7 +150,7 @@ fun ReservationModal(
                         reservationViewModel.createReservation(reservation)
                     }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = greenColor)
+                colors = ButtonDefaults.buttonColors(containerColor = darkModeColorGreen)
             ) {
                 Text(text = "Confirmer", color = Color.White)
             }

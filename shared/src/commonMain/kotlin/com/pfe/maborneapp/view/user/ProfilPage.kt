@@ -1,5 +1,6 @@
 package com.pfe.maborneapp.view.user
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -9,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.view.user.components.Menu
 import com.pfe.maborneapp.viewmodel.factories.user.UserViewModelFactory
 import com.pfe.maborneapp.viewmodel.user.UserViewModel
@@ -23,7 +25,8 @@ fun ProfilPage(navController: NavHostController, userId: String) {
     }
 
     var isMenuOpen by remember { mutableStateOf(false) }
-    val greenColor = Color(0xFF045C3C)
+    val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
+
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -47,7 +50,7 @@ fun ProfilPage(navController: NavHostController, userId: String) {
                         Text(
                             text = if (userEmail.isNotEmpty()) "Bonjour $userEmail" else "Chargement...",
                             style = MaterialTheme.typography.titleLarge,
-                            color = greenColor,
+                            color = darkModeColorGreen,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                         )
                     }

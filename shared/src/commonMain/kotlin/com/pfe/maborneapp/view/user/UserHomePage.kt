@@ -1,5 +1,6 @@
 package com.pfe.maborneapp.view.user
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -10,6 +11,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pfe.maborneapp.utils.DarkContainerColor
+import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.view.components.NetworkImage
 import com.pfe.maborneapp.view.user.components.BorneList
 import com.pfe.maborneapp.viewmodel.CarteViewModel
@@ -25,6 +28,7 @@ import com.pfe.maborneapp.view.components.Alert
 
 @Composable
 fun UserHomePage(navController: NavHostController, userId: String, carteId: String? = null) {
+    val darkModeColorTitle = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
     val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory())
     val userEmail by userViewModel.userEmail.collectAsState()
 
@@ -44,6 +48,7 @@ fun UserHomePage(navController: NavHostController, userId: String, carteId: Stri
     var alertMessage by remember { mutableStateOf("") }
     var alertIsSuccess by remember { mutableStateOf(true) }
 
+    // Fetch email and carte details on component load
     LaunchedEffect(userId, carteId) {
         userViewModel.fetchUserEmail(userId)
         carteViewModel.fetchCarteDetails(carteId)
@@ -72,7 +77,7 @@ fun UserHomePage(navController: NavHostController, userId: String, carteId: Stri
                         Text(
                             text = if (userEmail.isNotEmpty()) "Bonjour $userEmail" else "Chargement...",
                             style = MaterialTheme.typography.titleLarge,
-                            color = greenColor,
+                            color = darkModeColorTitle,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                         )
                     }

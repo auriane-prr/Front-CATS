@@ -15,7 +15,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.graphics.ImageBitmap
+import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.utils.loadImageBitmap
 import com.pfe.maborneapp.view.components.Alert
 
@@ -29,12 +31,11 @@ fun LoginPage(navController: NavHostController) {
     val userRole by viewModel.userRole.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    println("DEBUG,LoginPage: userRole=$userRole")
-
-    val greenColor = Color(0xFF045C3C)
     var alertVisible by remember { mutableStateOf(false) }
     var alertMessage by remember { mutableStateOf("") }
     var alertIsSuccess by remember { mutableStateOf(true) }
+
+    val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
     LaunchedEffect(userRole) {
         if (userRole.isNotEmpty()) {
@@ -98,9 +99,9 @@ fun LoginPage(navController: NavHostController) {
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = greenColor,
-                        unfocusedBorderColor = greenColor,
-                        focusedLabelColor = greenColor
+                        focusedBorderColor = darkModeColorGreen,
+                        unfocusedBorderColor = darkModeColorGreen,
+                        focusedLabelColor = darkModeColorGreen
                     )
                 )
 
@@ -109,7 +110,7 @@ fun LoginPage(navController: NavHostController) {
                 // Affichage du loader ou du bouton
                 if (isLoading) {
                     CircularProgressIndicator(
-                        color = greenColor,
+                        color = darkModeColorGreen,
                         modifier = Modifier.size(48.dp)
                     )
                 } else {
@@ -126,7 +127,7 @@ fun LoginPage(navController: NavHostController) {
                             .fillMaxWidth(),
                         enabled = mail.isNotEmpty(),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = greenColor,
+                            containerColor = darkModeColorGreen,
                             contentColor = Color.White
                         )
                     ) {
