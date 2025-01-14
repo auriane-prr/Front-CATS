@@ -7,6 +7,6 @@ import kotlinx.serialization.Serializable
 data class Carte(
     @SerialName("_id") val id: String,
     val nom: String,
-    val carte: String
+    val carte: String,
+    @SerialName("lastModified") val lastModified: String // Format ISO 8601
 )
-

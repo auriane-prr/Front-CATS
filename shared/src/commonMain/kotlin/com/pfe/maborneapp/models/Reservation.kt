@@ -11,3 +11,16 @@ data class Reservation(
     val dateDebut: String,
     val dateFin: String
 )
+
+@Serializable
+data class ReservationRequest(
+    val borne: IdReference,
+    val user: IdReference,
+    val dateDebut: String,
+    val dateFin: String
+)
+
+@Serializable
+data class IdReference(
+    @SerialName("_id") val id: String
+)

@@ -15,37 +15,34 @@ import androidx.compose.ui.window.Dialog
 
 @Composable
 fun Alert(
-    show: Boolean,
     isSuccess: Boolean,
     message: String,
     onDismiss: () -> Unit
 ) {
-    if (show) {
-        Dialog(onDismissRequest = { onDismiss() }) {
-            Card(
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier
-                    .padding(16.dp)
-                    .background(if (isSuccess) Color(0xFF045C3C).copy(alpha = 0.1f) else Color(0xFFEB0000).copy(alpha = 0.1f))
+    Dialog(onDismissRequest = { onDismiss() }) {
+        Card(
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier
+                .padding(16.dp)
+                .background(if (isSuccess) Color(0xFF045C3C).copy(alpha = 0.1f) else Color(0xFFEB0000).copy(alpha = 0.1f))
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = message,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = if (isSuccess) Color(0xFF045C3C) else Color(0xFFEB0000)
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (isSuccess) Color(0xFF045C3C) else Color(0xFFEB0000)
+                )
+                Button(
+                    onClick = { onDismiss() },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isSuccess) Color(0xFF045C3C) else Color(0xFFEB0000)
                     )
-                    Button(
-                        onClick = { onDismiss() },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isSuccess) Color(0xFF045C3C) else Color(0xFFEB0000)
-                        )
-                    ) {
-                        Text(text = "OK", color = Color.White)
-                    }
+                ) {
+                    Text(text = "OK", color = Color.White)
                 }
             }
         }

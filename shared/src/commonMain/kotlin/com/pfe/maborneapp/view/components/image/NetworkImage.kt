@@ -1,4 +1,4 @@
-package com.pfe.maborneapp.view.components
+package com.pfe.maborneapp.view.components.image
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun NetworkImage(
     imageUrl: String?,
+    lastModified: String? = null,
     contentDescription: String,
     modifier: Modifier = Modifier
 ) {
@@ -29,11 +30,11 @@ fun NetworkImage(
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(imageUrl) {
-        if (imageUrl != null) {
+        if (imageUrl != null && lastModified != null) {
             coroutineScope.launch {
                 try {
                     println("DEBUG, NetworkImage - Chargement de l'image depuis : $imageUrl")
-                    val bitmap = loadImageBitmap(imageUrl)
+                    val bitmap = loadImageBitmap(imageUrl, lastModified)
                     imageBitmap = bitmap
                     // Calcul dynamique du ratio largeur/hauteur
                     imageAspectRatio = bitmap.width.toFloat() / bitmap.height.toFloat()

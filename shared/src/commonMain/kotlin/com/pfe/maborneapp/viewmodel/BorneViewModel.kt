@@ -14,6 +14,9 @@ class BorneViewModel(private val repository: BorneRepository) : ViewModel() {
     private val _etatBornes = MutableStateFlow<EtatBornes?>(null)
     val etatBornes: StateFlow<EtatBornes?> = _etatBornes
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     init {
         fetchBornesByEtat()
     }
@@ -34,8 +37,9 @@ class BorneViewModel(private val repository: BorneRepository) : ViewModel() {
         }
     }
 
-    private fun fetchBornesByEtat() {
+    fun fetchBornesByEtat() {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 val fetchedEtatBornes = repository.fetchBornesByEtat()
                 if (fetchedEtatBornes != null) {
@@ -46,6 +50,8 @@ class BorneViewModel(private val repository: BorneRepository) : ViewModel() {
                 }
             } catch (e: Exception) {
                 println("DEBUG, Erreur lors du chargement des bornes : ${e.message}")
+            } finally {
+                _isLoading.value = false
             }
         }
     }

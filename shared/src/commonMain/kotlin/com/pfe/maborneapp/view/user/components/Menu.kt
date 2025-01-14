@@ -1,6 +1,7 @@
 package com.pfe.maborneapp.view.user.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -17,6 +18,7 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.compose.ui.Alignment
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.viewmodel.factories.user.UserViewModelFactory
 import com.pfe.maborneapp.viewmodel.user.UserViewModel
 
@@ -29,23 +31,22 @@ fun Menu(
     userId: String
 ) {
     val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory())
-    val userEmail by userViewModel.userEmail.collectAsState()
 
     LaunchedEffect(userId) {
         userViewModel.fetchUserEmail(userId)
     }
-
+    val darkModeColorMenu = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
     val greenColor = Color(0xFF045C3C)
     val menuBackgroundColor = Color(0xFFBDD3D0)
 
     Box(
-        modifier = Modifier.fillMaxSize() // Parent qui prend toute la taille de l'écran
+        modifier = Modifier.fillMaxSize()
     ) {
         if (isMenuOpen) {
             Box(
                 modifier = Modifier
-                    .align(Alignment.TopEnd) // Place le menu en haut à droite
-                    .height(250.dp)
+                    .align(Alignment.TopEnd)
+                    .wrapContentHeight()
                     .width(220.dp)
                     .background(menuBackgroundColor, RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))
                     .padding(vertical = 8.dp, horizontal = 12.dp)
@@ -75,7 +76,7 @@ fun Menu(
                         )
                     }
                     Divider(color = greenColor, thickness = 1.dp)
-
+/*
                     // Profil
                     TextButton(onClick = { navController.navigate("profil/$userId") }) {
                         Text(
@@ -84,7 +85,7 @@ fun Menu(
                             color = if (currentPage == "profil") greenColor else Color.Black
                         )
                     }
-                    Divider(color = greenColor, thickness = 1.dp)
+                    Divider(color = greenColor, thickness = 1.dp)*/
 
                     // Déconnexion
                     TextButton(onClick = {
@@ -113,7 +114,7 @@ fun Menu(
             Icon(
                 imageVector = Icons.Default.Menu,
                 contentDescription = "Menu",
-                tint = greenColor
+                tint = darkModeColorMenu
             )
         }
     }

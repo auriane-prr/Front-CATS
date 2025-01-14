@@ -15,8 +15,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.graphics.ImageBitmap
+import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.utils.loadImageBitmap
+import com.pfe.maborneapp.view.components.Alert
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 @Composable
 fun LoginPage(navController: NavHostController) {
@@ -25,13 +30,14 @@ fun LoginPage(navController: NavHostController) {
     val viewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory())
 
     var mail by remember { mutableStateOf("") }
-    val loginMessage by viewModel.loginMessage.collectAsState()
     val userRole by viewModel.userRole.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    println("DEBUG,LoginPage: loginMessage=$loginMessage, userRole=$userRole")
+    var alertVisible by remember { mutableStateOf(false) }
+    var alertMessage by remember { mutableStateOf("") }
+    var alertIsSuccess by remember { mutableStateOf(true) }
 
-    val greenColor = Color(0xFF045C3C)
+    val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
     LaunchedEffect(userRole) {
         if (userRole.isNotEmpty()) {
@@ -46,11 +52,14 @@ fun LoginPage(navController: NavHostController) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         content = { padding ->
+            // Ajout du scroll state
+            val scrollState = rememberScrollState()
+
             Column(
                 modifier = Modifier
-                    .padding(top = 12.dp)
                     .fillMaxSize()
-                    .padding(horizontal = 32.dp),
+                    .padding(horizontal = 32.dp)
+                    .verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
@@ -64,7 +73,7 @@ fun LoginPage(navController: NavHostController) {
                         bitmap = it,
                         contentDescription = "Logo",
                         modifier = Modifier
-                            .size(200.dp)
+                            .size(180.dp)
                     )
                 }
 
@@ -78,9 +87,9 @@ fun LoginPage(navController: NavHostController) {
                         bitmap = it,
                         contentDescription = "Login Illustration",
                         modifier = Modifier
-                            .height(400.dp)
+                            .height(450.dp)
                             .aspectRatio(it.width.toFloat() / it.height.toFloat())
-                            .padding(bottom = 16.dp)
+                            .padding(bottom = 24.dp)
                     )
                 }
 
@@ -95,29 +104,35 @@ fun LoginPage(navController: NavHostController) {
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = greenColor,
-                        unfocusedBorderColor = greenColor,
-                        focusedLabelColor = greenColor
+                        focusedBorderColor = darkModeColorGreen,
+                        unfocusedBorderColor = darkModeColorGreen,
+                        focusedLabelColor = darkModeColorGreen
                     )
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 // Affichage du loader ou du bouton
                 if (isLoading) {
                     CircularProgressIndicator(
-                        color = greenColor,
+                        color = darkModeColorGreen,
                         modifier = Modifier.size(48.dp)
                     )
                 } else {
                     Button(
-                        onClick = { viewModel.login(mail) },
+                        onClick = {
+                            viewModel.login(mail) { message, isSuccess ->
+                                alertMessage = message
+                                alertIsSuccess = isSuccess
+                                alertVisible = true
+                            }
+                        },
                         modifier = Modifier
                             .height(48.dp)
                             .fillMaxWidth(),
                         enabled = mail.isNotEmpty(),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = greenColor,
+                            containerColor = darkModeColorGreen,
                             contentColor = Color.White
                         )
                     ) {
@@ -125,15 +140,16 @@ fun LoginPage(navController: NavHostController) {
                     }
                 }
 
-                // Affichage du message d'erreur
-                if (loginMessage.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = loginMessage,
-                        color = Color.Red,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
+                Spacer(modifier = Modifier.height(32.dp))
+            }
+
+            // Alerte
+            if (alertVisible) {
+                Alert(
+                    isSuccess = alertIsSuccess,
+                    message = alertMessage,
+                    onDismiss = { alertVisible = false }
+                )
             }
         }
     )

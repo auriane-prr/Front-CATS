@@ -12,19 +12,16 @@ import kotlinx.serialization.json.Json
 class CarteRepository(private val client: HttpClient) {
     private val json = Json { ignoreUnknownKeys = true }
 
-    suspend fun fetchCartes(): List<Carte>? {
-        try {
-            val response = client.get("https://back-cats.onrender.com/carte")
+    suspend fun fetchLastModified(carteId: String): String? {
+        return try {
+            val response = client.get("https://back-cats.onrender.com/carte/$carteId/lastModified")
             if (response.status == HttpStatusCode.OK) {
-                return json.decodeFromString(
-                    ListSerializer(Carte.serializer()),
-                    response.bodyAsText()
-                )
-            }
+                response.bodyAsText() // Retourne la date au format ISO 8601
+            } else null
         } catch (e: Exception) {
-            println("Erreur dans fetchCartes : ${e.message}")
+            println("Erreur dans fetchLastModified : ${e.message}")
+            null
         }
-        return null
     }
 
     suspend fun fetchCarteImageUrl(carteId: String): String {
