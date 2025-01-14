@@ -6,7 +6,7 @@ import androidx.compose.material3.darkColorScheme
 
 val LightThemeColors = lightColorScheme(
     primary = Color(0xFF6200EE),
-    secondary = Color(0xFF03DAC5),
+    secondary = Color.White,
     background = Color(0xFFFFFFFF),
     surface = Color(0xFFFFFFFF),
     onPrimary = Color.White,

@@ -1,5 +1,6 @@
 package com.pfe.maborneapp.view.user
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -27,6 +28,8 @@ import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
 import com.pfe.maborneapp.view.components.Alert
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import com.pfe.maborneapp.view.components.image.NetworkImage
+import com.pfe.maborneapp.view.components.image.ZoomableImageView
 
 @Composable
 fun UserHomePage(navController: NavHostController, userId: String, carteId: String? = null) {
@@ -44,11 +47,11 @@ fun UserHomePage(navController: NavHostController, userId: String, carteId: Stri
 
     val signalementViewModel: SignalementViewModel = viewModel(factory = SignalementViewModelFactory())
 
-
     var isMenuOpen by remember { mutableStateOf(false) }
     var alertVisible by remember { mutableStateOf(false) }
     var alertMessage by remember { mutableStateOf("") }
     var alertIsSuccess by remember { mutableStateOf(true) }
+    var showZoomableMap by remember { mutableStateOf(false) }
 
     LaunchedEffect(userId, carteId) {
         userViewModel.fetchUserEmail(userId)
@@ -56,75 +59,57 @@ fun UserHomePage(navController: NavHostController, userId: String, carteId: Stri
         borneViewModel.fetchBornesByEtat()
     }
 
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        content = {
-            val scrollState = rememberScrollState()
-
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
+    if (showZoomableMap) {
+        ZoomableImageView(
+            imageUrl = selectedCarteImageUrl,
+            lastModified = selectedCarteLastModified,
+            contentDescription = "Detailed Map",
+            onClose = { showZoomableMap = false }
+        )
+    } else {
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.background,
+            content = {
                 Column(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .fillMaxSize()
-                        .verticalScroll(scrollState),
+                        .verticalScroll(rememberScrollState())
                 ) {
-                    // Header
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = if (userEmail.isNotEmpty()) "Bonjour $userEmail" else "Chargement...",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = darkModeColorTitle,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                        )
-                    }
+                    Text(
+                        text = if (userEmail.isNotEmpty()) "Bonjour $userEmail" else "Chargement...",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = darkModeColorTitle,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
 
                     Spacer(modifier = Modifier.height(16.dp))
-
-                    // Titre de la carte
                     Text(
                         text = "CATS de Montpellier",
                         style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        fontSize = 20.sp,
+                        fontSize = 20.sp
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
-
-                    MapView(
+                    NetworkImage(
                         imageUrl = selectedCarteImageUrl,
                         lastModified = selectedCarteLastModified,
-                        contentDescription = "Carte Image"
+                        contentDescription = "Carte Image",
+                        modifier = Modifier.clickable { showZoomableMap = true }
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
-
                     Text(
                         text = "Bornes :",
-                        fontSize = 20.sp,
-                        modifier = Modifier.padding(horizontal = 16.dp)
+                        fontSize = 20.sp
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
-
-                    // Afficher le loader ou la liste des bornes
                     if (isLoading) {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(
-                                color = darkModeColorTitle,
-                                modifier = Modifier.size(48.dp)
-                            )
-                        }
+                        CircularProgressIndicator(
+                            color = darkModeColorTitle,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
                     } else {
                         etatBornes?.let {
                             if (it.disponible.isEmpty() && it.occupee.isEmpty() && it.hs.isEmpty() && it.signalee.isEmpty()) {
@@ -145,11 +130,7 @@ fun UserHomePage(navController: NavHostController, userId: String, carteId: Stri
                             }
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(32.dp))
                 }
-
-                // Alerte
                 if (alertVisible) {
                     Alert(
                         isSuccess = alertIsSuccess,
@@ -157,8 +138,6 @@ fun UserHomePage(navController: NavHostController, userId: String, carteId: Stri
                         onDismiss = { alertVisible = false }
                     )
                 }
-
-                // Menu
                 Menu(
                     navController = navController,
                     isMenuOpen = isMenuOpen,
@@ -167,6 +146,6 @@ fun UserHomePage(navController: NavHostController, userId: String, carteId: Stri
                     userId = userId
                 )
             }
-        }
-    )
+        )
+    }
 }
