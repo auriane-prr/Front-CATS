@@ -5,6 +5,8 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,7 +30,6 @@ import com.pfe.maborneapp.viewmodel.factories.BorneViewModelFactory
 import com.pfe.maborneapp.viewmodel.BorneViewModel
 import com.pfe.maborneapp.models.CreateBorneRequest
 import com.pfe.maborneapp.models.TypeBorne
-
 @Composable
 fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
     val carteViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
@@ -42,10 +43,13 @@ fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
 
     var isMenuOpen by remember { mutableStateOf(false) }
     var showZoomableMap by remember { mutableStateOf(false) }
-    var isCreateModalOpen by remember { mutableStateOf(false) } // État pour la modale de création
-    val typesBorne = listOf( // Remplacez par un appel réel pour récupérer les types
+    var isCreateModalOpen by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) } // Pour gérer les erreurs
+
+    // Simulation de types de borne (remplacer par un appel réel)
+    val typesBorne = listOf(
         TypeBorne("675c2adb6fc93512a0050c43", "Voiture"),
-        TypeBorne("675c2adb6fc93512a0050c44", "Velo")
+        TypeBorne("675c2adb6fc93512a0050c44", "Vélo")
     )
 
     LaunchedEffect(carteId) {
@@ -62,13 +66,23 @@ fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
     } else {
         Scaffold(
             containerColor = MaterialTheme.colorScheme.background,
-            content = {
-                val scrollState = rememberScrollState()
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = {  navController.navigate("newBorne")},
+                    containerColor = darkModeColorGreen,
+                    contentColor = Color.White,
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = "Nouvelle Borne")
+                }
+            },
+            content = { paddingValues ->
                 Column(
                     modifier = Modifier
+                        .padding(paddingValues)
                         .padding(horizontal = 16.dp)
                         .fillMaxSize()
-                        .verticalScroll(scrollState)
+                        .verticalScroll(rememberScrollState())
                 ) {
                     Text(
                         text = "Bienvenue sur le tableau de bord administrateur",
@@ -85,7 +99,6 @@ fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Affichage de l'image
                     NetworkImage(
                         imageUrl = selectedCarteImageUrl,
                         lastModified = selectedCarteLastModified,
@@ -94,17 +107,6 @@ fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
                             .fillMaxWidth()
                             .clickable { showZoomableMap = true }
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Bouton pour créer une borne
-                    Button(
-                        onClick = { isCreateModalOpen = true },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                    ) {
-                        Text("Créer une borne")
-                    }
 
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
@@ -128,27 +130,28 @@ fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
                     }
                 }
 
-                // Modale de création de borne
                 if (isCreateModalOpen) {
-                    CreateBorneModal(
+                    NewBornePage(
+                        navController = navController,
                         typesBorne = typesBorne,
-                        onClose = { isCreateModalOpen = false },
-                        onSubmit = { request ->
-                            borneViewModel.createBorne(
-                                request = request,
-                                onSuccess = {
-                                    println("Borne créée avec succès : $it")
-                                    isCreateModalOpen = false
-                                },
-                                onError = { error ->
-                                    println("Erreur lors de la création : $error")
-                                }
-                            )
-                        }
+                        carteId = carteId,
                     )
                 }
 
-                // Menu Admin
+                // Afficher une alerte en cas d'erreur
+                errorMessage?.let { error ->
+                    AlertDialog(
+                        onDismissRequest = { errorMessage = null },
+                        confirmButton = {
+                            Button(onClick = { errorMessage = null }) {
+                                Text("OK")
+                            }
+                        },
+                        title = { Text("Erreur") },
+                        text = { Text(error) }
+                    )
+                }
+
                 AdminMenu(
                     navController = navController,
                     isMenuOpen = isMenuOpen,

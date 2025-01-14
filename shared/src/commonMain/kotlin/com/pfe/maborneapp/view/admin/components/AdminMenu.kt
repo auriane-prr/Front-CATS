@@ -1,6 +1,7 @@
 package com.pfe.maborneapp.view.admin.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -13,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.compose.ui.Alignment
+import com.pfe.maborneapp.utils.DarkModeGreen
 
 @Composable
 fun AdminMenu(
@@ -21,7 +23,7 @@ fun AdminMenu(
     onToggleMenu: () -> Unit,
     currentPage: String
 ) {
-    val greenColor = Color(0xFF045C3C)
+    val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
     val menuBackgroundColor = Color(0xFFBDD3D0)
 
     Box(
@@ -47,30 +49,30 @@ fun AdminMenu(
                         Text(
                             text = "Accueil",
                             style = MaterialTheme.typography.bodyLarge,
-                            color = if (currentPage == "adminHome") greenColor else Color.Black
+                            color = if (currentPage == "adminHome") darkModeColorGreen else Color.Black
                         )
                     }
-                    Divider(color = greenColor, thickness = 1.dp)
+                    Divider(color = darkModeColorGreen, thickness = 1.dp)
 
                     // Signalement
                     TextButton(onClick = { navController.navigate("adminSignalement") }) {
                         Text(
                             text = "Signalement",
                             style = MaterialTheme.typography.bodyLarge,
-                            color = if (currentPage == "adminSignalement") greenColor else Color.Black
+                            color = if (currentPage == "adminSignalement") darkModeColorGreen else Color.Black
                         )
                     }
-                    Divider(color = greenColor, thickness = 1.dp)
+                    Divider(color = darkModeColorGreen, thickness = 1.dp)
 
                     // Statistique
                     TextButton(onClick = { navController.navigate("adminStatistique") }) {
                         Text(
                             text = "Statistique",
                             style = MaterialTheme.typography.bodyLarge,
-                            color = if (currentPage == "adminStatistique") greenColor else Color.Black
+                            color = if (currentPage == "adminStatistique") darkModeColorGreen else Color.Black
                         )
                     }
-                    Divider(color = greenColor, thickness = 1.dp)
+                    Divider(color = darkModeColorGreen, thickness = 1.dp)
 
                     // Déconnexion
                     TextButton(onClick = { navController.navigate("login") }) {
@@ -95,7 +97,7 @@ fun AdminMenu(
             Icon(
                 imageVector = Icons.Default.Menu,
                 contentDescription = "Menu",
-                tint = greenColor
+                tint = darkModeColorGreen
             )
         }
     }

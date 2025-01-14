@@ -35,7 +35,7 @@ fun Menu(
     LaunchedEffect(userId) {
         userViewModel.fetchUserEmail(userId)
     }
-    val darkModeColorMenu = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
+    val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
     val greenColor = Color(0xFF045C3C)
     val menuBackgroundColor = Color(0xFFBDD3D0)
 
@@ -62,30 +62,30 @@ fun Menu(
                         Text(
                             text = "Accueil",
                             style = MaterialTheme.typography.bodyLarge,
-                            color = if (currentPage == "home") greenColor else Color.Black
+                            color = if (currentPage == "home") darkModeColorGreen else Color.Black
                         )
                     }
-                    Divider(color = greenColor, thickness = 1.dp)
+                    Divider(color = darkModeColorGreen, thickness = 1.dp)
 
                     // Réservations
                     TextButton(onClick = { navController.navigate("reservations/$userId") }) {
                         Text(
                             text = "Réservations",
                             style = MaterialTheme.typography.bodyLarge,
-                            color = if (currentPage == "reservations") greenColor else Color.Black
+                            color = if (currentPage == "reservations") darkModeColorGreen else Color.Black
                         )
                     }
-                    Divider(color = greenColor, thickness = 1.dp)
+                    Divider(color = darkModeColorGreen, thickness = 1.dp)
 /*
                     // Profil
                     TextButton(onClick = { navController.navigate("profil/$userId") }) {
                         Text(
                             text = "Profil",
                             style = MaterialTheme.typography.bodyLarge,
-                            color = if (currentPage == "profil") greenColor else Color.Black
+                            color = if (currentPage == "profil") darkModeColorGreen else Color.Black
                         )
                     }
-                    Divider(color = greenColor, thickness = 1.dp)*/
+                    Divider(color = darkModeColorGreen, thickness = 1.dp)*/
 
                     // Déconnexion
                     TextButton(onClick = {
@@ -114,7 +114,7 @@ fun Menu(
             Icon(
                 imageVector = Icons.Default.Menu,
                 contentDescription = "Menu",
-                tint = darkModeColorMenu
+                tint = darkModeColorGreen
             )
         }
     }
