@@ -1,6 +1,7 @@
 package com.pfe.maborneapp.repositories
 
 import com.pfe.maborneapp.models.Borne
+import com.pfe.maborneapp.models.CreateBorneRequest
 import com.pfe.maborneapp.models.EtatBornes
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -24,6 +25,24 @@ class BorneRepository(private val client: HttpClient) {
             println("DEBUG, Erreur dans fetchBornesByEtat : ${e.message}")
         }
         return null
+    }
+
+    suspend fun createBorne(request: CreateBorneRequest): Borne? {
+        return try {
+            val response = client.post("https://back-cats.onrender.com/borne") {
+                contentType(ContentType.Application.Json)
+                setBody(request)
+            }
+            if (response.status == HttpStatusCode.OK) {
+                json.decodeFromString(Borne.serializer(), response.bodyAsText())
+            } else {
+                println("Erreur : Statut HTTP ${response.status}")
+                null
+            }
+        } catch (e: Exception) {
+            println("Erreur lors de la création de la borne : ${e.message}")
+            null
+        }
     }
 
 }

@@ -14,11 +14,13 @@ import androidx.navigation.NavHostController
 import com.pfe.maborneapp.view.components.NetworkImage
 import com.pfe.maborneapp.view.admin.components.AdminMenu
 import com.pfe.maborneapp.view.admin.components.BorneListAdmin
-import com.pfe.maborneapp.view.user.components.BorneList
+import com.pfe.maborneapp.view.admin.components.CreateBorneModal
 import com.pfe.maborneapp.viewmodel.CarteViewModel
 import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
 import com.pfe.maborneapp.viewmodel.factories.BorneViewModelFactory
 import com.pfe.maborneapp.viewmodel.BorneViewModel
+import com.pfe.maborneapp.models.CreateBorneRequest
+import com.pfe.maborneapp.models.TypeBorne
 
 @Composable
 fun AdminHomePage(navController: NavHostController) {
@@ -29,6 +31,11 @@ fun AdminHomePage(navController: NavHostController) {
     val etatBornes by borneViewModel.etatBornes.collectAsState()
 
     var isMenuOpen by remember { mutableStateOf(false) }
+    var isCreateModalOpen by remember { mutableStateOf(false) } // État pour la modale de création
+    val typesBorne = listOf( // Remplacez par un appel réel pour récupérer les types
+        TypeBorne("675c2adb6fc93512a0050c43", "Voiture"),
+        TypeBorne("675c2adb6fc93512a0050c44", "Velo")
+    )
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -46,7 +53,7 @@ fun AdminHomePage(navController: NavHostController) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp), // Ajuste uniquement le padding vertical
+                            .padding(vertical = 8.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -56,7 +63,6 @@ fun AdminHomePage(navController: NavHostController) {
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                         )
                     }
-
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -74,9 +80,21 @@ fun AdminHomePage(navController: NavHostController) {
                         imageUrl = selectedCarteImageUrl,
                         contentDescription = "Carte pour Admin",
                         modifier = Modifier
-                            .fillMaxWidth() // Largeur maximale avec padding
-                            .padding(horizontal = 16.dp) // Ajout d'un padding horizontal
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
                     )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Bouton pour créer une borne
+                    Button(
+                        onClick = { isCreateModalOpen = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        Text("Créer une borne")
+                    }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -86,6 +104,26 @@ fun AdminHomePage(navController: NavHostController) {
                     } ?: run {
                         Text(text = "Chargement des bornes...")
                     }
+                }
+
+                // Modale de création de borne
+                if (isCreateModalOpen) {
+                    CreateBorneModal(
+                        typesBorne = typesBorne,
+                        onClose = { isCreateModalOpen = false },
+                        onSubmit = { request ->
+                            borneViewModel.createBorne(
+                                request = request,
+                                onSuccess = {
+                                    println("Borne créée avec succès : $it")
+                                    isCreateModalOpen = false
+                                },
+                                onError = { error ->
+                                    println("Erreur lors de la création : $error")
+                                }
+                            )
+                        }
+                    )
                 }
 
                 // Menu Admin

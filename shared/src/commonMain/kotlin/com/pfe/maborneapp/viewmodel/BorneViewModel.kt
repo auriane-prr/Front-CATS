@@ -3,6 +3,7 @@ package com.pfe.maborneapp.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pfe.maborneapp.models.Borne
+import com.pfe.maborneapp.models.CreateBorneRequest
 import com.pfe.maborneapp.models.EtatBornes
 import com.pfe.maborneapp.repositories.BorneRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,6 +16,22 @@ class BorneViewModel(private val repository: BorneRepository) : ViewModel() {
 
     init {
         fetchBornesByEtat()
+    }
+
+    fun createBorne(request: CreateBorneRequest, onSuccess: (Borne) -> Unit, onError: (String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val newBorne = repository.createBorne(request)
+                if (newBorne != null) {
+                    onSuccess(newBorne)
+                    fetchBornesByEtat() // Actualiser les bornes après création
+                } else {
+                    onError("Erreur lors de la création de la borne.")
+                }
+            } catch (e: Exception) {
+                onError("Erreur inattendue : ${e.message}")
+            }
+        }
     }
 
     private fun fetchBornesByEtat() {
