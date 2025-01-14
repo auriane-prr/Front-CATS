@@ -21,10 +21,14 @@ import com.pfe.maborneapp.view.admin.components.BorneListAdmin
 import com.pfe.maborneapp.view.components.image.MapView
 import com.pfe.maborneapp.view.components.image.NetworkImage
 import com.pfe.maborneapp.view.components.image.ZoomableImageView
+import com.pfe.maborneapp.view.admin.components.CreateBorneModal
 import com.pfe.maborneapp.viewmodel.CarteViewModel
 import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
 import com.pfe.maborneapp.viewmodel.factories.BorneViewModelFactory
 import com.pfe.maborneapp.viewmodel.BorneViewModel
+import com.pfe.maborneapp.models.CreateBorneRequest
+import com.pfe.maborneapp.models.TypeBorne
+
 @Composable
 fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
     val carteViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
@@ -38,6 +42,11 @@ fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
 
     var isMenuOpen by remember { mutableStateOf(false) }
     var showZoomableMap by remember { mutableStateOf(false) }
+    var isCreateModalOpen by remember { mutableStateOf(false) } // État pour la modale de création
+    val typesBorne = listOf( // Remplacez par un appel réel pour récupérer les types
+        TypeBorne("675c2adb6fc93512a0050c43", "Voiture"),
+        TypeBorne("675c2adb6fc93512a0050c44", "Velo")
+    )
 
     LaunchedEffect(carteId) {
         carteViewModel.fetchCarteDetails(carteId)
@@ -73,8 +82,10 @@ fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
                         text = "CATS de Montpellier",
                         style = MaterialTheme.typography.titleMedium
                     )
+
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // Affichage de l'image
                     NetworkImage(
                         imageUrl = selectedCarteImageUrl,
                         lastModified = selectedCarteLastModified,
@@ -83,6 +94,17 @@ fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
                             .fillMaxWidth()
                             .clickable { showZoomableMap = true }
                     )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Bouton pour créer une borne
+                    Button(
+                        onClick = { isCreateModalOpen = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        Text("Créer une borne")
+                    }
 
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
@@ -104,6 +126,26 @@ fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
                             )
                         } ?: Text(text = "Chargement des bornes...")
                     }
+                }
+
+                // Modale de création de borne
+                if (isCreateModalOpen) {
+                    CreateBorneModal(
+                        typesBorne = typesBorne,
+                        onClose = { isCreateModalOpen = false },
+                        onSubmit = { request ->
+                            borneViewModel.createBorne(
+                                request = request,
+                                onSuccess = {
+                                    println("Borne créée avec succès : $it")
+                                    isCreateModalOpen = false
+                                },
+                                onError = { error ->
+                                    println("Erreur lors de la création : $error")
+                                }
+                            )
+                        }
+                    )
                 }
 
                 // Menu Admin
