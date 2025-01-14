@@ -130,6 +130,7 @@ fun UserHomePage(navController: NavHostController, userId: String, carteId: Stri
                             }
                         }
                     }
+                    Spacer(modifier = Modifier.height(32.dp))
                 }
                 if (alertVisible) {
                     Alert(
