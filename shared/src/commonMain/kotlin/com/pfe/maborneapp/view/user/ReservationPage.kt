@@ -52,7 +52,6 @@ fun ReservationPage(navController: NavHostController, userId: String) {
     }
 
     var isMenuOpen by remember { mutableStateOf(false) }
-    var showReservationModal by remember { mutableStateOf(false) }
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
     Scaffold(
