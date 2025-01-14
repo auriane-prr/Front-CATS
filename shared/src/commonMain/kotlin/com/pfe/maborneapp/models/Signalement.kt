@@ -9,5 +9,6 @@ data class Signalement(
     @SerialName("_id") val id: String? = null,
     val borne: Borne,
     val user: User,
+    val etat: String,
     val motif: String
 )
