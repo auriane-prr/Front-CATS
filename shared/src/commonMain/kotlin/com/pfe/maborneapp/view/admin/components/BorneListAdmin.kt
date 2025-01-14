@@ -25,13 +25,6 @@ fun BorneListAdmin(etatBornes: EtatBornes, modifier: Modifier = Modifier,contain
     var selectedBorne by remember { mutableStateOf<Borne?>(null) }
     val darkModeColorTitle = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
-    Text(
-        text = "Bornes (Admin) :",
-        style = MaterialTheme.typography.titleMedium,
-        modifier = modifier
-            .padding(horizontal = 16.dp)
-    )
-
     Column(
         modifier = modifier
             .padding(16.dp)

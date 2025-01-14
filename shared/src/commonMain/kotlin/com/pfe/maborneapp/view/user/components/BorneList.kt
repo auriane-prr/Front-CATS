@@ -29,6 +29,7 @@ fun BorneList(
     borneViewModel: BorneViewModel,
     showAlert: (String, Boolean) -> Unit,
     containerColor: Color,
+    modifier: Modifier = Modifier
 ) {
     var selectedBorne by remember { mutableStateOf<Borne?>(null) }
 
@@ -41,22 +42,20 @@ fun BorneList(
         etatBornes.signalee.map { it to "Signalée" }
     ).flatten()
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                color = containerColor,
-                shape = RoundedCornerShape(16.dp)
-            )
-            .border(
-                width = 2.dp,
-                color = darkModeColorTitle,
-                shape = RoundedCornerShape(16.dp)
-            )
-            .padding(16.dp)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth()
+
+    Column(
+            modifier = modifier
+                .padding(16.dp)
+                .background(
+                    color = containerColor,
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .border(
+                    width = 2.dp,
+                    color = darkModeColorTitle,
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .padding(16.dp)
         ) {
             allBornes.forEachIndexed { index, (borne, label) ->
                 Row(
@@ -111,7 +110,7 @@ fun BorneList(
                 }
             }
         }
-    }
+
 
     if (selectedBorne != null) {
         SignalementModal(

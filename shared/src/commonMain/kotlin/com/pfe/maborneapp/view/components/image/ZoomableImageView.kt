@@ -122,7 +122,7 @@ fun ZoomableImageView(
                     Icon(Icons.Default.Remove, contentDescription = "Zoom Out", tint = Color.White)
                 }
                 Button(onClick = onClose, colors = ButtonDefaults.buttonColors(containerColor = darkModeColorGreen)) {
-                    Text(text = "Fermer")
+                    Text(text = "Fermer", color = Color.White)
                 }
             }
             Spacer(modifier = Modifier.weight(0.1f))
