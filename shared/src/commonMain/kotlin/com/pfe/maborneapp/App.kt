@@ -2,12 +2,13 @@ package com.pfe.maborneapp
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Shapes
 import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.pfe.maborneapp.utils.ImageCache
 import com.pfe.maborneapp.utils.DarkThemeColors
 import com.pfe.maborneapp.utils.LightThemeColors
@@ -16,8 +17,10 @@ import com.pfe.maborneapp.view.user.UserHomePage
 import com.pfe.maborneapp.view.LoginPage
 import com.pfe.maborneapp.view.admin.AdminSignalementPage
 import com.pfe.maborneapp.view.admin.AdminStatistiquePage
+import com.pfe.maborneapp.view.user.AvailableBornesPage
 import com.pfe.maborneapp.view.user.ReservationPage
 import com.pfe.maborneapp.view.user.ProfilPage
+import com.pfe.maborneapp.view.user.NewReservationPage
 
 
 @Composable
@@ -55,6 +58,7 @@ fun AppNavigation(navController: NavHostController) {
         composable("adminHome") { AdminHomePage(navController) }
         composable("adminSignalement") { AdminSignalementPage(navController) }
         composable("adminStatistique") { AdminStatistiquePage(navController) }
+        // Pages Admin
         composable("userHome/{userId}") { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId") ?: ""
             UserHomePage(navController, userId)
@@ -67,5 +71,23 @@ fun AppNavigation(navController: NavHostController) {
             val userId = backStackEntry.arguments?.getString("userId") ?: ""
             ProfilPage(navController, userId)
         }
+        composable("newReservation/{userId}") { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId") ?: ""
+            NewReservationPage(navController, userId)
+        }
+        composable(
+            route = "availableBornes/{startDate}/{endDate}/{userId}",
+            arguments = listOf(
+                navArgument("startDate") { type = NavType.StringType },
+                navArgument("endDate") { type = NavType.StringType },
+                navArgument("userId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val startDate = backStackEntry.arguments?.getString("startDate") ?: ""
+            val endDate = backStackEntry.arguments?.getString("endDate") ?: ""
+            val userId = backStackEntry.arguments?.getString("userId") ?: ""
+            AvailableBornesPage(navController, startDate, endDate, userId)
+        }
+
     }
 }

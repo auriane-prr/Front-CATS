@@ -8,6 +8,11 @@ import com.pfe.maborneapp.repositories.ReservationRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import com.pfe.maborneapp.utils.formatDateOnly
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 class ReservationViewModel(private val reservationRepository: ReservationRepository) : ViewModel() {
     private val _reservations = MutableStateFlow<List<Reservation>?>(null)
@@ -19,9 +24,13 @@ class ReservationViewModel(private val reservationRepository: ReservationReposit
     private val _creationStatus = MutableStateFlow<Boolean?>(null)
     val creationStatus: StateFlow<Boolean?> = _creationStatus
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     fun fetchReservations(userId: String) {
         println("DEBUG: Appel à fetchReservations avec userId = $userId")
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 val fetchedReservations = reservationRepository.fetchReservationsByUser(userId)
                 println("DEBUG: Réservations reçues du repository = $fetchedReservations")
@@ -29,6 +38,8 @@ class ReservationViewModel(private val reservationRepository: ReservationReposit
             } catch (e: Exception) {
                 println("DEBUG: Exception dans fetchReservations : ${e.message}")
                 _reservations.value = null
+            } finally {
+                _isLoading.value = false
             }
         }
     }
@@ -64,6 +75,30 @@ class ReservationViewModel(private val reservationRepository: ReservationReposit
                 _creationStatus.value = false
             }
         }
+    }
+
+    fun getSortedReservations(): Pair<List<Reservation>, List<Reservation>> {
+        val now = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+
+        val upcomingReservations = _reservations.value?.filter { reservation ->
+            val startDate = Instant.parse(reservation.dateDebut).toLocalDateTime(TimeZone.UTC)
+            startDate >= now
+        }?.sortedBy { reservation ->
+            Instant.parse(reservation.dateDebut).toLocalDateTime(TimeZone.UTC)
+        } ?: emptyList()
+
+        val pastReservations = _reservations.value?.filter { reservation ->
+            val endDate = Instant.parse(reservation.dateFin).toLocalDateTime(TimeZone.UTC)
+            endDate < now
+        }?.sortedByDescending { reservation ->
+            Instant.parse(reservation.dateDebut).toLocalDateTime(TimeZone.UTC)
+        } ?: emptyList()
+
+        return Pair(upcomingReservations, pastReservations)
+    }
+
+    fun formatReservationDate(dateTime: String): String {
+        return formatDateOnly(dateTime)
     }
 }
 

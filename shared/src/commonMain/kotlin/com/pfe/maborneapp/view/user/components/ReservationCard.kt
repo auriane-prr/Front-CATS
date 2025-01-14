@@ -34,24 +34,19 @@ fun ReservationCard(reservation: Reservation) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = "Borne ${reservation.borne.numero}     -     ${reservation.borne.carte.nom}",
-                style = MaterialTheme.typography.titleMedium
-            )
             val startDate = formatDateOnly(reservation.dateDebut)
             val startTime = formatTimeOnly(reservation.dateDebut)
             val endTime = formatTimeOnly(reservation.dateFin)
 
             Text(
-                text = "Le $startDate de $startTime à $endTime",
+                text = "$startDate, $startTime - $endTime",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Text(
+                text = "Borne ${reservation.borne.numero} - ${reservation.borne.carte.nom}",
                 style = MaterialTheme.typography.bodyMedium
             )
         }
-
-        /*Icon(
-            imageVector = Icons.Default.ChevronRight,
-            contentDescription = "Chevron",
-            tint = Color(0xFF045C3C)
-        )*/
     }
 }

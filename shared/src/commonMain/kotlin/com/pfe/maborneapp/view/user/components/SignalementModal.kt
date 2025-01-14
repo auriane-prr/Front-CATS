@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pfe.maborneapp.models.Borne
 import com.pfe.maborneapp.utils.DarkModeGreen
-import com.pfe.maborneapp.view.components.Alert
 import com.pfe.maborneapp.viewmodel.SignalementViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,7 +34,7 @@ fun SignalementModal(
             title = {
                 Box(
                     modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center // Centrage horizontal
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "Signaler la borne ${selectedBorne.numero}",

@@ -57,10 +57,9 @@ fun LoginPage(navController: NavHostController) {
 
             Column(
                 modifier = Modifier
-                    .padding(top = 12.dp)
                     .fillMaxSize()
                     .padding(horizontal = 32.dp)
-                    .verticalScroll(scrollState), // Activation du défilement vertical
+                    .verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
@@ -74,7 +73,7 @@ fun LoginPage(navController: NavHostController) {
                         bitmap = it,
                         contentDescription = "Logo",
                         modifier = Modifier
-                            .size(200.dp)
+                            .size(180.dp)
                     )
                 }
 
@@ -88,9 +87,9 @@ fun LoginPage(navController: NavHostController) {
                         bitmap = it,
                         contentDescription = "Login Illustration",
                         modifier = Modifier
-                            .height(400.dp)
+                            .height(450.dp)
                             .aspectRatio(it.width.toFloat() / it.height.toFloat())
-                            .padding(bottom = 16.dp)
+                            .padding(bottom = 24.dp)
                     )
                 }
 
@@ -111,7 +110,7 @@ fun LoginPage(navController: NavHostController) {
                     )
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 // Affichage du loader ou du bouton
                 if (isLoading) {
