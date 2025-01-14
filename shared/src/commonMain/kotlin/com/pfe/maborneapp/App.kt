@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.pfe.maborneapp.models.TypeBorne
 import com.pfe.maborneapp.utils.ImageCache
 import com.pfe.maborneapp.utils.DarkThemeColors
 import com.pfe.maborneapp.utils.LightThemeColors
@@ -17,6 +18,7 @@ import com.pfe.maborneapp.view.user.UserHomePage
 import com.pfe.maborneapp.view.LoginPage
 import com.pfe.maborneapp.view.admin.AdminSignalementPage
 import com.pfe.maborneapp.view.admin.AdminStatistiquePage
+import com.pfe.maborneapp.view.admin.NewBornePage
 import com.pfe.maborneapp.view.user.AvailableBornesPage
 import com.pfe.maborneapp.view.user.ReservationPage
 import com.pfe.maborneapp.view.user.ProfilPage
@@ -75,6 +77,13 @@ fun AppNavigation(navController: NavHostController) {
             val userId = backStackEntry.arguments?.getString("userId") ?: ""
             NewReservationPage(navController, userId)
         }
+        composable("newBorne") {
+            NewBornePage(navController = navController, typesBorne = listOf(
+                TypeBorne("675c2adb6fc93512a0050c43", "Voiture"),
+                TypeBorne("675c2adb6fc93512a0050c44", "Vélo")
+            ))
+        }
+
         composable(
             route = "availableBornes/{startDate}/{endDate}/{userId}",
             arguments = listOf(

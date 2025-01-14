@@ -17,25 +17,35 @@ class BorneViewModel(private val repository: BorneRepository) : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    private val _creationStatus = MutableStateFlow<Boolean?>(null)
+    val creationStatus: StateFlow<Boolean?> = _creationStatus
+
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage
+
     init {
         fetchBornesByEtat()
     }
 
-    fun createBorne(request: CreateBorneRequest, onSuccess: (Borne) -> Unit, onError: (String) -> Unit) {
+    fun createBorne(request: CreateBorneRequest) {
         viewModelScope.launch {
+            _creationStatus.value = null // Réinitialise l'état
             try {
                 val newBorne = repository.createBorne(request)
                 if (newBorne != null) {
-                    onSuccess(newBorne)
+                    _creationStatus.value = true
                     fetchBornesByEtat() // Actualiser les bornes après création
                 } else {
-                    onError("Erreur lors de la création de la borne.")
+                    _creationStatus.value = false
+                    _errorMessage.value = "Erreur inconnue lors de la création de la borne."
                 }
             } catch (e: Exception) {
-                onError("Erreur inattendue : ${e.message}")
+                _creationStatus.value = false
+                _errorMessage.value = e.message ?: "Erreur inattendue."
             }
         }
     }
+
 
     fun fetchBornesByEtat() {
         viewModelScope.launch {
@@ -54,6 +64,9 @@ class BorneViewModel(private val repository: BorneRepository) : ViewModel() {
                 _isLoading.value = false
             }
         }
+    }
+    fun resetErrorMessage() {
+        _errorMessage.value = null
     }
 
 }

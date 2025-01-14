@@ -74,10 +74,10 @@ fun BorneModalAdmin(selectedBorne: Borne?, onClose: () -> Unit) {
                     confirmButton = {
                         Button(
                             onClick = { onClose() },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFBDD3D0)),
+                            colors = ButtonDefaults.buttonColors(containerColor = darkModeColorGreen),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(text = "Fermer")
+                            Text(text = "Fermer" )
                         }
                     },
                     dismissButton = null
