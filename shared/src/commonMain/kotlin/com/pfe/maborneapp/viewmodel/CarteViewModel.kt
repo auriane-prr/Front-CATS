@@ -14,6 +14,9 @@ class CarteViewModel(private val carteRepository: CarteRepository) : ViewModel()
     private val _carte = MutableStateFlow<List<Carte>>(emptyList())
     val carte: StateFlow<List<Carte>> = _carte
 
+    private val _selectedCarte = MutableStateFlow<Carte?>(null)
+    val selectedCarte: StateFlow<Carte?> = _selectedCarte
+
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
@@ -27,6 +30,10 @@ class CarteViewModel(private val carteRepository: CarteRepository) : ViewModel()
     val isLoading: StateFlow<Boolean> = _isLoading
 
     private val defaultCarteId = "6763ed3c4545c40e2a6c7e80" // ID de la carte par défaut
+
+    fun setSelectedCarte(carte: Carte?) {
+        _selectedCarte.value = carte
+    }
 
     fun fetchCarteDetails(carteId: String? = null) {
         viewModelScope.launch {

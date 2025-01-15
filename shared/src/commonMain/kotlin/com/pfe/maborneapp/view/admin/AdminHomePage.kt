@@ -39,22 +39,23 @@ import com.pfe.maborneapp.view.admin.components.CustomDropDown
 fun AdminHomePage(navController: NavHostController) {
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
-    // ViewModels pour gérer les cartes et les bornes
+
     val carteViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
-    val listeCartesViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
     val borneViewModel: BorneViewModel = viewModel(factory = BorneViewModelFactory())
 
+
     // États pour gérer les cartes, les bornes, et les erreurs
-    val cartes by listeCartesViewModel.carte.collectAsState()
+    val cartes by carteViewModel.carte.collectAsState()
     val selectedCarteImageUrl by carteViewModel.selectedCarteImageUrl.collectAsState()
     val selectedCarteLastModified by carteViewModel.selectedCarteLastModified.collectAsState()
+    val selectedCarte by carteViewModel.selectedCarte.collectAsState()
     val etatBornes by borneViewModel.etatBornes.collectAsState()
-    val isLoadingCartes by listeCartesViewModel.isLoading.collectAsState()
+    val isLoadingCartes by carteViewModel.isLoading.collectAsState()
     val isLoadingBornes by borneViewModel.isLoading.collectAsState()
-    val errorLoadingCartes by listeCartesViewModel.errorMessage.collectAsState()
+    val errorLoadingCartes by carteViewModel.errorMessage.collectAsState()
 
     // Gestion de la carte sélectionnée
-    var selectedCarte by remember { mutableStateOf<Carte?>(null) }
+
     var isMenuOpen by remember { mutableStateOf(false) }
     var showZoomableMap by remember { mutableStateOf(false) }
     var isCreateModalOpen by remember { mutableStateOf(false) }
@@ -62,13 +63,13 @@ fun AdminHomePage(navController: NavHostController) {
 
     // Charger les cartes au montage
     LaunchedEffect(Unit) {
-        listeCartesViewModel.fetchCartes()
+        carteViewModel.fetchCartes()
     }
 
     // Sélectionner la carte par défaut (CATS de Montpellier) après le chargement des cartes
     LaunchedEffect(cartes) {
         if (!cartes.isNullOrEmpty() && selectedCarte == null) {
-            selectedCarte = cartes.find { it.nom == "CATS de Montpellier" } // ID peut aussi être utilisé ici
+            carteViewModel.setSelectedCarte(cartes.find { it.nom == "CATS de Montpellier" })
         }
     }
 
@@ -94,7 +95,7 @@ fun AdminHomePage(navController: NavHostController) {
                 FloatingActionButton(
                     onClick = {
                         selectedCarte?.let { carte ->
-                            navController.navigate("newBorne/${carte.id}")
+                            navController.navigate("newBorne")
                         }
                     },
                     containerColor = darkModeColorGreen,
@@ -125,7 +126,9 @@ fun AdminHomePage(navController: NavHostController) {
                                 CarteDropdownMenu(
                                     cartes = cartes,
                                     selectedCarte = selectedCarte,
-                                    onCarteSelected = { selectedCarte = it }
+                                    onCarteSelected = {
+                                        carteViewModel.setSelectedCarte(it) // Mettre à jour la carte sélectionnée
+                                    }
                                 )
                             } else {
                                 Text(
@@ -170,8 +173,8 @@ fun AdminHomePage(navController: NavHostController) {
 
                             if (isCreateModalOpen) {
                                 NewBornePage(
-                                    navController = navController,
-                                    carteId = selectedCarte?.id,
+                                    navController = navController
+
                                 )
                             }
 
