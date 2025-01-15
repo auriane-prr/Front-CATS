@@ -22,6 +22,46 @@ data class SignalementRequest(
 
 class SignalementRepository(private val httpClient: HttpClient) {
 
+    suspend fun updateBorneStatus(borneId: String, newStatus: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = httpClient.put("https://back-cats.onrender.com/borne/$borneId/status/$newStatus") {
+                    contentType(ContentType.Application.Json)
+                }
+
+                if (response.status.isSuccess()) {
+                    println("DEBUG: Statut de la borne mis à jour avec succès : ${response.status}")
+                    true
+                } else {
+                    println("DEBUG: Échec de la mise à jour du statut : ${response.status}")
+                    false
+                }
+            } catch (e: Exception) {
+                println("Erreur lors de la mise à jour du statut : ${e.message}")
+                false
+            }
+        }
+    }
+
+    suspend fun closeSignalement(signalementId: String): Boolean {
+        return try {
+            val response = httpClient.put("https://back-cats.onrender.com/signalement/$signalementId/close") {
+                contentType(ContentType.Application.Json)
+            }
+            if (response.status.isSuccess()) {
+                println("Signalement fermé avec succès pour ID : $signalementId")
+                true
+            } else {
+                println("Erreur : Statut HTTP ${response.status}")
+                false
+            }
+        } catch (e: Exception) {
+            println("Erreur lors de la fermeture du signalement : ${e.message}")
+            false
+        }
+    }
+
+
     suspend fun signalerBorne(borneId: String, userId: String, motif: String): Boolean {
         return withContext(Dispatchers.IO) {
             val requestBody = SignalementRequest(

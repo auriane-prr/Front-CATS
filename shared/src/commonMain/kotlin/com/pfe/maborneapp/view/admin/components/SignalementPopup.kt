@@ -10,7 +10,11 @@ import androidx.compose.ui.unit.dp
 import com.pfe.maborneapp.models.Signalement
 
 @Composable
-fun SignalementPopup(signalement: Signalement, onDismiss: () -> Unit) {
+fun SignalementPopup(
+    signalement: Signalement,
+    onDismiss: () -> Unit,
+    onUpdateStatus: (borneId: String, newStatus: String) -> Unit // Callback pour changer l'état
+) {
     AlertDialog(
         onDismissRequest = { onDismiss() },
         title = {
@@ -30,6 +34,36 @@ fun SignalementPopup(signalement: Signalement, onDismiss: () -> Unit) {
                 Text(text = "Utilisateur : ${signalement.user.mail}")
                 Text(text = "Type de borne : ${signalement.borne.typeBorne.nom}")
                 Text(text = "Carte : ${signalement.borne.carte.nom}")
+
+                // Boutons pour changer l'état de la borne
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Button(
+                        onClick = {
+                            signalement.borne.id?.let { id ->
+                                onUpdateStatus(id, "hs")
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
+                        modifier = Modifier.weight(1f).padding(end = 8.dp)
+                    ) {
+                        Text("Déclarer HS")
+                    }
+
+                    Button(
+                        onClick = {
+                            signalement.borne.id?.let { id ->
+                                onUpdateStatus(id, "Fonctionnelle")
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Green),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Déclarer Fonctionnelle")
+                    }
+                }
             }
         },
         confirmButton = {

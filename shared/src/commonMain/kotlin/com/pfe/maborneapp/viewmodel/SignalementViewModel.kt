@@ -19,13 +19,60 @@ class SignalementViewModel(private val repository: SignalementRepository) : View
         fetchSignalements()
     }
 
-    private fun fetchSignalements() {
+    fun fetchSignalements() {
         viewModelScope.launch {
             try {
                 _signalements.value = repository.getSignalements()
             } catch (e: Exception) {
                 e.printStackTrace()
                 _signalements.value = emptyList()
+            }
+        }
+    }
+
+    fun closeSignalement(
+        signalementId: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val result = repository.closeSignalement(signalementId)
+                if (result) {
+                    // Supprime le signalement fermé de la liste
+                    _signalements.value = _signalements.value?.filterNot { it.id == signalementId }
+                    println("DEBUG: Signalement fermé avec succès.")
+                    onSuccess()
+                } else {
+                    onError("Échec de la fermeture du signalement.")
+                }
+            } catch (e: Exception) {
+                println("Erreur lors de la fermeture du signalement : ${e.message}")
+                onError("Erreur : ${e.message}")
+            }
+        }
+    }
+
+
+    // Fonction pour mettre à jour le statut d'une borne
+    fun updateBorneStatus(
+        borneId: String,
+        newStatus: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val updatedBorne = repository.updateBorneStatus(borneId, newStatus)
+                if (updatedBorne != null) {
+                    println("Statut de la borne mis à jour avec succès : $updatedBorne")
+                    onSuccess()
+                } else {
+                    onError("Échec de la mise à jour du statut de la borne.")
+                }
+            } catch (e: Exception) {
+                println("Erreur lors de la mise à jour du statut de la borne : ${e.message}")
+                onError("Erreur : ${e.message}")
             }
         }
     }
