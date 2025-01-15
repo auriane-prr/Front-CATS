@@ -1,6 +1,7 @@
 package com.pfe.maborneapp.repositories
 
 import com.pfe.maborneapp.models.Borne
+import com.pfe.maborneapp.models.CarteId
 import com.pfe.maborneapp.models.CreateBorneRequest
 import com.pfe.maborneapp.models.EtatBornes
 import io.ktor.client.*
@@ -17,6 +18,24 @@ class BorneRepository(private val client: HttpClient) {
     suspend fun fetchBornesByEtat(): EtatBornes? {
         return try {
             val response = client.get("https://back-cats.onrender.com/borne/etat")
+            println("DEBUG, Réponse brute : ${response.bodyAsText()}")
+            if (response.status == HttpStatusCode.OK) {
+                json.decodeFromString(EtatBornes.serializer(), response.bodyAsText())
+            } else {
+                println("DEBUG, Statut HTTP inattendu : ${response.status}")
+                null
+            }
+        } catch (e: Exception) {
+            println("DEBUG, Erreur dans fetchBornesByEtat : ${e.message}")
+            null
+        }
+    }
+
+    suspend fun fetchBornesByEtatAndCarte(carteId: CarteId): EtatBornes? {
+        return try {
+            val carteIdString = carteId._id
+            println("DEBUG, Appel à fetchBornesByEtatAndCarte avec carteId = $carteIdString")
+            val response = client.get("https://back-cats.onrender.com/borne/etat/$carteIdString")
             println("DEBUG, Réponse brute : ${response.bodyAsText()}")
             if (response.status == HttpStatusCode.OK) {
                 json.decodeFromString(EtatBornes.serializer(), response.bodyAsText())

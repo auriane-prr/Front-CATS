@@ -2,6 +2,8 @@ package com.pfe.maborneapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pfe.maborneapp.models.Carte
+import com.pfe.maborneapp.models.TypeBorne
 import com.pfe.maborneapp.repositories.CarteRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -9,11 +11,20 @@ import kotlinx.coroutines.launch
 
 class CarteViewModel(private val carteRepository: CarteRepository) : ViewModel() {
 
+    private val _carte = MutableStateFlow<List<Carte>>(emptyList())
+    val carte: StateFlow<List<Carte>> = _carte
+
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage
+
     private val _selectedCarteImageUrl = MutableStateFlow<String?>(null)
     val selectedCarteImageUrl: StateFlow<String?> = _selectedCarteImageUrl
 
     private val _selectedCarteLastModified = MutableStateFlow<String?>(null)
     val selectedCarteLastModified: StateFlow<String?> = _selectedCarteLastModified
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
 
     private val defaultCarteId = "6763ed3c4545c40e2a6c7e80" // ID de la carte par défaut
 
@@ -33,6 +44,26 @@ class CarteViewModel(private val carteRepository: CarteRepository) : ViewModel()
                 println("DEBUG, fetchCarteDetails - Chargé : $idToUse avec URL $imageUrl et lastModified $lastModified")
             } catch (e: Exception) {
                 println("Erreur dans fetchCarteDetails : ${e.message}")
+            }
+        }
+    }
+
+    fun fetchCartes() {
+        println("DEBUG: Appel à fetchTypesBorne")
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val fetchCarte = carteRepository.fetchCarte()
+                if (fetchCarte != null) {
+                    println("DEBUG: Types de bornes chargés avec succès : $fetchCarte")
+                    _carte.value = fetchCarte
+                } else {
+                    println("DEBUG: Aucune donnée retournée par le backend.")
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Erreur lors de la récupération des types de borne : ${e.message}"
+            } finally {
+                _isLoading.value = false
             }
         }
     }
