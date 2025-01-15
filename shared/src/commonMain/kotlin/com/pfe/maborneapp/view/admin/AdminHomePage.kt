@@ -34,13 +34,13 @@ import com.pfe.maborneapp.models.CreateBorneRequest
 import com.pfe.maborneapp.models.TypeBorne
 import com.pfe.maborneapp.view.admin.components.CarteDropdownMenu
 import com.pfe.maborneapp.view.admin.components.CustomDropDown
+import com.pfe.maborneapp.viewmodel.LocalCarteViewModel
 
 @Composable
 fun AdminHomePage(navController: NavHostController) {
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
+    val carteViewModel = LocalCarteViewModel.current
 
-
-    val carteViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
     val borneViewModel: BorneViewModel = viewModel(factory = BorneViewModelFactory())
 
 
@@ -76,10 +76,12 @@ fun AdminHomePage(navController: NavHostController) {
     // Charger les détails de la carte sélectionnée
     LaunchedEffect(selectedCarte) {
         selectedCarte?.let {
+            println("DEBUG: Chargement des bornes pour la carte sélectionnée - ID: ${it.id}")
             carteViewModel.fetchCarteDetails(it.id)
             borneViewModel.fetchBornesByEtatAndCarte(CarteId(it.id))
-        }
+        } ?: println("DEBUG: Aucune carte sélectionnée")
     }
+
 
     if (showZoomableMap) {
         ZoomableImageView(
@@ -127,7 +129,8 @@ fun AdminHomePage(navController: NavHostController) {
                                     cartes = cartes,
                                     selectedCarte = selectedCarte,
                                     onCarteSelected = {
-                                        carteViewModel.setSelectedCarte(it) // Mettre à jour la carte sélectionnée
+                                        carteViewModel.setSelectedCarte(it)
+                                        borneViewModel.fetchBornesByEtatAndCarte(CarteId(it.id))
                                     }
                                 )
                             } else {

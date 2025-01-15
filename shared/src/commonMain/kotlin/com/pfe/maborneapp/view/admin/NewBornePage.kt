@@ -24,6 +24,7 @@ import com.pfe.maborneapp.view.components.image.NetworkImage
 import com.pfe.maborneapp.view.components.image.ZoomableImageView
 import com.pfe.maborneapp.viewmodel.BorneViewModel
 import com.pfe.maborneapp.viewmodel.CarteViewModel
+import com.pfe.maborneapp.viewmodel.LocalCarteViewModel
 import com.pfe.maborneapp.viewmodel.TypeBorneViewModel
 import com.pfe.maborneapp.viewmodel.factories.BorneViewModelFactory
 import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
@@ -34,7 +35,7 @@ import com.pfe.maborneapp.viewmodel.factories.TypeBorneViewModelFactory
 @Composable
 fun NewBornePage(navController: NavHostController) {
     val borneViewModel: BorneViewModel = viewModel(factory = BorneViewModelFactory())
-    val carteViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
+    val carteViewModel = LocalCarteViewModel.current
     val typeBorneViewModel: TypeBorneViewModel = viewModel(factory = TypeBorneViewModelFactory())
 
     // États pour les champs de la borne et les cartes

@@ -24,10 +24,6 @@ class BorneViewModel(private val repository: BorneRepository) : ViewModel() {
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
-    init {
-        fetchBornesByEtat()
-    }
-
     fun createBorne(request: CreateBorneRequest) {
         viewModelScope.launch {
             println("DEBUG: Appel à createBorne avec request = $request")
@@ -69,11 +65,11 @@ class BorneViewModel(private val repository: BorneRepository) : ViewModel() {
             }
         }
     }
-
     fun fetchBornesByEtatAndCarte(carteId: CarteId) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
+                println("DEBUG: Appel à fetchBornesByEtatAndCarte avec carteId = $carteId")
                 val fetchedEtatBornes = repository.fetchBornesByEtatAndCarte(carteId)
                 if (fetchedEtatBornes != null) {
                     println("DEBUG, Bornes chargées avec succès : $fetchedEtatBornes")
@@ -88,6 +84,7 @@ class BorneViewModel(private val repository: BorneRepository) : ViewModel() {
             }
         }
     }
+
     fun resetErrorMessage() {
         _errorMessage.value = null
     }

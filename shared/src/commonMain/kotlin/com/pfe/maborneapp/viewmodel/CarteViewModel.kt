@@ -1,5 +1,6 @@
 package com.pfe.maborneapp.viewmodel
 
+import androidx.compose.runtime.compositionLocalOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pfe.maborneapp.models.Carte
@@ -9,7 +10,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+
 class CarteViewModel(private val carteRepository: CarteRepository) : ViewModel() {
+
+
 
     private val _carte = MutableStateFlow<List<Carte>>(emptyList())
     val carte: StateFlow<List<Carte>> = _carte
@@ -75,3 +79,9 @@ class CarteViewModel(private val carteRepository: CarteRepository) : ViewModel()
         }
     }
 }
+
+
+val LocalCarteViewModel = compositionLocalOf<CarteViewModel> {
+    error("CarteViewModel not provided")
+}
+
