@@ -21,25 +21,30 @@ import com.pfe.maborneapp.models.CarteId
 import com.pfe.maborneapp.models.CreateBorneRequest
 import com.pfe.maborneapp.models.TypeBorne
 import com.pfe.maborneapp.models.TypeBorneId
+import com.pfe.maborneapp.repositories.TypeBorneRepository
 import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.view.admin.components.CustomDropDown
 import com.pfe.maborneapp.view.components.image.NetworkImage
 import com.pfe.maborneapp.view.components.image.ZoomableImageView
 import com.pfe.maborneapp.viewmodel.BorneViewModel
 import com.pfe.maborneapp.viewmodel.CarteViewModel
+import com.pfe.maborneapp.viewmodel.TypeBorneViewModel
 import com.pfe.maborneapp.viewmodel.factories.BorneViewModelFactory
 import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
+import com.pfe.maborneapp.viewmodel.factories.TypeBorneViewModelFactory
+import io.ktor.client.HttpClient
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewBornePage(navController: NavHostController, typesBorne: List<TypeBorne>, carteId: String? = null) {
+fun NewBornePage(navController: NavHostController, carteId: String? = null) {
     val borneViewModel: BorneViewModel = viewModel(factory = BorneViewModelFactory())
     val carteViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
+    val typeBorneViewModel: TypeBorneViewModel = viewModel(factory = TypeBorneViewModelFactory())
 
     var coordX by remember { mutableStateOf("") }
     var coordY by remember { mutableStateOf("") }
     var numero by remember { mutableStateOf("") }
     var selectedTypeBorne by remember { mutableStateOf<TypeBorne?>(null) }
-
     var isSubmitting by remember { mutableStateOf(false) }
     var showZoomableMap by remember { mutableStateOf(false) }
 
@@ -47,12 +52,24 @@ fun NewBornePage(navController: NavHostController, typesBorne: List<TypeBorne>, 
     val errorMessage by borneViewModel.errorMessage.collectAsState()
     val selectedCarteImageUrl by carteViewModel.selectedCarteImageUrl.collectAsState()
     val selectedCarteLastModified by carteViewModel.selectedCarteLastModified.collectAsState()
+    val typesBorne by typeBorneViewModel.typesBorne.collectAsState()
+    val isLoadingTypesBorne by typeBorneViewModel.isLoading.collectAsState()
+    val errorLoadingTypesBorne by typeBorneViewModel.errorMessage.collectAsState()
 
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
+    // Fetch Carte et Types de Borne
     LaunchedEffect(carteId) {
-        carteViewModel.fetchCarteDetails(carteId)
+        println("DEBUG: carteId reçu = $carteId")
+        if (carteId != null) {
+            carteViewModel.fetchCarteDetails(carteId)
+            typeBorneViewModel.fetchTypesBorne()
+        } else {
+            println("DEBUG: Erreur, carteId est null")
+        }
     }
+
+
     if (showZoomableMap) {
         ZoomableImageView(
             imageUrl = selectedCarteImageUrl,
@@ -104,17 +121,29 @@ fun NewBornePage(navController: NavHostController, typesBorne: List<TypeBorne>, 
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    CustomDropDown(
-                        typesBorne = typesBorne,
-                        selectedType = selectedTypeBorne,
-                        onTypeSelected = { selectedTypeBorne = it }
-                    )
+                    if (isLoadingTypesBorne) {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    } else if (!typesBorne.isNullOrEmpty()) {
+                        CustomDropDown(
+                            typesBorne = typesBorne,
+                            selectedType = selectedTypeBorne,
+                            onTypeSelected = { selectedTypeBorne = it }
+                        )
+                    } else {
+                        Text(
+                            text = errorLoadingTypesBorne ?: "Erreur lors du chargement des types de borne.",
+                            color = Color.Red,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Bouton de soumission
                     Button(
                         onClick = {
+                            println("DEBUG: carteId utilisé pour CreateBorneRequest = $carteId")
                             if (numero.isNotEmpty() && selectedTypeBorne != null) {
                                 isSubmitting = true
                                 borneViewModel.createBorne(

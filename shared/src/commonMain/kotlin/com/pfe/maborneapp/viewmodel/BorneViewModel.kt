@@ -29,13 +29,16 @@ class BorneViewModel(private val repository: BorneRepository) : ViewModel() {
 
     fun createBorne(request: CreateBorneRequest) {
         viewModelScope.launch {
+            println("DEBUG: Appel à createBorne avec request = $request")
             _creationStatus.value = null // Réinitialise l'état
             try {
                 val newBorne = repository.createBorne(request)
                 if (newBorne != null) {
+                    println("DEBUG: Réservation créée avec succès")
                     _creationStatus.value = true
                     fetchBornesByEtat() // Actualiser les bornes après création
                 } else {
+                    println("DEBUG: Échec de la création de la réservation")
                     _creationStatus.value = false
                     _errorMessage.value = "Erreur inconnue lors de la création de la borne."
                 }

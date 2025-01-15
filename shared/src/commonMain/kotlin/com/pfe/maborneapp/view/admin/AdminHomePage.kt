@@ -31,7 +31,7 @@ import com.pfe.maborneapp.viewmodel.BorneViewModel
 import com.pfe.maborneapp.models.CreateBorneRequest
 import com.pfe.maborneapp.models.TypeBorne
 @Composable
-fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
+fun AdminHomePage(navController: NavHostController) {
     val carteViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
     val selectedCarteImageUrl by carteViewModel.selectedCarteImageUrl.collectAsState()
     val selectedCarteLastModified by carteViewModel.selectedCarteLastModified.collectAsState()
@@ -41,18 +41,19 @@ fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
     val isLoading by borneViewModel.isLoading.collectAsState()
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
+    var carteId by remember { mutableStateOf<String?>(null) }
     var isMenuOpen by remember { mutableStateOf(false) }
     var showZoomableMap by remember { mutableStateOf(false) }
     var isCreateModalOpen by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) } // Pour gérer les erreurs
 
-    // Simulation de types de borne (remplacer par un appel réel)
-    val typesBorne = listOf(
-        TypeBorne("675c2adb6fc93512a0050c43", "Voiture"),
-        TypeBorne("675c2adb6fc93512a0050c44", "Vélo")
-    )
 
-    LaunchedEffect(carteId) {
+
+    LaunchedEffect(Unit) {
+        val defaultCarteId = "6763ed3c4545c40e2a6c7e80"
+        carteId = defaultCarteId
+        println("DEBUG: carteId initialisé à $carteId")
+
         carteViewModel.fetchCarteDetails(carteId)
     }
 
@@ -68,7 +69,13 @@ fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
             containerColor = MaterialTheme.colorScheme.background,
             floatingActionButton = {
                 FloatingActionButton(
-                    onClick = {  navController.navigate("newBorne")},
+                    onClick = {
+                        if (carteId != null) {
+                            navController.navigate("newBorne/$carteId")
+                        } else {
+                            println("DEBUG: carteId est null")
+                        }
+                    },
                     containerColor = darkModeColorGreen,
                     contentColor = Color.White,
                     modifier = Modifier.padding(16.dp)
@@ -76,7 +83,8 @@ fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
                     Icon(imageVector = Icons.Default.Add, contentDescription = "Nouvelle Borne")
                 }
             },
-            content = { paddingValues ->
+
+                    content = { paddingValues ->
                 Column(
                     modifier = Modifier
                         .padding(paddingValues)
@@ -133,7 +141,6 @@ fun AdminHomePage(navController: NavHostController, carteId: String? = null) {
                 if (isCreateModalOpen) {
                     NewBornePage(
                         navController = navController,
-                        typesBorne = typesBorne,
                         carteId = carteId,
                     )
                 }
