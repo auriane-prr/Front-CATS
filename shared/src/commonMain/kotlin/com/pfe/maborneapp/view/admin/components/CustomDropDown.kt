@@ -7,6 +7,8 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,59 +31,70 @@ fun CustomDropDown(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .background(
-                color = Color.White,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .border(
-                width = 2.dp,
-                color = darkModeColorTitle,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .clickable { dropdownExpanded = !dropdownExpanded }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        contentAlignment = Alignment.CenterStart
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+        // Champ de sélection
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = Color.White,
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .border(
+                    width = 2.dp,
+                    color = darkModeColorTitle,
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .clickable { dropdownExpanded = !dropdownExpanded }
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            contentAlignment = Alignment.CenterStart
         ) {
-            Text(
-                text = selectedType?.nom ?: "Sélectionner un type de borne",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Black,
-                modifier = Modifier.weight(1f)
-            )
-            Icon(
-                imageVector = Icons.Default.ChevronRight,
-                contentDescription = "Chevron",
-                tint = darkModeColorTitle
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = selectedType?.nom ?: "Sélectionner un type de borne",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.Black,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = if (dropdownExpanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                    contentDescription = "Chevron",
+                    tint = darkModeColorTitle
+                )
+            }
         }
-    }
 
-    DropdownMenu(
-        expanded = dropdownExpanded,
-        onDismissRequest = { dropdownExpanded = false },
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                color = Color.White,
-                shape = RoundedCornerShape(12.dp)
-            )
-    ) {
-        typesBorne.forEach { type ->
-            DropdownMenuItem(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp) // Assure une hauteur uniforme
-                    .padding(horizontal = 16.dp),
-                text = { Text(type.nom) },
-                onClick = {
-                    onTypeSelected(type)
-                    dropdownExpanded = false
+        // Menu déroulant aligné sous le champ
+        DropdownMenu(
+            expanded = dropdownExpanded,
+            onDismissRequest = { dropdownExpanded = false },
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            typesBorne.forEachIndexed { index, type ->
+                DropdownMenuItem(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .height(50.dp),
+                    text = { Text(type.nom) },
+                    onClick = {
+                        onTypeSelected(type)
+                        dropdownExpanded = false
+                    }
+                )
+                if (index < typesBorne.size - 1) {
+                    Divider(
+                        color = darkModeColorTitle.copy(alpha = 0.2f), // Couleur avec transparence
+                        thickness = 1.dp,
+                        modifier = Modifier.padding(horizontal = 8.dp) // Espacement horizontal
+                    )
                 }
-            )
+            }
         }
     }
 }
+

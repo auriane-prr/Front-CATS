@@ -39,7 +39,7 @@ fun NewBornePage(navController: NavHostController, typesBorne: List<TypeBorne>, 
     var coordY by remember { mutableStateOf("") }
     var numero by remember { mutableStateOf("") }
     var selectedTypeBorne by remember { mutableStateOf<TypeBorne?>(null) }
-    var dropdownExpanded by remember { mutableStateOf(false) }
+
     var isSubmitting by remember { mutableStateOf(false) }
     var showZoomableMap by remember { mutableStateOf(false) }
 
@@ -89,7 +89,6 @@ fun NewBornePage(navController: NavHostController, typesBorne: List<TypeBorne>, 
                             .fillMaxWidth()
                             .height(200.dp)
                             .clickable { showZoomableMap = true }
-                            .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
                             .padding(8.dp)
                     )
 
@@ -105,46 +104,11 @@ fun NewBornePage(navController: NavHostController, typesBorne: List<TypeBorne>, 
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Menu déroulant Type Borne
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.White, shape = RoundedCornerShape(8.dp))
-                            .border(1.dp, darkModeColorGreen, RoundedCornerShape(8.dp))
-                            .clickable { dropdownExpanded = true }
-                            .padding(16.dp)
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = selectedTypeBorne?.nom ?: "Sélectionner un type de borne",
-                                color = Color.Black
-                            )
-                            Icon(
-                                imageVector = Icons.Default.ArrowDropDown,
-                                contentDescription = "Flèche vers le bas"
-                            )
-                        }
-                    }
-
-                    DropdownMenu(
-                        expanded = dropdownExpanded,
-                        onDismissRequest = { dropdownExpanded = false },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        typesBorne.forEach { type ->
-                            DropdownMenuItem(
-                                text = { Text(type.nom) },
-                                onClick = {
-                                    selectedTypeBorne = type
-                                    dropdownExpanded = false
-                                }
-                            )
-                        }
-                    }
+                    CustomDropDown(
+                        typesBorne = typesBorne,
+                        selectedType = selectedTypeBorne,
+                        onTypeSelected = { selectedTypeBorne = it }
+                    )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
