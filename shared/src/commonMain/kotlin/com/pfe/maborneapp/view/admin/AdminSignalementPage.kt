@@ -55,68 +55,56 @@ fun AdminSignalementPage(navController: NavHostController) {
                         modifier = Modifier.padding(16.dp)
                     )
 
-                    when {
-                        isLoading -> {
-                            // Loader principal pendant le chargement initial
-                            CircularProgressIndicator(
-                                modifier = Modifier.padding(16.dp),
-                                color = Color(0xFF045C3C)
-                            )
-                        }
-                        errorMessage != null -> {
-                            // Message d'erreur en cas de problème
-                            Text(
-                                text = errorMessage ?: "Une erreur inconnue s'est produite",
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
-                        signalements != null -> {
-                            // Affichage des signalements avec gestion des actions
-                            SignalementList(
-                                signalements = signalements!!,
-                                onCloseSignalement = { signalementId ->
-                                    isActionLoading = true // Démarrer le loader d'action
-                                    viewModel.closeSignalement(
-                                        signalementId = signalementId,
-                                        onSuccess = {
-                                            isActionLoading = false // Arrêter le loader d'action
-                                            println("Signalement fermé avec succès.")
-                                            viewModel.fetchSignalements() // Rafraîchir la liste
-                                        },
-                                        onError = { error ->
-                                            isActionLoading = false
-                                            println("Erreur lors de la fermeture du signalement : $error")
-                                        }
-                                    )
-                                },
-                                onUpdateStatus = { borneId, newStatus ->
-                                    isActionLoading = true // Démarrer le loader d'action
-                                    viewModel.updateBorneStatus(
-                                        borneId = borneId,
-                                        newStatus = newStatus,
-                                        onSuccess = {
-                                            isActionLoading = false // Arrêter le loader d'action
-                                            println("Statut mis à jour avec succès.")
-                                            viewModel.fetchSignalements() // Rafraîchir la liste
-                                        },
-                                        onError = { error ->
-                                            isActionLoading = false
-                                            println("Erreur lors de la mise à jour du statut : $error")
-                                        }
-                                    )
-                                }
-                            )
-                        }
-                        else -> {
-                            // Message si aucun signalement disponible
-                            Text(
-                                text = "Aucun signalement disponible",
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            color = Color(0xFF045C3C)
+                        )
+                    } else if (errorMessage != null) {
+                        Text(
+                            text = errorMessage ?: "Une erreur inconnue s'est produite",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    } else if (signalements.isNullOrEmpty()) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            color = Color(0xFF045C3C)
+                        )
+                    } else {
+                        SignalementList(
+                            signalements = signalements!!,
+                            onCloseSignalement = { signalementId ->
+                                isActionLoading = true
+                                viewModel.closeSignalement(
+                                    signalementId,
+                                    onSuccess = {
+                                        isActionLoading = false
+                                        viewModel.fetchSignalements()
+                                    },
+                                    onError = { error ->
+                                        isActionLoading = false
+                                        errorMessage = error
+                                    }
+                                )
+                            },
+                            onUpdateStatus = { borneId, newStatus ->
+                                isActionLoading = true
+                                viewModel.updateBorneStatus(
+                                    borneId,
+                                    newStatus,
+                                    onSuccess = {
+                                        isActionLoading = false
+                                        viewModel.fetchSignalements()
+                                    },
+                                    onError = { error ->
+                                        isActionLoading = false
+                                        errorMessage = error
+                                    }
+                                )
+                            }
+                        )
                     }
                 }
 
