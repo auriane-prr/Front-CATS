@@ -9,26 +9,29 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class SignalementViewModel(private val repository: SignalementRepository) : ViewModel() {
-
-    // État des signalements pour l'admin
     private val _signalements = MutableStateFlow<List<Signalement>?>(null)
     val signalements: StateFlow<List<Signalement>?> = _signalements
 
-    // Récupérer les signalements
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     init {
         fetchSignalements()
     }
 
     fun fetchSignalements() {
+        _isLoading.value = true  // Commence le chargement
         viewModelScope.launch {
             try {
                 _signalements.value = repository.getSignalements()
             } catch (e: Exception) {
                 e.printStackTrace()
-                _signalements.value = emptyList()
+            } finally {
+                _isLoading.value = false  // Arrête le chargement, indépendamment du résultat
             }
         }
     }
+    
 
     fun closeSignalement(
         signalementId: String,
