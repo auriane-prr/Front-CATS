@@ -1,5 +1,6 @@
 package com.pfe.maborneapp.repositories
 
+import com.pfe.maborneapp.models.CarteId
 import com.pfe.maborneapp.models.Signalement
 import kotlinx.serialization.Serializable
 import io.ktor.client.*
@@ -94,12 +95,30 @@ class SignalementRepository(private val httpClient: HttpClient) {
         }
     }
 
-    private val baseUrl = "https://back-cats.onrender.com/signalement/en-attente"
 
     suspend fun getSignalements(): List<Signalement>? {
         return try {
             val response = httpClient.get("https://back-cats.onrender.com/signalement/en-attente")
             println("DEBUG, Réponse brute : ${response.bodyAsText()}")
+            if (response.status == HttpStatusCode.OK) {
+                val signalements = json.decodeFromString(ListSerializer(Signalement.serializer()), response.bodyAsText())
+                println("DEBUG, Signalements récupérés avec succès= $signalements")
+                signalements
+            } else {
+                println("DEBUG, Statut HTTP inattendu : ${response.status}")
+                null
+            }
+        } catch (e: Exception) {
+            println("DEBUG, Erreur dans fetchBornesByEtat : ${e.message}")
+            null
+        }
+    }
+
+    suspend fun getSignalementsByCarte(carteId: CarteId): List<Signalement>? {
+        return try {
+            val carteIdString = carteId._id
+            val response = httpClient.get("https://back-cats.onrender.com/signalement/carte/$carteIdString/en-attente")
+            println("DEBUG, Signalement:  Réponse brute : ${response.bodyAsText()}")
             if (response.status == HttpStatusCode.OK) {
                 val signalements = json.decodeFromString(ListSerializer(Signalement.serializer()), response.bodyAsText())
                 println("DEBUG, Signalements récupérés avec succès= $signalements")

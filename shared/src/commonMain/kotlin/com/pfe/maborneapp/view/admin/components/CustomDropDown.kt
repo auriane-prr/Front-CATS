@@ -16,7 +16,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.pfe.maborneapp.models.TypeBorne
+import com.pfe.maborneapp.utils.DarkContainerColor
 import com.pfe.maborneapp.utils.DarkModeGreen
 @Composable
 fun CustomDropDown(
@@ -26,7 +28,7 @@ fun CustomDropDown(
 ) {
     var dropdownExpanded by remember { mutableStateOf(false) }
     val darkModeColorTitle = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
-
+    val darkModeColorBackground = if (isSystemInDarkTheme()) DarkContainerColor else Color.White
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -37,7 +39,7 @@ fun CustomDropDown(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    color = Color.White,
+                    color = darkModeColorBackground,
                     shape = RoundedCornerShape(12.dp)
                 )
                 .border(
@@ -56,7 +58,6 @@ fun CustomDropDown(
                 Text(
                     text = selectedType?.nom ?: "Sélectionner un type de borne",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = Color.Black,
                     modifier = Modifier.weight(1f)
                 )
                 Icon(
@@ -80,7 +81,7 @@ fun CustomDropDown(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                         .height(50.dp),
-                    text = { Text(type.nom) },
+                    text = { Text(type.nom, fontSize = 16.sp) },
                     onClick = {
                         onTypeSelected(type)
                         dropdownExpanded = false

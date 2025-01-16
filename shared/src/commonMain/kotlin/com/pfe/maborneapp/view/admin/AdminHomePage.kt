@@ -61,6 +61,8 @@ fun AdminHomePage(navController: NavHostController) {
     var isCreateModalOpen by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
+    val carteId = CarteId(selectedCarte?.id ?: "")
+
     // Charger les cartes au montage
     LaunchedEffect(Unit) {
         carteViewModel.fetchCartes()
@@ -202,7 +204,8 @@ fun AdminHomePage(navController: NavHostController) {
                             navController = navController,
                             isMenuOpen = isMenuOpen,
                             onToggleMenu = { isMenuOpen = !isMenuOpen },
-                            currentPage = "adminHome"
+                            currentPage = "adminHome",
+                            carteId = carteId
                         )
                     }
         )

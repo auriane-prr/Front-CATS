@@ -2,6 +2,7 @@ package com.pfe.maborneapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pfe.maborneapp.models.CarteId
 import com.pfe.maborneapp.models.Signalement
 import com.pfe.maborneapp.repositories.SignalementRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,15 +16,24 @@ class SignalementViewModel(private val repository: SignalementRepository) : View
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    init {
-        fetchSignalements()
-    }
-
     fun fetchSignalements() {
         _isLoading.value = true  // Commence le chargement
         viewModelScope.launch {
             try {
                 _signalements.value = repository.getSignalements()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                _isLoading.value = false  // Arrête le chargement, indépendamment du résultat
+            }
+        }
+    }
+
+    fun fetchSignalementsByCarte(carteId: CarteId) {
+        _isLoading.value = true  // Commence le chargement
+        viewModelScope.launch {
+            try {
+                _signalements.value = repository.getSignalementsByCarte(carteId)
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {

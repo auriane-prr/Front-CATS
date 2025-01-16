@@ -143,7 +143,11 @@ fun NewBornePage(navController: NavHostController, defaultCarteId: String) {
                         onValueChange = { numero = it },
                         label = { Text("Numéro de la borne") },
                         modifier = Modifier.fillMaxWidth(),
-                        isError = numero.isEmpty()
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = darkModeColorGreen,
+                            unfocusedBorderColor = darkModeColorGreen,
+                            focusedLabelColor = darkModeColorGreen
+                    )
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))

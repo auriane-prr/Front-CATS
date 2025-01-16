@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.pfe.maborneapp.models.CarteId
 import com.pfe.maborneapp.models.TypeBorne
 import com.pfe.maborneapp.repositories.CarteRepository
 import com.pfe.maborneapp.utils.ImageCache
@@ -69,7 +70,15 @@ fun AppNavigation(navController: NavHostController) {
         composable("login") { LoginPage(navController) }
         // Pages Admin
         composable("adminHome") { AdminHomePage(navController) }
-        composable("adminSignalement") { AdminSignalementPage(navController) }
+        composable(
+            route = "adminSignalement/{carteId}",
+            arguments = listOf(navArgument("carteId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val carteIdString = backStackEntry.arguments?.getString("carteId") ?: ""
+            val carteId = CarteId(carteIdString)
+            AdminSignalementPage(navController, defaultCarteId = carteId)
+        }
+
         composable("adminStatistique") { AdminStatistiquePage(navController) }
         // Pages Admin
         composable("userHome/{userId}") { backStackEntry ->

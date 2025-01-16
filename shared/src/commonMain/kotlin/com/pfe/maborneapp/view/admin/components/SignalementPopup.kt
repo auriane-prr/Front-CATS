@@ -1,5 +1,6 @@
 package com.pfe.maborneapp.view.admin.components
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,13 +15,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pfe.maborneapp.models.Signalement
+import com.pfe.maborneapp.utils.DarkContainerColor
+import com.pfe.maborneapp.utils.DarkModeGreen
 
 @Composable
 fun SignalementPopup(
     signalement: Signalement,
     onDismiss: () -> Unit,
-    onUpdateStatus: (borneId: String, newStatus: String) -> Unit // Callback pour changer l'état
-) {
+    onUpdateStatus: (borneId: String, newStatus: String, signalementId: String?) -> Unit
+)
+
+{
+    val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
+    val darkModeBoackground = if (isSystemInDarkTheme()) DarkContainerColor else MaterialTheme.colorScheme.surface
+    val darkModeTitle = if (isSystemInDarkTheme()) Color.White else Color(0xFF616161)
     AlertDialog(
         onDismissRequest = { onDismiss() },
         title = {
@@ -33,20 +41,20 @@ fun SignalementPopup(
                 Text(
                     text = "Détails du signalement",
                     style = MaterialTheme.typography.titleLarge,
-                    color = Color(0xFF045C3C),
-                    modifier = Modifier.weight(1f) // Prend tout l'espace disponible sauf pour l'icône
+                    color = darkModeColorGreen,
+                    modifier = Modifier.weight(1f)
                 )
 
                 IconButton(
                     onClick = { onDismiss() },
                     modifier = Modifier
-                        .size(24.dp) // Taille discrète
+                        .size(30.dp)
                         .padding(4.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Fermer",
-                        tint = Color(0xFF045C3C) // Même couleur que le bouton "Déclarer Fonctionnelle"
+                        tint = darkModeColorGreen,
                     )
                 }
             }
@@ -66,33 +74,32 @@ fun SignalementPopup(
 
                 Divider(color = Color(0xFFE0E0E0))
                 Spacer(modifier = Modifier.height(8.dp))
-                // Boutons pour changer l'état de la borne
+
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp), // Augmente l'espacement entre les boutons
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 1.dp) // Ajoute une marge pour que les boutons ne touchent pas les bords
+                        .padding(horizontal = 1.dp)
                 ) {
                     Button(
                         onClick = {
-                            signalement.borne.id?.let { id ->
-                                onUpdateStatus(id, "hs")
-                                onDismiss() // Ferme le popup après l'action
+                            signalement.borne.id?.let { borneId ->
+                                onUpdateStatus(borneId, "hs", signalement.id)
+                                onDismiss()
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFBDBDBD)),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
                         modifier = Modifier
                             .weight(1f)
-                            .height(56.dp), // Augmente la hauteur pour mieux afficher le texte
-                        shape = RoundedCornerShape(12.dp) // Courbe légèrement plus marquée
+                            .height(56.dp),
+                        shape = RoundedCornerShape(12.dp)
                     ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center // Centrage du texte
+                            contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 "Déclarer HS",
-                                color = Color.White,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -101,24 +108,23 @@ fun SignalementPopup(
 
                     Button(
                         onClick = {
-                            signalement.borne.id?.let { id ->
-                                onUpdateStatus(id, "Fonctionnelle")
-                                onDismiss() // Ferme le popup après l'action
+                            signalement.borne.id?.let { borneId ->
+                                onUpdateStatus(borneId, "Fonctionnelle", signalement.id)
+                                onDismiss()
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF045C3C)), // Même couleur que la croix
+                        colors = ButtonDefaults.buttonColors(containerColor = darkModeColorGreen),
                         modifier = Modifier
                             .weight(1f)
-                            .height(56.dp), // Même hauteur que l'autre bouton
+                            .height(56.dp),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center // Centrage du texte
+                            contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 "Déclarer Fonctionnelle",
-                                color = Color.White,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -127,14 +133,17 @@ fun SignalementPopup(
                 }
             }
         },
-        confirmButton = {}, // Supprime le bouton "Fermer"
+        confirmButton = {},
         shape = RoundedCornerShape(16.dp),
-        containerColor = Color(0xFFF5F5F5)
+        containerColor = darkModeBoackground,
     )
 }
 
+
 @Composable
 fun DetailItem(label: String, value: String) {
+    val darkModeTitle = if (isSystemInDarkTheme()) Color.White else Color(0xFF616161)
+    val darkModeValeur = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF212121)
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -143,12 +152,12 @@ fun DetailItem(label: String, value: String) {
         Text(
             text = "$label :",
             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-            color = Color(0xFF616161)
+            color = darkModeTitle
         )
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
-            color = Color(0xFF212121)
+            color = darkModeValeur
         )
     }
 }
