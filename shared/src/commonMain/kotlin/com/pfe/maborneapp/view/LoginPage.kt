@@ -52,7 +52,6 @@ fun LoginPage(navController: NavHostController) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         content = { padding ->
-            // Ajout du scroll state
             val scrollState = rememberScrollState()
 
             Column(
