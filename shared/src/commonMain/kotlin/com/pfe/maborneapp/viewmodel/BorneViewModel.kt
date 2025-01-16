@@ -46,6 +46,19 @@ class BorneViewModel(private val repository: BorneRepository) : ViewModel() {
         }
     }
 
+    fun deleteBorne(borneId: String) {
+        viewModelScope.launch {
+            val success = repository.deleteBorne(borneId)
+            if (success) {
+                fetchBornesByEtat()  // Rafraîchir la liste après suppression
+                _errorMessage.value = "Borne supprimée avec succès."
+            } else {
+                _errorMessage.value = "Échec de la suppression de la borne."
+            }
+        }
+    }
+
+
 
     fun fetchBornesByEtat() {
         viewModelScope.launch {

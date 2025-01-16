@@ -18,10 +18,11 @@ import androidx.compose.ui.unit.dp
 import com.pfe.maborneapp.models.Borne
 import com.pfe.maborneapp.models.EtatBornes
 import com.pfe.maborneapp.utils.DarkModeGreen
+import com.pfe.maborneapp.viewmodel.BorneViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BorneListAdmin(etatBornes: EtatBornes, modifier: Modifier = Modifier,containerColor: Color,) {
+fun BorneListAdmin(etatBornes: EtatBornes, viewModel: BorneViewModel, modifier: Modifier = Modifier, containerColor: Color,) {
     var selectedBorne by remember { mutableStateOf<Borne?>(null) }
     val darkModeColorTitle = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
@@ -103,7 +104,10 @@ fun BorneListAdmin(etatBornes: EtatBornes, modifier: Modifier = Modifier,contain
     if (selectedBorne != null) {
         BorneModalAdmin(
             selectedBorne = selectedBorne,
-            onClose = { selectedBorne = null }
+            onClose = { selectedBorne = null },
+            onDelete = { id ->
+                viewModel.deleteBorne(id)
+            }
         )
     }
 }
