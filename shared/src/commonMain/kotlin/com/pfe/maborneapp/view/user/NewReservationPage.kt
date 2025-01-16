@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,9 +17,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.pfe.maborneapp.models.Carte
+import com.pfe.maborneapp.models.CarteId
 import com.pfe.maborneapp.utils.DarkModeGreen
+import com.pfe.maborneapp.view.components.CarteDropdownMenu
 import com.pfe.maborneapp.view.components.Alert
 import com.pfe.maborneapp.view.user.components.TimePickerDialog
+import com.pfe.maborneapp.viewmodel.CarteViewModel
+import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
 import com.pfe.maborneapp.viewmodel.factories.user.ReservationViewModelFactory
 import com.pfe.maborneapp.viewmodel.user.ReservationViewModel
 import kotlinx.datetime.*
@@ -27,6 +33,7 @@ import kotlinx.datetime.*
 @Composable
 fun NewReservationPage(navController: NavHostController, userId: String) {
     val reservationViewModel: ReservationViewModel = viewModel(factory = ReservationViewModelFactory())
+    val carteViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
 
     var showStartTimePicker by remember { mutableStateOf(false) }
     var showEndTimePicker by remember { mutableStateOf(false) }
@@ -45,27 +52,30 @@ fun NewReservationPage(navController: NavHostController, userId: String) {
     val startTime = reservationViewModel.startTime.value
     val endTime = reservationViewModel.endTime.value
 
-    val startTimeState = remember { mutableStateOf("") }
-    val endTimeState = remember { mutableStateOf("") }
+    val cartes by carteViewModel.carte.collectAsState()
+    var showCarteDropdown by remember { mutableStateOf(false) }
+    val selectedCarte = reservationViewModel.selectedCarte
+
+    LaunchedEffect(Unit) {
+        carteViewModel.fetchCartes()
+    }
 
     // Fonction de validation des champs
     fun validateInputs() {
-        // Vérifier si tous les champs sont remplis
-        if (reservationViewModel.selectedDate.value.isEmpty() || reservationViewModel.startTime.value.isEmpty() || reservationViewModel.endTime.value.isEmpty()) {
+        if (reservationViewModel.selectedDate.value.isEmpty() || reservationViewModel.startTime.value.isEmpty() || reservationViewModel.endTime.value.isEmpty() || selectedCarte.value == null) {
             alertMessage = "Vous devez remplir tous les champs"
             isAlertSuccess = false
             showAlert = true
             return
         }
 
-        // Vérification de l'heure de fin par rapport à l'heure de début
+        // Vérification des heures
         val startParts = reservationViewModel.startTime.value.split(":")
         val endParts = reservationViewModel.endTime.value.split(":")
 
-        val startMinutes = startParts[0].toInt() * 60 + startParts[1].toInt() // Convertir en minutes
-        val endMinutes = endParts[0].toInt() * 60 + endParts[1].toInt() // Convertir en minutes
+        val startMinutes = startParts[0].toInt() * 60 + startParts[1].toInt()
+        val endMinutes = endParts[0].toInt() * 60 + endParts[1].toInt()
 
-        // Vérifier que l'heure de fin est après l'heure de début
         if (endMinutes <= startMinutes) {
             alertMessage = "Veuillez entrer des horaires corrects"
             isAlertSuccess = false
@@ -79,31 +89,34 @@ fun NewReservationPage(navController: NavHostController, userId: String) {
         }T${reservationViewModel.startTime.value}:00"
         val end =
             "${reservationViewModel.selectedDate.value.split("-").reversed().joinToString("-")}T${reservationViewModel.endTime.value}:00"
-        println("DEBUG, Bouton cliqué avec start: $start, end: $end")
-        val route = "availableBornes/$start/$end/$userId"
+        val carteId = selectedCarte.value?.id ?: ""
+
+        println("DEBUG, Bouton cliqué avec start: $start, end: $end, carteId: $carteId")
+
+        if (carteId.isNotEmpty()) {
+            reservationViewModel.fetchAvailableBornesByCarte(start, end, CarteId(carteId))
+        }
+
+        val route = "availableBornes/$start/$end/$userId/$carteId"
+        reservationViewModel.selectedCarte.value = cartes.find { it.id == carteId }
         navController.navigate(route)
     }
 
     // Fonction de validation des dates
     fun validateDateAndCloseDialog() {
-        // Récupérer la date actuelle sans l'heure
         val currentDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date // Date actuelle sans l'heure
 
         try {
-            // Convertir la date sélectionnée de 'jj-MM-AAAA' à 'yyyy-MM-dd'
-            val dateParts = reservationViewModel.selectedDate.value.split("-")
-            val formattedDate = "${dateParts[2]}-${dateParts[1]}-${dateParts[0]}" // Format yyyy-MM-dd
 
-            // Convertir la date formatée en LocalDate
+            val dateParts = reservationViewModel.selectedDate.value.split("-")
+            val formattedDate = "${dateParts[2]}-${dateParts[1]}-${dateParts[0]}"
             val selectedLocalDate = LocalDate.parse(formattedDate)
 
-            // Vérifier si la date sélectionnée est antérieure à la date actuelle
             if (selectedLocalDate <= currentDate) {
                 alertMessage = "Veuillez entrer une date correcte"
                 isAlertSuccess = false
                 showAlert = true
             } else {
-                // Si la date est correcte, fermer le DatePicker
                 showDatePicker = false
             }
         } catch (e: Exception) {
@@ -134,6 +147,52 @@ fun NewReservationPage(navController: NavHostController, userId: String) {
                     .padding(16.dp)
                     .fillMaxSize()
             ) {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Sélecteur de carte
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentSize(Alignment.TopStart)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showCarteDropdown = !showCarteDropdown
+                            }
+                            .background(Color(0xFFBDD3D0), shape = MaterialTheme.shapes.small)
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = selectedCarte.value?.nom ?: "Sélectionnez une carte",
+                            modifier = Modifier.weight(1f),
+                            color = Color.Black,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Icon(
+                            imageVector = Icons.Default.Map,
+                            contentDescription = "Sélecteur de carte"
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = showCarteDropdown,
+                        onDismissRequest = { showCarteDropdown = false }
+                    ) {
+                        cartes.forEach { carte ->
+                            DropdownMenuItem(
+                                text = { Text(carte.nom) },
+                                onClick = {
+                                    selectedCarte.value = carte // Mettre à jour la carte sélectionnée
+                                    showCarteDropdown = false
+                                }
+                            )
+                        }
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Sélecteur de date

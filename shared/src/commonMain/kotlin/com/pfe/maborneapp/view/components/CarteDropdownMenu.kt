@@ -1,4 +1,4 @@
-package com.pfe.maborneapp.view.admin.components
+package com.pfe.maborneapp.view.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.pfe.maborneapp.models.Carte
 import com.pfe.maborneapp.utils.DarkModeGreen
+
 @Composable
 fun CarteDropdownMenu(
     cartes: List<Carte>,

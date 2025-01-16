@@ -50,5 +50,26 @@ class CarteRepository(private val client: HttpClient) {
         }
     }
 
+    suspend fun fetchCarteById(carteId: String): Carte? {
+        val url = "https://back-cats.onrender.com/carte/$carteId"
+        println("DEBUG: Appel à l'API pour récupérer la carte avec l'ID $carteId")
+
+        return try {
+            val response = client.get(url)
+            if (response.status == HttpStatusCode.OK) {
+                val carte = response.body<Carte>() // Utilisation de la sérialisation pour décoder la réponse
+                println("DEBUG: Carte récupérée = $carte")
+                carte
+            } else {
+                println("Erreur lors de la récupération de la carte : Statut ${response.status}")
+                null
+            }
+        } catch (e: Exception) {
+            println("Erreur dans fetchCarteById : ${e.message}")
+            null
+        }
+    }
+
+
 }
 

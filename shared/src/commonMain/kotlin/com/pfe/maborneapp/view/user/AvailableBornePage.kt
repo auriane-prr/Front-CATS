@@ -22,9 +22,12 @@ import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.viewmodel.factories.user.ReservationViewModelFactory
 import com.pfe.maborneapp.viewmodel.user.ReservationViewModel
 import com.pfe.maborneapp.models.Borne
+import com.pfe.maborneapp.models.CarteId
 import com.pfe.maborneapp.models.Reservation
 import com.pfe.maborneapp.models.User
 import com.pfe.maborneapp.view.components.Alert
+import com.pfe.maborneapp.viewmodel.CarteViewModel
+import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,11 +35,15 @@ fun AvailableBornesPage(
     navController: NavHostController,
     startDate: String,
     endDate: String,
-    userId: String
+    userId: String,
+    carteId: CarteId,
 ) {
     val reservationViewModel: ReservationViewModel = viewModel(factory = ReservationViewModelFactory())
+    val carteViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
     val availableBornes by reservationViewModel.availableBornes.collectAsState()
     var selectedBorne by remember { mutableStateOf<Borne?>(null) }
+    var selectedCarteName by remember { mutableStateOf<String?>(null) }
+    val selectedCarte by carteViewModel.selectedCarte.collectAsState()
 
     var showAlert by remember { mutableStateOf(false) }
     var alertMessage by remember { mutableStateOf("") }
@@ -44,10 +51,26 @@ fun AvailableBornesPage(
 
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
+    // Charger les bornes disponibles
     LaunchedEffect(startDate, endDate) {
-        reservationViewModel.fetchAvailableBornes(startDate, endDate)
+        reservationViewModel.fetchAvailableBornesByCarte(startDate, endDate, carteId)
     }
 
+    LaunchedEffect(carteId) {
+        try {
+            val carte = carteViewModel.fetchCarteById(carteId._id)
+            if (carte != null) {
+                selectedCarteName = carte.nom
+                println("DEBUG: Carte trouvée : ${carte.nom}")
+            } else {
+                println("DEBUG: Aucune carte trouvée pour l'ID ${carteId._id}")
+            }
+        } catch (e: Exception) {
+            println("Erreur lors de la récupération de la carte : ${e.message}")
+        }
+    }
+
+    // Formater les dates
     fun formatDateRange(start: String, end: String): String {
         val startParts = start.split("T")
         val date = startParts[0].split("-")
@@ -118,7 +141,12 @@ fun AvailableBornesPage(
             ) {
                 Text(
                     text = formattedDateRange,
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Black
+                )
+                Text(
+                    text = selectedCarteName ?: "Nom de la carte non disponible",
+                    style = MaterialTheme.typography.bodyMedium,
                     color = Color.Black
                 )
 
@@ -190,7 +218,6 @@ fun AvailableBornesPage(
             isSuccess = isAlertSuccess,
             message = alertMessage,
             onDismiss = {
-                // Une fois que l'utilisateur ferme l'alerte, permettre la navigation
                 showAlert = false
                 navController.popBackStack("reservations/$userId", inclusive = false)
             }

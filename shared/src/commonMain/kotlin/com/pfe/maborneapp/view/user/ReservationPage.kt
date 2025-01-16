@@ -79,21 +79,14 @@ fun ReservationPage(navController: NavHostController, userId: String) {
                         .fillMaxSize()
                         .verticalScroll(scrollState)
                 ) {
-                    // Header
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "Mes réservations",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = darkModeColorGreen,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                        )
-                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Text(
+                        text =  "Mes réservations",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = darkModeColorGreen
+                    )
 
                     Spacer(modifier = Modifier.height(16.dp))
 

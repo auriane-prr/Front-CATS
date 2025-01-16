@@ -17,29 +17,11 @@ import kotlinx.serialization.json.Json
 class ReservationRepository(private val client: HttpClient) {
     private val json = Json { ignoreUnknownKeys = true }
 
-    suspend fun fetchAvailableBornes(start: String, end: String): EtatBornes? {
-        println("DEBUG: Requête fetchAvailableBornes - start = $start, end = $end")
-        return try {
-            val response = client.get("https://back-cats.onrender.com/borne/etat-date?start=$start&end=$end")
-            println("DEBUG: Réponse brute = ${response.bodyAsText()}")
-            if (response.status == HttpStatusCode.OK) {
-                val bornes = json.decodeFromString(EtatBornes.serializer(), response.bodyAsText())
-                println("DEBUG: Bornes disponibles décodées = $bornes")
-                bornes
-            } else {
-                println("Erreur lors de la récupération des bornes disponibles : ${response.status}")
-                null
-            }
-        } catch (e: Exception) {
-            println("Erreur dans ReservationRepository : ${e.message}")
-            null
-        }
-    }
-
     suspend fun fetchAvailableBornesByCarte(start: String, end: String, carteId: CarteId): EtatBornes? {
         println("DEBUG: Requête fetchAvailableBornes - start = $start, end = $end")
         return try {
-            val response = client.get("https://back-cats.onrender.com/borne/carte/$carteId/etat-date?start=$start&end=$end")
+            val carteIdString = carteId._id
+            val response = client.get("https://back-cats.onrender.com/borne/carte/$carteIdString/etat-date?start=$start&end=$end")
             println("DEBUG: Réponse brute = ${response.bodyAsText()}")
             if (response.status == HttpStatusCode.OK) {
                 val bornes = json.decodeFromString(EtatBornes.serializer(), response.bodyAsText())
