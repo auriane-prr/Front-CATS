@@ -168,6 +168,7 @@ fun AdminHomePage(navController: NavHostController) {
                                         Spacer(modifier = Modifier.height(16.dp))
                                         BorneListAdmin(
                                             etatBornes = it,
+                                            viewModel = borneViewModel,
                                             containerColor = if (isSystemInDarkTheme()) DarkContainerColor else MaterialTheme.colorScheme.surface,
                                         )
                                     } ?: Text(text = "Aucune borne disponible pour cette carte.")
