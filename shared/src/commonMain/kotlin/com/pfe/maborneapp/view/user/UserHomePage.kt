@@ -28,24 +28,31 @@ import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
 import com.pfe.maborneapp.view.components.Alert
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import com.pfe.maborneapp.models.CarteId
+import com.pfe.maborneapp.view.admin.components.BorneListAdmin
+import com.pfe.maborneapp.view.admin.components.CarteDropdownMenu
 import com.pfe.maborneapp.view.components.image.NetworkImage
 import com.pfe.maborneapp.view.components.image.ZoomableImageView
+import com.pfe.maborneapp.viewmodel.LocalCarteViewModel
 
 @Composable
 fun UserHomePage(navController: NavHostController, userId: String, carteId: String? = null) {
     val darkModeColorTitle = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
     val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory())
-    val userEmail by userViewModel.userEmail.collectAsState()
+    val borneViewModel: BorneViewModel = viewModel(factory = BorneViewModelFactory())
+    val signalementViewModel: SignalementViewModel = viewModel(factory = SignalementViewModelFactory())
+    val carteViewModel = LocalCarteViewModel.current
 
-    val carteViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
+    val userEmail by userViewModel.userEmail.collectAsState()
     val selectedCarteImageUrl by carteViewModel.selectedCarteImageUrl.collectAsState()
     val selectedCarteLastModified by carteViewModel.selectedCarteLastModified.collectAsState()
-
-    val borneViewModel: BorneViewModel = viewModel(factory = BorneViewModelFactory())
     val etatBornes by borneViewModel.etatBornes.collectAsState()
     val isLoading by borneViewModel.isLoading.collectAsState()
-
-    val signalementViewModel: SignalementViewModel = viewModel(factory = SignalementViewModelFactory())
+    val cartes by carteViewModel.carte.collectAsState()
+    val selectedCarte by carteViewModel.selectedCarte.collectAsState()
+    val isLoadingCartes by carteViewModel.isLoading.collectAsState()
+    val errorLoadingCartes by carteViewModel.errorMessage.collectAsState()
+    val isLoadingBornes by borneViewModel.isLoading.collectAsState()
 
     var isMenuOpen by remember { mutableStateOf(false) }
     var alertVisible by remember { mutableStateOf(false) }
@@ -53,10 +60,29 @@ fun UserHomePage(navController: NavHostController, userId: String, carteId: Stri
     var alertIsSuccess by remember { mutableStateOf(true) }
     var showZoomableMap by remember { mutableStateOf(false) }
 
-    LaunchedEffect(userId, carteId) {
+    // Charger les cartes au montage
+    LaunchedEffect(Unit) {
+        carteViewModel.fetchCartes()
+    }
+
+    // Sélectionner la carte par défaut (CATS de Montpellier) après le chargement des cartes
+    LaunchedEffect(cartes) {
+        if (!cartes.isNullOrEmpty() && selectedCarte == null) {
+            carteViewModel.setSelectedCarte(cartes.find { it.nom == "CATS de Montpellier" })
+        }
+    }
+
+    // Charger les détails de la carte sélectionnée
+    LaunchedEffect(selectedCarte) {
+        selectedCarte?.let {
+            println("DEBUG: Chargement des bornes pour la carte sélectionnée - ID: ${it.id}")
+            carteViewModel.fetchCarteDetails(it.id)
+            borneViewModel.fetchBornesByEtatAndCarte(CarteId(it.id))
+        } ?: println("DEBUG: Aucune carte sélectionnée")
+    }
+
+    LaunchedEffect(userId) {
         userViewModel.fetchUserEmail(userId)
-        carteViewModel.fetchCarteDetails(carteId)
-        borneViewModel.fetchBornesByEtat()
     }
 
     if (showZoomableMap) {
@@ -83,54 +109,58 @@ fun UserHomePage(navController: NavHostController, userId: String, carteId: Stri
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "CATS de Montpellier",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontSize = 20.sp
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                    NetworkImage(
-                        imageUrl = selectedCarteImageUrl,
-                        lastModified = selectedCarteLastModified,
-                        contentDescription = "Carte Image",
-                        modifier = Modifier.clickable { showZoomableMap = true }
-                    )
-
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Text(
-                        text = "Bornes :",
-                        fontSize = 20.sp
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                    if (isLoading) {
-                        CircularProgressIndicator(
-                            color = darkModeColorTitle,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                    // Menu déroulant pour sélectionner une carte
+                    if (isLoadingCartes) {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    } else if (!cartes.isNullOrEmpty()) {
+                        CarteDropdownMenu(
+                            cartes = cartes,
+                            selectedCarte = selectedCarte,
+                            onCarteSelected = {
+                                carteViewModel.setSelectedCarte(it)
+                                borneViewModel.fetchBornesByEtatAndCarte(CarteId(it.id))
+                            }
                         )
                     } else {
-                        etatBornes?.let {
-                            if (it.disponible.isEmpty() && it.occupee.isEmpty() && it.hs.isEmpty() && it.signalee.isEmpty()) {
-                                Text(text = "Aucune borne disponible pour le moment.", color = Color.Red)
-                            } else {
-                                BorneList(
+                        Text(
+                            text = errorLoadingCartes ?: "Erreur lors du chargement des cartes.",
+                            color = Color.Red,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Affichage de la carte sélectionnée
+                    selectedCarte?.let {
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        NetworkImage(
+                            imageUrl = selectedCarteImageUrl,
+                            lastModified = selectedCarteLastModified,
+                            contentDescription = "Carte Image",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { showZoomableMap = true }
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        if (isLoadingBornes) {
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                        } else {
+                            etatBornes?.let {
+                                Text(text = "Bornes associées :",
+                                    fontSize = 20.sp)
+                                Spacer(modifier = Modifier.height(16.dp))
+                                BorneListAdmin(
                                     etatBornes = it,
-                                    userId = userId,
-                                    signalementViewModel = signalementViewModel,
-                                    borneViewModel = borneViewModel,
-                                    showAlert = { message, isSuccess ->
-                                        alertMessage = message
-                                        alertIsSuccess = isSuccess
-                                        alertVisible = true
-                                    },
                                     containerColor = if (isSystemInDarkTheme()) DarkContainerColor else MaterialTheme.colorScheme.surface,
                                 )
-                            }
+                            } ?: Text(text = "Aucune borne disponible pour cette carte.")
                         }
                     }
-                    Spacer(modifier = Modifier.height(32.dp))
                 }
                 if (alertVisible) {
                     Alert(
