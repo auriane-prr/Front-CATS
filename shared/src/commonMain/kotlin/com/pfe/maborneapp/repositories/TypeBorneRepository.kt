@@ -17,17 +17,17 @@ class TypeBorneRepository(private val client: HttpClient) {
         println("DEBUG: TypeBorneRepository.fetchTypesBorne()")
         return try {
             val response = client.get("https://back-cats.onrender.com/type_borne")
-            println("DEBUG: Réponse brute = ${response.bodyAsText()}")
+            println("DEBUG:TYPE_BORNE Réponse brute = ${response.bodyAsText()}")
             if (response.status == HttpStatusCode.OK) {
                 val type_borne = json.decodeFromString(ListSerializer(TypeBorne.serializer()), response.bodyAsText())
-                println("DEBUG: Bornes disponibles décodées = $type_borne")
+                println("DEBUG: type_borne disponibles décodées = $type_borne")
                 type_borne
             } else {
-                println("Erreur lors de la récupération des bornes disponibles : ${response.status}")
+                println("DEBUG:Erreur lors de la récupération des bornes disponibles : ${response.status}")
                 null
             }
         } catch (e: Exception) {
-            println("Erreur dans ReservationRepository : ${e.message}")
+            println("DEBUG:Erreur dans ReservationRepository : ${e.message}")
             null
         }
     }

@@ -68,6 +68,17 @@ class BorneRepository(private val client: HttpClient) {
         }
     }
 
+    suspend fun deleteBorne(borneId: String): Boolean {
+        return try {
+            val response = client.delete("https://back-cats.onrender.com/borne/$borneId")
+            response.status == HttpStatusCode.OK
+        } catch (e: Exception) {
+            println("Erreur lors de la suppression de la borne : ${e.message}")
+            false
+        }
+    }
+
+
     // Mise à jour du statut d'une borne
     suspend fun updateBorneStatus(borneId: String, newStatus: String): Borne? {
         return try {

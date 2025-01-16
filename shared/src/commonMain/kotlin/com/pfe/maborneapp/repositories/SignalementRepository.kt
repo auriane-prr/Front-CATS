@@ -1,5 +1,6 @@
 package com.pfe.maborneapp.repositories
 
+import com.pfe.maborneapp.models.CarteId
 import com.pfe.maborneapp.models.Signalement
 import kotlinx.serialization.Serializable
 import io.ktor.client.*
@@ -33,14 +34,14 @@ class SignalementRepository(private val httpClient: HttpClient) {
                 }
 
                 if (response.status.isSuccess()) {
-                    println("DEBUG: Statut de la borne mis à jour avec succès : ${response.status}")
+                    println("DEBUG: UPDATE_BORNE: Statut de la borne mis à jour avec succès : ${response.status}")
                     true
                 } else {
                     println("DEBUG: Échec de la mise à jour du statut : ${response.status}")
                     false
                 }
             } catch (e: Exception) {
-                println("Erreur lors de la mise à jour du statut : ${e.message}")
+                println("DEBUG: Erreur lors de la mise à jour du statut : ${e.message}")
                 false
             }
         }
@@ -52,14 +53,14 @@ class SignalementRepository(private val httpClient: HttpClient) {
                 contentType(ContentType.Application.Json)
             }
             if (response.status.isSuccess()) {
-                println("Signalement fermé avec succès pour ID : $signalementId")
+                println("DEBUG: Signalement fermé avec succès pour ID : $signalementId")
                 true
             } else {
-                println("Erreur : Statut HTTP ${response.status}")
+                println("DEBUG: Erreur : Statut HTTP ${response.status}")
                 false
             }
         } catch (e: Exception) {
-            println("Erreur lors de la fermeture du signalement : ${e.message}")
+            println("DEBUG: Erreur lors de la fermeture du signalement : ${e.message}")
             false
         }
     }
@@ -88,18 +89,36 @@ class SignalementRepository(private val httpClient: HttpClient) {
                     false
                 }
             } catch (e: Exception) {
-                println("Erreur lors de l'envoi du signalement : ${e.message}")
+                println("DEBUG: Erreur lors de l'envoi du signalement : ${e.message}")
                 false
             }
         }
     }
 
-    private val baseUrl = "https://back-cats.onrender.com/signalement/en-attente"
 
     suspend fun getSignalements(): List<Signalement>? {
         return try {
             val response = httpClient.get("https://back-cats.onrender.com/signalement/en-attente")
             println("DEBUG, Réponse brute : ${response.bodyAsText()}")
+            if (response.status == HttpStatusCode.OK) {
+                val signalements = json.decodeFromString(ListSerializer(Signalement.serializer()), response.bodyAsText())
+                println("DEBUG, Signalements récupérés avec succès= $signalements")
+                signalements
+            } else {
+                println("DEBUG, Statut HTTP inattendu : ${response.status}")
+                null
+            }
+        } catch (e: Exception) {
+            println("DEBUG, Erreur dans fetchBornesByEtat : ${e.message}")
+            null
+        }
+    }
+
+    suspend fun getSignalementsByCarte(carteId: CarteId): List<Signalement>? {
+        return try {
+            val carteIdString = carteId._id
+            val response = httpClient.get("https://back-cats.onrender.com/signalement/carte/$carteIdString/en-attente")
+            println("DEBUG, Signalement:  Réponse brute : ${response.bodyAsText()}")
             if (response.status == HttpStatusCode.OK) {
                 val signalements = json.decodeFromString(ListSerializer(Signalement.serializer()), response.bodyAsText())
                 println("DEBUG, Signalements récupérés avec succès= $signalements")

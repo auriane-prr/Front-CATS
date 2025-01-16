@@ -18,17 +18,19 @@ import com.pfe.maborneapp.utils.DarkModeGreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BorneModalAdmin(selectedBorne: Borne?, onClose: () -> Unit) {
+fun BorneModalAdmin(
+    selectedBorne: Borne?,
+    onClose: () -> Unit,
+    onDelete: (String) -> Unit
+) {
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
     if (selectedBorne != null) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .graphicsLayer {
-                    renderEffect = BlurEffect(20f, 20f) // Flou sur tout l'arrière-plan
-                }
-                .background(Color.Black.copy(alpha = 0.4f)), // Couleur et opacité de la Box
+                .graphicsLayer { renderEffect = BlurEffect(20f, 20f) }
+                .background(Color.Black.copy(alpha = 0.4f)),
             contentAlignment = Alignment.Center
         ) {
             Box(
@@ -39,11 +41,9 @@ fun BorneModalAdmin(selectedBorne: Borne?, onClose: () -> Unit) {
             ) {
                 AlertDialog(
                     onDismissRequest = { onClose() },
-                    modifier = Modifier
-                        .fillMaxWidth(),
                     title = {
                         Text(
-                            text = "Détails de la borne",
+                            "Détails de la borne",
                             style = MaterialTheme.typography.titleLarge,
                             color = darkModeColorGreen,
                             modifier = Modifier.padding(16.dp)
@@ -55,19 +55,9 @@ fun BorneModalAdmin(selectedBorne: Borne?, onClose: () -> Unit) {
                                 .fillMaxWidth()
                                 .padding(16.dp)
                         ) {
-                            Text(
-                                text = "Borne : ${selectedBorne.numero}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = darkModeColorGreen
-                            )
+                            Text("Borne : ${selectedBorne.numero}", style = MaterialTheme.typography.bodyMedium, color = darkModeColorGreen)
                             Spacer(modifier = Modifier.height(8.dp))
-
-                            Text(
-                                text = "Statut : ${selectedBorne.status}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.Gray
-                            )
-
+                            Text("Statut : ${selectedBorne.status}", style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
                             Spacer(modifier = Modifier.height(16.dp))
                         }
                     },
@@ -77,10 +67,17 @@ fun BorneModalAdmin(selectedBorne: Borne?, onClose: () -> Unit) {
                             colors = ButtonDefaults.buttonColors(containerColor = darkModeColorGreen),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(text = "Fermer" )
+                            Text("Fermer")
                         }
                     },
-                    dismissButton = null
+                    dismissButton = {
+                        Button(
+                            onClick = { onDelete(selectedBorne.id) },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                        ) {
+                            Text("Supprimer")
+                        }
+                    }
                 )
             }
         }

@@ -14,7 +14,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.pfe.maborneapp.models.Carte
+import com.pfe.maborneapp.utils.DarkContainerColor
 import com.pfe.maborneapp.utils.DarkModeGreen
 
 @Composable
@@ -25,6 +27,7 @@ fun CarteDropdownMenu(
 ) {
     var dropdownExpanded by remember { mutableStateOf(false) }
     val darkModeColorTitle = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
+    val darkModeColorBackground = if (isSystemInDarkTheme()) DarkContainerColor else Color.White
 
     Box(
         modifier = Modifier
@@ -35,7 +38,7 @@ fun CarteDropdownMenu(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    color = Color.White,
+                    color = darkModeColorBackground,
                     shape = RoundedCornerShape(12.dp)
                 )
                 .border(
@@ -54,7 +57,6 @@ fun CarteDropdownMenu(
                 Text(
                     text = selectedCarte?.nom ?: "Sélectionner une carte",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = Color.Black,
                     modifier = Modifier.weight(1f)
                 )
                 Icon(
@@ -72,7 +74,7 @@ fun CarteDropdownMenu(
         ) {
             cartes.forEach { carte ->
                 DropdownMenuItem(
-                    text = { Text(carte.nom) },
+                    text = { Text(carte.nom, fontSize = 16.sp) },
                     onClick = {
                         onCarteSelected(carte)
                         dropdownExpanded = false

@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import com.pfe.maborneapp.models.CarteId
 import com.pfe.maborneapp.view.admin.components.AdminMenu
 
 @Composable
@@ -34,7 +35,8 @@ fun AdminStatistiquePage(navController: NavHostController) {
                     navController = navController,
                     isMenuOpen = isMenuOpen,
                     onToggleMenu = { isMenuOpen = !isMenuOpen },
-                    currentPage = "adminStatistique"
+                    currentPage = "adminStatistique",
+                    carteId = CarteId("0")
                 )
             }
         }

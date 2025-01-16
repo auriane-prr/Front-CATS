@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.compose.ui.Alignment
+import com.pfe.maborneapp.models.CarteId
 import com.pfe.maborneapp.utils.DarkModeGreen
 
 @Composable
@@ -21,7 +22,8 @@ fun AdminMenu(
     navController: NavHostController,
     isMenuOpen: Boolean,
     onToggleMenu: () -> Unit,
-    currentPage: String
+    currentPage: String,
+    carteId: CarteId
 ) {
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
     val menuBackgroundColor = Color(0xFFBDD3D0)
@@ -55,7 +57,7 @@ fun AdminMenu(
                     Divider(color = darkModeColorGreen, thickness = 1.dp)
 
                     // Signalement
-                    TextButton(onClick = { navController.navigate("adminSignalement") }) {
+                    TextButton(onClick = { navController.navigate("adminSignalement/${carteId._id}") }) {
                         Text(
                             text = "Signalement",
                             style = MaterialTheme.typography.bodyLarge,

@@ -103,7 +103,9 @@ fun NewBornePage(navController: NavHostController, defaultCarteId: String) {
                 ) {
                     // Menu déroulant pour sélectionner une carte
                     if (isLoadingCartes) {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            color = darkModeColorGreen)
                     } else if (!cartes.isNullOrEmpty()) {
                         CarteDropdownMenu(
                             cartes = cartes,
@@ -141,14 +143,20 @@ fun NewBornePage(navController: NavHostController, defaultCarteId: String) {
                         onValueChange = { numero = it },
                         label = { Text("Numéro de la borne") },
                         modifier = Modifier.fillMaxWidth(),
-                        isError = numero.isEmpty()
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = darkModeColorGreen,
+                            unfocusedBorderColor = darkModeColorGreen,
+                            focusedLabelColor = darkModeColorGreen
+                    )
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Menu déroulant pour les types de bornes
                     if (isLoadingTypesBorne) {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            color = darkModeColorGreen)
                     } else if (!typesBorne.isNullOrEmpty()) {
                         CustomDropDown(
                             typesBorne = typesBorne,

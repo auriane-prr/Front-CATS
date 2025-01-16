@@ -52,6 +52,8 @@ fun AdminHomePage(navController: NavHostController) {
     var isCreateModalOpen by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
+    val carteId = CarteId(selectedCarte?.id ?: "")
+
     // Charger les cartes au montage
     LaunchedEffect(Unit) {
         carteViewModel.fetchCartes()
@@ -115,7 +117,9 @@ fun AdminHomePage(navController: NavHostController) {
                             )
                             // Menu déroulant pour sélectionner une carte
                             if (isLoadingCartes) {
-                                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                                CircularProgressIndicator(
+                                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                                    color = darkModeColorGreen)
                             } else if (!cartes.isNullOrEmpty()) {
                                 CarteDropdownMenu(
                                     cartes = cartes,
@@ -152,7 +156,9 @@ fun AdminHomePage(navController: NavHostController) {
                                 Spacer(modifier = Modifier.height(16.dp))
 
                                 if (isLoadingBornes) {
-                                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                                        color = darkModeColorGreen)
                                 } else {
                                     etatBornes?.let {
                                         Text(text = "Bornes associées :",
@@ -160,6 +166,7 @@ fun AdminHomePage(navController: NavHostController) {
                                         Spacer(modifier = Modifier.height(16.dp))
                                         BorneListAdmin(
                                             etatBornes = it,
+                                            viewModel = borneViewModel,
                                             containerColor = if (isSystemInDarkTheme()) DarkContainerColor else MaterialTheme.colorScheme.surface,
                                         )
                                     } ?: Text(text = "Aucune borne disponible pour cette carte.")
@@ -193,7 +200,8 @@ fun AdminHomePage(navController: NavHostController) {
                             navController = navController,
                             isMenuOpen = isMenuOpen,
                             onToggleMenu = { isMenuOpen = !isMenuOpen },
-                            currentPage = "adminHome"
+                            currentPage = "adminHome",
+                            carteId = carteId
                         )
                     }
         )
