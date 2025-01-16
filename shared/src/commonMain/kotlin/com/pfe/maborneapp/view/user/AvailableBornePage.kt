@@ -4,7 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -13,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.pfe.maborneapp.utils.DarkModeGreen
@@ -21,6 +24,7 @@ import com.pfe.maborneapp.viewmodel.user.ReservationViewModel
 import com.pfe.maborneapp.models.Borne
 import com.pfe.maborneapp.models.Reservation
 import com.pfe.maborneapp.models.User
+import com.pfe.maborneapp.view.components.Alert
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,12 +38,28 @@ fun AvailableBornesPage(
     val availableBornes by reservationViewModel.availableBornes.collectAsState()
     var selectedBorne by remember { mutableStateOf<Borne?>(null) }
 
+    var showAlert by remember { mutableStateOf(false) }
+    var alertMessage by remember { mutableStateOf("") }
+    var isAlertSuccess by remember { mutableStateOf(false) }
+
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
-    // Charger les bornes disponibles
     LaunchedEffect(startDate, endDate) {
         reservationViewModel.fetchAvailableBornes(startDate, endDate)
     }
+
+    fun formatDateRange(start: String, end: String): String {
+        val startParts = start.split("T")
+        val date = startParts[0].split("-")
+        val startTime = startParts[1].split(":")
+
+        val endParts = end.split("T")
+        val endTime = endParts[1].split(":")
+
+        return "Le ${date[2]}/${date[1]}/${date[0]} de ${startTime[0]}:${startTime[1]} à ${endTime[0]}:${endTime[1]}"
+    }
+
+    val formattedDateRange = formatDateRange(startDate, endDate)
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -64,16 +84,16 @@ fun AvailableBornesPage(
                     onClick = { navController.popBackStack() },
                     modifier = Modifier.weight(1f).padding(end = 8.dp)
                 ) {
-                    Text("Annuler")
+                    Text("Annuler", color = Color.Gray)
                 }
 
                 Button(
                     onClick = {
                         selectedBorne?.let { borne ->
                             val reservation = Reservation(
-                                id = "", // Généré par le backend
+                                id = "",
                                 borne = borne,
-                                user = User(userId, "user@example.com", "User"), // Utilisateur actuel
+                                user = User(userId, "user@example.com", "User"),
                                 dateDebut = startDate,
                                 dateFin = endDate
                             )
@@ -88,12 +108,24 @@ fun AvailableBornesPage(
             }
         },
         content = { paddingValues ->
+            val scrollState = rememberScrollState()
             Column(
                 modifier = Modifier
                     .padding(paddingValues)
                     .padding(16.dp)
                     .fillMaxSize()
+                    .verticalScroll(scrollState),
             ) {
+                Text(
+                    text = formattedDateRange,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
+                    color = Color.Black
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+                Divider(color = darkModeColorGreen, thickness = (1.5).dp)
+                Spacer(modifier = Modifier.height(16.dp))
+
                 if (availableBornes == null) {
                     // Afficher un loader pendant le chargement
                     Box(
@@ -118,7 +150,7 @@ fun AvailableBornesPage(
                                 .clickable { selectedBorne = borne }
                                 .padding(vertical = 8.dp)
                                 .background(
-                                    color = if (selectedBorne == borne) darkModeColorGreen else Color(0xFFE0E0E0),
+                                    color = if (selectedBorne == borne) Color(0xFFBDD3D0) else Color(0xFFE0E0E0),
                                     shape = RoundedCornerShape(8.dp)
                                 )
                                 .padding(16.dp),
@@ -127,7 +159,7 @@ fun AvailableBornesPage(
                             Text(
                                 text = "Borne ${borne.numero} - ${borne.status}",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = if (selectedBorne == borne) Color.White else Color.Black
+                                color = Color.Black
                             )
                         }
                     }
@@ -139,9 +171,29 @@ fun AvailableBornesPage(
     // Gestion de la création de réservation
     val creationStatus by reservationViewModel.creationStatus.collectAsState()
     LaunchedEffect(creationStatus) {
-        if (creationStatus == true) {
-            // Retourner à la page des réservations après succès
-            navController.popBackStack("reservations/$userId", inclusive = false)
+        creationStatus?.let {
+            if (it) {
+                isAlertSuccess = true
+                alertMessage = "Votre réservation a bien été prise en compte"
+                showAlert = true
+            } else {
+                isAlertSuccess = false
+                alertMessage = "Erreur lors de la création de la réservation. Veuillez réessayer."
+                showAlert = true
+            }
         }
+    }
+
+    // Afficher l'alerte d'erreur ou de succès
+    if (showAlert) {
+        Alert(
+            isSuccess = isAlertSuccess,
+            message = alertMessage,
+            onDismiss = {
+                // Une fois que l'utilisateur ferme l'alerte, permettre la navigation
+                showAlert = false
+                navController.popBackStack("reservations/$userId", inclusive = false)
+            }
+        )
     }
 }

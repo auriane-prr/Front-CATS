@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.pfe.maborneapp.utils.DarkModeGreen
@@ -45,6 +44,9 @@ fun NewReservationPage(navController: NavHostController, userId: String) {
     val selectedDate = reservationViewModel.selectedDate.value
     val startTime = reservationViewModel.startTime.value
     val endTime = reservationViewModel.endTime.value
+
+    val startTimeState = remember { mutableStateOf("") }
+    val endTimeState = remember { mutableStateOf("") }
 
     // Fonction de validation des champs
     fun validateInputs() {
