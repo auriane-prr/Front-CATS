@@ -3,6 +3,7 @@ package com.pfe.maborneapp.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pfe.maborneapp.models.Borne
+import com.pfe.maborneapp.models.CarteId
 import com.pfe.maborneapp.models.CreateBorneRequest
 import com.pfe.maborneapp.models.EtatBornes
 import com.pfe.maborneapp.repositories.BorneRepository
@@ -23,19 +24,18 @@ class BorneViewModel(private val repository: BorneRepository) : ViewModel() {
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
-    init {
-        fetchBornesByEtat()
-    }
-
     fun createBorne(request: CreateBorneRequest) {
         viewModelScope.launch {
+            println("DEBUG: Appel à createBorne avec request = $request")
             _creationStatus.value = null // Réinitialise l'état
             try {
                 val newBorne = repository.createBorne(request)
                 if (newBorne != null) {
+                    println("DEBUG: Réservation créée avec succès")
                     _creationStatus.value = true
                     fetchBornesByEtat() // Actualiser les bornes après création
                 } else {
+                    println("DEBUG: Échec de la création de la réservation")
                     _creationStatus.value = false
                     _errorMessage.value = "Erreur inconnue lors de la création de la borne."
                 }
@@ -65,6 +65,26 @@ class BorneViewModel(private val repository: BorneRepository) : ViewModel() {
             }
         }
     }
+    fun fetchBornesByEtatAndCarte(carteId: CarteId) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                println("DEBUG: Appel à fetchBornesByEtatAndCarte avec carteId = $carteId")
+                val fetchedEtatBornes = repository.fetchBornesByEtatAndCarte(carteId)
+                if (fetchedEtatBornes != null) {
+                    println("DEBUG, Bornes chargées avec succès : $fetchedEtatBornes")
+                    _etatBornes.value = fetchedEtatBornes
+                } else {
+                    println("DEBUG, Aucune donnée retournée par le backend.")
+                }
+            } catch (e: Exception) {
+                println("DEBUG, Erreur lors du chargement des bornes : ${e.message}")
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
     fun resetErrorMessage() {
         _errorMessage.value = null
     }

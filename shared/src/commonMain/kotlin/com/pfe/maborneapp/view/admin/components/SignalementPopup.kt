@@ -46,7 +46,7 @@ fun SignalementPopup(
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Fermer",
-                        tint = Color(0xFF045C3C) // Même couleur que le bouton "Fermer"
+                        tint = Color(0xFF045C3C) // Même couleur que le bouton "Déclarer Fonctionnelle"
                     )
                 }
             }
@@ -65,7 +65,7 @@ fun SignalementPopup(
                 DetailItem(label = "Carte", value = signalement.borne.carte.nom)
 
                 Divider(color = Color(0xFFE0E0E0))
-
+                Spacer(modifier = Modifier.height(8.dp))
                 // Boutons pour changer l'état de la borne
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(12.dp), // Augmente l'espacement entre les boutons
@@ -77,6 +77,7 @@ fun SignalementPopup(
                         onClick = {
                             signalement.borne.id?.let { id ->
                                 onUpdateStatus(id, "hs")
+                                onDismiss() // Ferme le popup après l'action
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFBDBDBD)),
@@ -85,32 +86,43 @@ fun SignalementPopup(
                             .height(56.dp), // Augmente la hauteur pour mieux afficher le texte
                         shape = RoundedCornerShape(12.dp) // Courbe légèrement plus marquée
                     ) {
-                        Text(
-                            "Déclarer Hors-Service",
-                            color = Color.White,
-                            fontSize = 14.sp,
-                            modifier = Modifier.align(Alignment.CenterVertically)
-                        )
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center // Centrage du texte
+                        ) {
+                            Text(
+                                "Déclarer HS",
+                                color = Color.White,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
 
                     Button(
                         onClick = {
                             signalement.borne.id?.let { id ->
                                 onUpdateStatus(id, "Fonctionnelle")
+                                onDismiss() // Ferme le popup après l'action
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF045C3C)), // Même couleur que la croix
                         modifier = Modifier
                             .weight(1f)
                             .height(56.dp), // Même hauteur que l'autre bouton
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text(
-                            "Déclarer Fonctionnelle",
-                            color = Color.White,
-                            fontSize = 14.sp,
-                            modifier = Modifier.align(Alignment.CenterVertically)
-                        )
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center // Centrage du texte
+                        ) {
+                            Text(
+                                "Déclarer Fonctionnelle",
+                                color = Color.White,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
             }

@@ -1,5 +1,6 @@
 package com.pfe.maborneapp.viewmodel.user
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pfe.maborneapp.models.Borne
@@ -15,6 +16,10 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 class ReservationViewModel(private val reservationRepository: ReservationRepository) : ViewModel() {
+    var selectedDate = mutableStateOf("")
+    var startTime = mutableStateOf("")
+    var endTime = mutableStateOf("")
+
     private val _reservations = MutableStateFlow<List<Reservation>?>(null)
     val reservations: StateFlow<List<Reservation>?> = _reservations
 

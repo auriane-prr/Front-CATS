@@ -52,6 +52,13 @@ kotlin {
                 implementation("org.jetbrains.compose.ui:ui-graphics:1.5.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
+                implementation("androidx.compose.material3:material3:1.3.1")
+                implementation("androidx.compose.runtime:runtime:1.3.3")
+                implementation("androidx.compose.foundation:foundation:1.3.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+
+                implementation("androidx.compose.material3:material3-window-size-class:1.3.1")
+
                 implementation(compose.foundation)
                 implementation(compose.material3)
                 implementation(compose.ui)
@@ -71,7 +78,8 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
                 implementation(libs.kotlinx.serialization.json)
                 implementation("io.ktor:ktor-client-okhttp:2.3.0")
-
+                implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.1")
+                implementation("androidx.compose.ui:ui-graphics:1.5.0")
             }
         }
 
@@ -114,6 +122,7 @@ dependencies {
     implementation(libs.androidx.ui.android)
     implementation(libs.androidx.foundation.android)
     implementation(libs.androidx.core.i18n)
+    implementation(libs.androidx.material3.android)
 }
 
 tasks.register("assembleXCFramework") {

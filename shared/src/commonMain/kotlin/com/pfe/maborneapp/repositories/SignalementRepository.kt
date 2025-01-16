@@ -6,11 +6,13 @@ import io.ktor.client.*
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.*
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 
 @Serializable
@@ -21,6 +23,7 @@ data class SignalementRequest(
 )
 
 class SignalementRepository(private val httpClient: HttpClient) {
+    private val json = Json { ignoreUnknownKeys = true }
 
     suspend fun updateBorneStatus(borneId: String, newStatus: String): Boolean {
         return withContext(Dispatchers.IO) {
@@ -91,11 +94,23 @@ class SignalementRepository(private val httpClient: HttpClient) {
         }
     }
 
-    private val baseUrl = "https://back-cats.onrender.com/signalement"
+    private val baseUrl = "https://back-cats.onrender.com/signalement/en-attente"
 
-    suspend fun getSignalements(): List<Signalement> {
-        return httpClient.get(baseUrl) {
-            contentType(ContentType.Application.Json)
-        }.body()
+    suspend fun getSignalements(): List<Signalement>? {
+        return try {
+            val response = httpClient.get("https://back-cats.onrender.com/signalement/en-attente")
+            println("DEBUG, Réponse brute : ${response.bodyAsText()}")
+            if (response.status == HttpStatusCode.OK) {
+                val signalements = json.decodeFromString(ListSerializer(Signalement.serializer()), response.bodyAsText())
+                println("DEBUG, Signalements récupérés avec succès= $signalements")
+                signalements
+            } else {
+                println("DEBUG, Statut HTTP inattendu : ${response.status}")
+                null
+            }
+        } catch (e: Exception) {
+            println("DEBUG, Erreur dans fetchBornesByEtat : ${e.message}")
+            null
+        }
     }
 }

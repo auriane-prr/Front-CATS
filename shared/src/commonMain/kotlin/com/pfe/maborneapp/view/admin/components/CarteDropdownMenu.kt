@@ -1,5 +1,4 @@
 package com.pfe.maborneapp.view.admin.components
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -9,20 +8,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.pfe.maborneapp.models.TypeBorne
+import com.pfe.maborneapp.models.Carte
 import com.pfe.maborneapp.utils.DarkModeGreen
 @Composable
-fun CustomDropDown(
-    typesBorne: List<TypeBorne>,
-    selectedType: TypeBorne?,
-    onTypeSelected: (TypeBorne) -> Unit
+fun CarteDropdownMenu(
+    cartes: List<Carte>,
+    selectedCarte: Carte?,
+    onCarteSelected: (Carte) -> Unit
 ) {
     var dropdownExpanded by remember { mutableStateOf(false) }
     val darkModeColorTitle = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
@@ -32,7 +30,6 @@ fun CustomDropDown(
             .fillMaxWidth()
             .padding(vertical = 8.dp)
     ) {
-        // Champ de sélection
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -54,7 +51,7 @@ fun CustomDropDown(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = selectedType?.nom ?: "Sélectionner un type de borne",
+                    text = selectedCarte?.nom ?: "Sélectionner une carte",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.Black,
                     modifier = Modifier.weight(1f)
@@ -67,34 +64,20 @@ fun CustomDropDown(
             }
         }
 
-        // Menu déroulant aligné sous le champ
         DropdownMenu(
             expanded = dropdownExpanded,
             onDismissRequest = { dropdownExpanded = false },
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         ) {
-            typesBorne.forEachIndexed { index, type ->
+            cartes.forEach { carte ->
                 DropdownMenuItem(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .height(50.dp),
-                    text = { Text(type.nom) },
+                    text = { Text(carte.nom) },
                     onClick = {
-                        onTypeSelected(type)
+                        onCarteSelected(carte)
                         dropdownExpanded = false
                     }
                 )
-                if (index < typesBorne.size - 1) {
-                    Divider(
-                        color = darkModeColorTitle.copy(alpha = 0.2f), // Couleur avec transparence
-                        thickness = 1.dp,
-                        modifier = Modifier.padding(horizontal = 8.dp) // Espacement horizontal
-                    )
-                }
             }
         }
     }
 }
-

@@ -65,9 +65,9 @@ fun SignalementModal(
                             .fillMaxWidth()
                             .height(120.dp)
                             .padding(vertical = 8.dp),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                        colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = darkModeColorGreen,
-                            unfocusedBorderColor = darkModeColorGreen
+                            unfocusedBorderColor = darkModeColorGreen,
                         )
                     )
                 }

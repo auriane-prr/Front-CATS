@@ -1,13 +1,9 @@
 package com.pfe.maborneapp.view.admin
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,43 +12,72 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.pfe.maborneapp.models.Borne
+import com.pfe.maborneapp.models.Carte
 import com.pfe.maborneapp.models.CarteId
 import com.pfe.maborneapp.models.CreateBorneRequest
 import com.pfe.maborneapp.models.TypeBorne
 import com.pfe.maborneapp.models.TypeBorneId
 import com.pfe.maborneapp.utils.DarkModeGreen
+import com.pfe.maborneapp.view.admin.components.CarteDropdownMenu
 import com.pfe.maborneapp.view.admin.components.CustomDropDown
 import com.pfe.maborneapp.view.components.image.NetworkImage
 import com.pfe.maborneapp.view.components.image.ZoomableImageView
 import com.pfe.maborneapp.viewmodel.BorneViewModel
 import com.pfe.maborneapp.viewmodel.CarteViewModel
+import com.pfe.maborneapp.viewmodel.LocalCarteViewModel
+import com.pfe.maborneapp.viewmodel.TypeBorneViewModel
 import com.pfe.maborneapp.viewmodel.factories.BorneViewModelFactory
 import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
+import com.pfe.maborneapp.viewmodel.factories.TypeBorneViewModelFactory
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewBornePage(navController: NavHostController, typesBorne: List<TypeBorne>, carteId: String? = null) {
+fun NewBornePage(navController: NavHostController) {
     val borneViewModel: BorneViewModel = viewModel(factory = BorneViewModelFactory())
-    val carteViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
+    val carteViewModel = LocalCarteViewModel.current
+    val typeBorneViewModel: TypeBorneViewModel = viewModel(factory = TypeBorneViewModelFactory())
 
+    // États pour les champs de la borne et les cartes
     var coordX by remember { mutableStateOf("") }
     var coordY by remember { mutableStateOf("") }
     var numero by remember { mutableStateOf("") }
+    var selectedCarte by remember { mutableStateOf<Carte?>(null) }
     var selectedTypeBorne by remember { mutableStateOf<TypeBorne?>(null) }
-    var dropdownExpanded by remember { mutableStateOf(false) }
     var isSubmitting by remember { mutableStateOf(false) }
     var showZoomableMap by remember { mutableStateOf(false) }
 
-    val creationStatus by borneViewModel.creationStatus.collectAsState()
-    val errorMessage by borneViewModel.errorMessage.collectAsState()
+    val cartes by carteViewModel.carte.collectAsState()
+    val typesBorne by typeBorneViewModel.typesBorne.collectAsState()
+    val isLoadingCartes by carteViewModel.isLoading.collectAsState()
+    val isLoadingTypesBorne by typeBorneViewModel.isLoading.collectAsState()
     val selectedCarteImageUrl by carteViewModel.selectedCarteImageUrl.collectAsState()
     val selectedCarteLastModified by carteViewModel.selectedCarteLastModified.collectAsState()
+    val creationStatus by borneViewModel.creationStatus.collectAsState()
+    val errorMessage by borneViewModel.errorMessage.collectAsState()
 
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
-    LaunchedEffect(carteId) {
-        carteViewModel.fetchCarteDetails(carteId)
+    // Charger les cartes au montage
+    LaunchedEffect(Unit) {
+        carteViewModel.fetchCartes()
     }
+
+    // Sélectionner la carte par défaut (CATS de Montpellier) après le chargement des cartes
+    LaunchedEffect(cartes) {
+        if (!cartes.isNullOrEmpty() && selectedCarte == null) {
+            selectedCarte = cartes.find { it.nom == "CATS de Montpellier" }
+        }
+    }
+
+    // Charger les détails de la carte sélectionnée et les types de bornes
+    LaunchedEffect(selectedCarte) {
+        selectedCarte?.let {
+            carteViewModel.fetchCarteDetails(it.id)
+            typeBorneViewModel.fetchTypesBorne()
+        }
+    }
+
     if (showZoomableMap) {
         ZoomableImageView(
             imageUrl = selectedCarteImageUrl,
@@ -80,6 +105,26 @@ fun NewBornePage(navController: NavHostController, typesBorne: List<TypeBorne>, 
                         .padding(16.dp)
                         .fillMaxSize()
                 ) {
+                    // Menu déroulant pour sélectionner une carte
+                    if (isLoadingCartes) {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    } else if (!cartes.isNullOrEmpty()) {
+                        CarteDropdownMenu(
+                            cartes = cartes,
+                            selectedCarte = selectedCarte,
+                            onCarteSelected = { selectedCarte = it }
+                        )
+                    } else {
+                        Text(
+                            text = "Erreur lors du chargement des cartes.",
+                            color = Color.Red,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     // Carte interactive
                     NetworkImage(
                         imageUrl = selectedCarteImageUrl,
@@ -89,8 +134,6 @@ fun NewBornePage(navController: NavHostController, typesBorne: List<TypeBorne>, 
                             .fillMaxWidth()
                             .height(200.dp)
                             .clickable { showZoomableMap = true }
-                            .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
-                            .padding(8.dp)
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -103,47 +146,25 @@ fun NewBornePage(navController: NavHostController, typesBorne: List<TypeBorne>, 
                         modifier = Modifier.fillMaxWidth(),
                         isError = numero.isEmpty()
                     )
+
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Menu déroulant Type Borne
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.White, shape = RoundedCornerShape(8.dp))
-                            .border(1.dp, darkModeColorGreen, RoundedCornerShape(8.dp))
-                            .clickable { dropdownExpanded = true }
-                            .padding(16.dp)
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
+                    // Menu déroulant pour les types de bornes
+                    if (isLoadingTypesBorne) {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    } else if (!typesBorne.isNullOrEmpty()) {
+                        CustomDropDown(
+                            typesBorne = typesBorne,
+                            selectedType = selectedTypeBorne,
+                            onTypeSelected = { selectedTypeBorne = it }
+                        )
+                    } else {
+                        Text(
+                            text = "Erreur lors du chargement des types de borne.",
+                            color = Color.Red,
+                            style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = selectedTypeBorne?.nom ?: "Sélectionner un type de borne",
-                                color = Color.Black
-                            )
-                            Icon(
-                                imageVector = Icons.Default.ArrowDropDown,
-                                contentDescription = "Flèche vers le bas"
-                            )
-                        }
-                    }
-
-                    DropdownMenu(
-                        expanded = dropdownExpanded,
-                        onDismissRequest = { dropdownExpanded = false },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        typesBorne.forEach { type ->
-                            DropdownMenuItem(
-                                text = { Text(type.nom) },
-                                onClick = {
-                                    selectedTypeBorne = type
-                                    dropdownExpanded = false
-                                }
-                            )
-                        }
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -151,7 +172,7 @@ fun NewBornePage(navController: NavHostController, typesBorne: List<TypeBorne>, 
                     // Bouton de soumission
                     Button(
                         onClick = {
-                            if (numero.isNotEmpty() && selectedTypeBorne != null) {
+                            if (numero.isNotEmpty() && selectedTypeBorne != null && selectedCarte != null) {
                                 isSubmitting = true
                                 borneViewModel.createBorne(
                                     CreateBorneRequest(
@@ -159,7 +180,7 @@ fun NewBornePage(navController: NavHostController, typesBorne: List<TypeBorne>, 
                                         coord_y = coordY.toIntOrNull(),
                                         numero = numero.toInt(),
                                         typeBorne = TypeBorneId(selectedTypeBorne?.id ?: ""),
-                                        carte = CarteId(carteId ?: "")
+                                        carte = CarteId(selectedCarte?.id ?: "")
                                     )
                                 )
                             }
@@ -201,3 +222,4 @@ fun NewBornePage(navController: NavHostController, typesBorne: List<TypeBorne>, 
         )
     }
 }
+

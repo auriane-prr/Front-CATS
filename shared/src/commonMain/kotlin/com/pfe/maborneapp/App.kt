@@ -10,8 +10,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.pfe.maborneapp.models.TypeBorne
+import com.pfe.maborneapp.repositories.CarteRepository
 import com.pfe.maborneapp.utils.ImageCache
 import com.pfe.maborneapp.utils.DarkThemeColors
+import com.pfe.maborneapp.utils.HttpClientFactoryImpl
 import com.pfe.maborneapp.utils.LightThemeColors
 import com.pfe.maborneapp.view.admin.AdminHomePage
 import com.pfe.maborneapp.view.user.UserHomePage
@@ -23,10 +25,16 @@ import com.pfe.maborneapp.view.user.AvailableBornesPage
 import com.pfe.maborneapp.view.user.ReservationPage
 import com.pfe.maborneapp.view.user.ProfilPage
 import com.pfe.maborneapp.view.user.NewReservationPage
+import com.pfe.maborneapp.viewmodel.CarteViewModel
+import com.pfe.maborneapp.viewmodel.LocalCarteViewModel
 
 
 @Composable
 fun App(context: Any? = null) {
+    val carteViewModel: CarteViewModel = remember {
+        CarteViewModel(CarteRepository(HttpClientFactoryImpl().create()))
+    }
+
     AppTheme {
         // Initialisation du cache
         LaunchedEffect(context) {
@@ -35,11 +43,14 @@ fun App(context: Any? = null) {
             }
         }
 
-        MaterialTheme {
-        val navController = rememberNavController()
-        AppNavigation(navController)
-    } }
+        CompositionLocalProvider(LocalCarteViewModel provides carteViewModel) {
+            val navController = rememberNavController()
+            AppNavigation(navController)
+        }
+    }
 }
+
+
 @Composable
 fun AppTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     val colors = if (darkTheme) DarkThemeColors else LightThemeColors
@@ -77,12 +88,11 @@ fun AppNavigation(navController: NavHostController) {
             val userId = backStackEntry.arguments?.getString("userId") ?: ""
             NewReservationPage(navController, userId)
         }
-        composable("newBorne") {
-            NewBornePage(navController = navController, typesBorne = listOf(
-                TypeBorne("675c2adb6fc93512a0050c43", "Voiture"),
-                TypeBorne("675c2adb6fc93512a0050c44", "Vélo")
-            ))
+        composable("newBorne") { backStackEntry ->
+            NewBornePage(navController = navController)
         }
+
+
 
         composable(
             route = "availableBornes/{startDate}/{endDate}/{userId}",
