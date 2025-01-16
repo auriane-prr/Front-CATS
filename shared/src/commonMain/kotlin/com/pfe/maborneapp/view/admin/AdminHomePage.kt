@@ -126,7 +126,9 @@ fun AdminHomePage(navController: NavHostController) {
                             )
                             // Menu déroulant pour sélectionner une carte
                             if (isLoadingCartes) {
-                                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                                CircularProgressIndicator(
+                                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                                    color = darkModeColorGreen)
                             } else if (!cartes.isNullOrEmpty()) {
                                 CarteDropdownMenu(
                                     cartes = cartes,
@@ -163,7 +165,9 @@ fun AdminHomePage(navController: NavHostController) {
                                 Spacer(modifier = Modifier.height(16.dp))
 
                                 if (isLoadingBornes) {
-                                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                                        color = darkModeColorGreen)
                                 } else {
                                     etatBornes?.let {
                                         Text(text = "Bornes associées :",

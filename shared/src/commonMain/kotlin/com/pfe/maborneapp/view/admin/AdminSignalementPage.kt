@@ -79,7 +79,9 @@ fun AdminSignalementPage(navController: NavHostController, defaultCarteId: Carte
                 Spacer(modifier = Modifier.height(16.dp))
                 // Menu déroulant pour sélectionner une carte
                 if (isLoadingCartes) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        color = darkModeColorGreen)
                 } else if (!cartes.isNullOrEmpty()) {
                     CarteDropdownMenu(
                         cartes = cartes,
