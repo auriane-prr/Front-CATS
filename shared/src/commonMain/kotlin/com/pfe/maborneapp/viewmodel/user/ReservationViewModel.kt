@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pfe.maborneapp.models.Borne
+import com.pfe.maborneapp.models.CarteId
 import com.pfe.maborneapp.models.Reservation
 import com.pfe.maborneapp.repositories.ReservationRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,6 +55,20 @@ class ReservationViewModel(private val reservationRepository: ReservationReposit
         viewModelScope.launch {
             try {
                 val response = reservationRepository.fetchAvailableBornes(start, end)
+                println("DEBUG: Bornes disponibles reçues du repository = $response")
+                _availableBornes.value = response?.disponible
+            } catch (e: Exception) {
+                println("DEBUG: Exception dans fetchAvailableBornes : ${e.message}")
+                _availableBornes.value = null
+            }
+        }
+    }
+
+    fun fetchAvailableBornesByCarte(start: String, end: String, carteId: CarteId) {
+        println("DEBUG: Appel à fetchAvailableBornes avec start = $start et end = $end")
+        viewModelScope.launch {
+            try {
+                val response = reservationRepository.fetchAvailableBornesByCarte(start, end, carteId)
                 println("DEBUG: Bornes disponibles reçues du repository = $response")
                 _availableBornes.value = response?.disponible
             } catch (e: Exception) {
