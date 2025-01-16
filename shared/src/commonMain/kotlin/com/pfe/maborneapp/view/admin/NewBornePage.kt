@@ -33,7 +33,7 @@ import com.pfe.maborneapp.viewmodel.factories.TypeBorneViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewBornePage(navController: NavHostController) {
+fun NewBornePage(navController: NavHostController, defaultCarteId: String) {
     val borneViewModel: BorneViewModel = viewModel(factory = BorneViewModelFactory())
     val carteViewModel = LocalCarteViewModel.current
     val typeBorneViewModel: TypeBorneViewModel = viewModel(factory = TypeBorneViewModelFactory())
@@ -57,25 +57,23 @@ fun NewBornePage(navController: NavHostController) {
     val errorMessage by borneViewModel.errorMessage.collectAsState()
 
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
-
     // Charger les cartes au montage
     LaunchedEffect(Unit) {
         carteViewModel.fetchCartes()
     }
 
-    // Sélectionner la carte par défaut (CATS de Montpellier) après le chargement des cartes
-    LaunchedEffect(cartes) {
+    // Sélectionner la carte par défaut avec l'ID passé
+    LaunchedEffect(defaultCarteId, cartes) {
         if (!cartes.isNullOrEmpty() && selectedCarte == null) {
-            selectedCarte = cartes.find { it.nom == "CATS de Montpellier" }
+            val carte = cartes.find { it.id == defaultCarteId }
+            selectedCarte = carte
+            carte?.let { carteViewModel.fetchCarteDetails(it.id) }
         }
     }
 
-    // Charger les détails de la carte sélectionnée et les types de bornes
+    // Charger les types de bornes pour la carte sélectionnée
     LaunchedEffect(selectedCarte) {
-        selectedCarte?.let {
-            carteViewModel.fetchCarteDetails(it.id)
-            typeBorneViewModel.fetchTypesBorne()
-        }
+        selectedCarte?.let { typeBorneViewModel.fetchTypesBorne() }
     }
 
     if (showZoomableMap) {
@@ -123,6 +121,7 @@ fun NewBornePage(navController: NavHostController) {
                         )
                     }
 
+                    Spacer(modifier = Modifier.height(16.dp))
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Carte interactive

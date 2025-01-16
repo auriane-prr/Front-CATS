@@ -88,10 +88,10 @@ fun AppNavigation(navController: NavHostController) {
             val userId = backStackEntry.arguments?.getString("userId") ?: ""
             NewReservationPage(navController, userId)
         }
-        composable("newBorne") { backStackEntry ->
-            NewBornePage(navController = navController)
+        composable("newBorne/{carteId}") { backStackEntry ->
+            val carteId = backStackEntry.arguments?.getString("carteId") ?: ""
+            NewBornePage(navController, defaultCarteId = carteId)
         }
-
 
 
         composable(

@@ -97,7 +97,8 @@ fun AdminHomePage(navController: NavHostController) {
                 FloatingActionButton(
                     onClick = {
                         selectedCarte?.let { carte ->
-                            navController.navigate("newBorne")
+                            navController.navigate("newBorne/${selectedCarte?.id}")
+
                         }
                     },
                     containerColor = darkModeColorGreen,
@@ -176,7 +177,8 @@ fun AdminHomePage(navController: NavHostController) {
 
                             if (isCreateModalOpen) {
                                 NewBornePage(
-                                    navController = navController
+                                    navController = navController,
+                                    defaultCarteId = selectedCarte?.id ?: "",
 
                                 )
                             }
