@@ -35,13 +35,13 @@ class CarteRepository(private val client: HttpClient) {
         println("DEBUG: CarteRepository.fetchCarte()")
         return try {
             val response = client.get("https://back-cats.onrender.com/carte")
-            println("DEBUG: Réponse brute = ${response.bodyAsText()}")
+            println("DEBUG: CARTE: Réponse brute = ${response.bodyAsText()}")
             if (response.status == HttpStatusCode.OK) {
                 val carte = json.decodeFromString(ListSerializer(Carte.serializer()), response.bodyAsText())
-                println("DEBUG: Bornes disponibles décodées = $carte")
+                println("DEBUG: Carte disponibles décodées = $carte")
                 carte
             } else {
-                println("Erreur lors de la récupération des carte disponibles : ${response.status}")
+                println("Erreur lors de la récupération des cartes disponibles : ${response.status}")
                 null
             }
         } catch (e: Exception) {

@@ -34,14 +34,14 @@ class SignalementRepository(private val httpClient: HttpClient) {
                 }
 
                 if (response.status.isSuccess()) {
-                    println("DEBUG: Statut de la borne mis à jour avec succès : ${response.status}")
+                    println("DEBUG: UPDATE_BORNE: Statut de la borne mis à jour avec succès : ${response.status}")
                     true
                 } else {
                     println("DEBUG: Échec de la mise à jour du statut : ${response.status}")
                     false
                 }
             } catch (e: Exception) {
-                println("Erreur lors de la mise à jour du statut : ${e.message}")
+                println("DEBUG: Erreur lors de la mise à jour du statut : ${e.message}")
                 false
             }
         }
@@ -53,14 +53,14 @@ class SignalementRepository(private val httpClient: HttpClient) {
                 contentType(ContentType.Application.Json)
             }
             if (response.status.isSuccess()) {
-                println("Signalement fermé avec succès pour ID : $signalementId")
+                println("DEBUG: Signalement fermé avec succès pour ID : $signalementId")
                 true
             } else {
-                println("Erreur : Statut HTTP ${response.status}")
+                println("DEBUG: Erreur : Statut HTTP ${response.status}")
                 false
             }
         } catch (e: Exception) {
-            println("Erreur lors de la fermeture du signalement : ${e.message}")
+            println("DEBUG: Erreur lors de la fermeture du signalement : ${e.message}")
             false
         }
     }
@@ -89,7 +89,7 @@ class SignalementRepository(private val httpClient: HttpClient) {
                     false
                 }
             } catch (e: Exception) {
-                println("Erreur lors de l'envoi du signalement : ${e.message}")
+                println("DEBUG: Erreur lors de l'envoi du signalement : ${e.message}")
                 false
             }
         }

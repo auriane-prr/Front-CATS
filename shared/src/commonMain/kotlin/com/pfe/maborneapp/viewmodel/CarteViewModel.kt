@@ -52,27 +52,27 @@ class CarteViewModel(private val carteRepository: CarteRepository) : ViewModel()
                 val imageUrl = carteRepository.fetchCarteImageUrl(idToUse)
                 _selectedCarteImageUrl.value = imageUrl
 
-                println("DEBUG, fetchCarteDetails - Chargé : $idToUse avec URL $imageUrl et lastModified $lastModified")
+                println("DEBUG: fetchCarteDetails - Chargé : $idToUse avec URL $imageUrl et lastModified $lastModified")
             } catch (e: Exception) {
-                println("Erreur dans fetchCarteDetails : ${e.message}")
+                println("DEBUG:Erreur dans fetchCarteDetails : ${e.message}")
             }
         }
     }
 
     fun fetchCartes() {
-        println("DEBUG: Appel à fetchTypesBorne")
+        println("DEBUG: Appel à fetchCartes()")
         viewModelScope.launch {
             _isLoading.value = true
             try {
                 val fetchCarte = carteRepository.fetchCarte()
                 if (fetchCarte != null) {
-                    println("DEBUG: Types de bornes chargés avec succès : $fetchCarte")
+                    println("DEBUG: Carte chargés avec succès : $fetchCarte")
                     _carte.value = fetchCarte
                 } else {
                     println("DEBUG: Aucune donnée retournée par le backend.")
                 }
             } catch (e: Exception) {
-                _errorMessage.value = "Erreur lors de la récupération des types de borne : ${e.message}"
+                _errorMessage.value = "Erreur lors de la récupération des cartes : ${e.message}"
             } finally {
                 _isLoading.value = false
             }

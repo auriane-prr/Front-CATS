@@ -57,11 +57,11 @@ class SignalementViewModel(private val repository: SignalementRepository) : View
                     println("DEBUG: Signalement fermé avec succès.")
                     onSuccess()
                 } else {
-                    onError("Échec de la fermeture du signalement.")
+                    onError("DEBUG:Échec de la fermeture du signalement.")
                 }
             } catch (e: Exception) {
-                println("Erreur lors de la fermeture du signalement : ${e.message}")
-                onError("Erreur : ${e.message}")
+                println("DEBUG:Erreur lors de la fermeture du signalement : ${e.message}")
+                onError("DEBUG:Erreur : ${e.message}")
             }
         }
     }
@@ -78,14 +78,14 @@ class SignalementViewModel(private val repository: SignalementRepository) : View
             try {
                 val updatedBorne = repository.updateBorneStatus(borneId, newStatus)
                 if (updatedBorne != null) {
-                    println("Statut de la borne mis à jour avec succès : $updatedBorne")
+                    println("DEBUG:Statut de la borne mis à jour avec succès : $updatedBorne")
                     onSuccess()
                 } else {
-                    onError("Échec de la mise à jour du statut de la borne.")
+                    onError("DEBUG:Échec de la mise à jour du statut de la borne.")
                 }
             } catch (e: Exception) {
-                println("Erreur lors de la mise à jour du statut de la borne : ${e.message}")
-                onError("Erreur : ${e.message}")
+                println("DEBUG:Erreur lors de la mise à jour du statut de la borne : ${e.message}")
+                onError("DEBUG:Erreur : ${e.message}")
             }
         }
     }
@@ -110,8 +110,8 @@ class SignalementViewModel(private val repository: SignalementRepository) : View
                     onError("Signalement échoué")
                 }
             } catch (e: Exception) {
-                println("Erreur lors de l'envoi du signalement : ${e.message}")
-                onError("Erreur : ${e.message}")
+                println("DEBUG:Erreur lors de l'envoi du signalement : ${e.message}")
+                onError("DEBUG:Erreur : ${e.message}")
             }
         }
     }
