@@ -29,7 +29,8 @@ fun BorneList(
     borneViewModel: BorneViewModel,
     showAlert: (String, Boolean) -> Unit,
     containerColor: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    carteId: CarteId
 ) {
     var selectedBorne by remember { mutableStateOf<Borne?>(null) }
 
@@ -118,7 +119,7 @@ fun BorneList(
             userId = userId,
             signalementViewModel = signalementViewModel,
             onClose = { selectedBorne = null },
-            onRefreshBornes = { borneViewModel.fetchBornesByEtat() },
+            onRefreshBornes = { borneViewModel.fetchBornesByEtatAndCarte(carteId) },
             showAlert = showAlert
         )
     }

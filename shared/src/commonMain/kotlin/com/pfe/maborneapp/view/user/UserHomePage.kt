@@ -14,9 +14,7 @@ import androidx.navigation.NavHostController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pfe.maborneapp.utils.DarkContainerColor
 import com.pfe.maborneapp.utils.DarkModeGreen
-import com.pfe.maborneapp.view.components.image.MapView
 import com.pfe.maborneapp.view.user.components.BorneList
-import com.pfe.maborneapp.viewmodel.CarteViewModel
 import com.pfe.maborneapp.view.user.components.Menu
 import com.pfe.maborneapp.viewmodel.factories.BorneViewModelFactory
 import com.pfe.maborneapp.viewmodel.factories.SignalementViewModelFactory
@@ -24,19 +22,17 @@ import com.pfe.maborneapp.viewmodel.factories.user.UserViewModelFactory
 import com.pfe.maborneapp.viewmodel.BorneViewModel
 import com.pfe.maborneapp.viewmodel.user.UserViewModel
 import com.pfe.maborneapp.viewmodel.SignalementViewModel
-import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
 import com.pfe.maborneapp.view.components.Alert
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import com.pfe.maborneapp.models.CarteId
-import com.pfe.maborneapp.view.admin.components.BorneListAdmin
 import com.pfe.maborneapp.view.admin.components.CarteDropdownMenu
 import com.pfe.maborneapp.view.components.image.NetworkImage
 import com.pfe.maborneapp.view.components.image.ZoomableImageView
 import com.pfe.maborneapp.viewmodel.LocalCarteViewModel
 
 @Composable
-fun UserHomePage(navController: NavHostController, userId: String, carteId: String? = null) {
+fun UserHomePage(navController: NavHostController, userId: String) {
     val darkModeColorTitle = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
     val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory())
     val borneViewModel: BorneViewModel = viewModel(factory = BorneViewModelFactory())
@@ -59,6 +55,8 @@ fun UserHomePage(navController: NavHostController, userId: String, carteId: Stri
     var alertMessage by remember { mutableStateOf("") }
     var alertIsSuccess by remember { mutableStateOf(true) }
     var showZoomableMap by remember { mutableStateOf(false) }
+
+    val carteId = CarteId(selectedCarte?.id ?: "")
 
     // Charger les cartes au montage
     LaunchedEffect(Unit) {
@@ -154,8 +152,17 @@ fun UserHomePage(navController: NavHostController, userId: String, carteId: Stri
                                 Text(text = "Bornes associées :",
                                     fontSize = 20.sp)
                                 Spacer(modifier = Modifier.height(16.dp))
-                                BorneListAdmin(
+                                BorneList(
                                     etatBornes = it,
+                                    userId = userId,
+                                    signalementViewModel = signalementViewModel,
+                                    borneViewModel = borneViewModel,
+                                    carteId = carteId,
+                                    showAlert = { message, isSuccess ->
+                                        alertMessage = message
+                                        alertIsSuccess = isSuccess
+                                        alertVisible = true
+                                    },
                                     containerColor = if (isSystemInDarkTheme()) DarkContainerColor else MaterialTheme.colorScheme.surface,
                                 )
                             } ?: Text(text = "Aucune borne disponible pour cette carte.")
