@@ -16,7 +16,7 @@ import androidx.navigation.NavHostController
 import com.pfe.maborneapp.models.CarteId
 import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.view.admin.components.AdminMenu
-import com.pfe.maborneapp.view.admin.components.CarteDropdownMenu
+import com.pfe.maborneapp.view.components.CarteDropdownMenu
 import com.pfe.maborneapp.view.admin.components.SignalementList
 import com.pfe.maborneapp.viewmodel.LocalCarteViewModel
 import com.pfe.maborneapp.viewmodel.SignalementViewModel

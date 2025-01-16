@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pfe.maborneapp.models.Borne
+import com.pfe.maborneapp.models.Carte
 import com.pfe.maborneapp.models.CarteId
 import com.pfe.maborneapp.models.Reservation
 import com.pfe.maborneapp.repositories.ReservationRepository
@@ -20,6 +21,7 @@ class ReservationViewModel(private val reservationRepository: ReservationReposit
     var selectedDate = mutableStateOf("")
     var startTime = mutableStateOf("")
     var endTime = mutableStateOf("")
+    val selectedCarte = mutableStateOf<Carte?>(null)
 
     private val _reservations = MutableStateFlow<List<Reservation>?>(null)
     val reservations: StateFlow<List<Reservation>?> = _reservations
@@ -32,6 +34,8 @@ class ReservationViewModel(private val reservationRepository: ReservationReposit
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _cartes = MutableStateFlow<List<Carte>>(emptyList())
 
     fun fetchReservations(userId: String) {
         println("DEBUG: Appel à fetchReservations avec userId = $userId")
@@ -46,20 +50,6 @@ class ReservationViewModel(private val reservationRepository: ReservationReposit
                 _reservations.value = null
             } finally {
                 _isLoading.value = false
-            }
-        }
-    }
-
-    fun fetchAvailableBornes(start: String, end: String) {
-        println("DEBUG: Appel à fetchAvailableBornes avec start = $start et end = $end")
-        viewModelScope.launch {
-            try {
-                val response = reservationRepository.fetchAvailableBornes(start, end)
-                println("DEBUG: Bornes disponibles reçues du repository = $response")
-                _availableBornes.value = response?.disponible
-            } catch (e: Exception) {
-                println("DEBUG: Exception dans fetchAvailableBornes : ${e.message}")
-                _availableBornes.value = null
             }
         }
     }

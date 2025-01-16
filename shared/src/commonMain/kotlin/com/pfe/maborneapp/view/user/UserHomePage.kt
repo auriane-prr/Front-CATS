@@ -26,7 +26,7 @@ import com.pfe.maborneapp.view.components.Alert
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import com.pfe.maborneapp.models.CarteId
-import com.pfe.maborneapp.view.admin.components.CarteDropdownMenu
+import com.pfe.maborneapp.view.components.CarteDropdownMenu
 import com.pfe.maborneapp.view.components.image.NetworkImage
 import com.pfe.maborneapp.view.components.image.ZoomableImageView
 import com.pfe.maborneapp.viewmodel.LocalCarteViewModel
@@ -43,7 +43,6 @@ fun UserHomePage(navController: NavHostController, userId: String) {
     val selectedCarteImageUrl by carteViewModel.selectedCarteImageUrl.collectAsState()
     val selectedCarteLastModified by carteViewModel.selectedCarteLastModified.collectAsState()
     val etatBornes by borneViewModel.etatBornes.collectAsState()
-    val isLoading by borneViewModel.isLoading.collectAsState()
     val cartes by carteViewModel.carte.collectAsState()
     val selectedCarte by carteViewModel.selectedCarte.collectAsState()
     val isLoadingCartes by carteViewModel.isLoading.collectAsState()
@@ -65,7 +64,7 @@ fun UserHomePage(navController: NavHostController, userId: String) {
 
     // Sélectionner la carte par défaut (CATS de Montpellier) après le chargement des cartes
     LaunchedEffect(cartes) {
-        if (!cartes.isNullOrEmpty() && selectedCarte == null) {
+        if (cartes.isNotEmpty() && selectedCarte == null) {
             carteViewModel.setSelectedCarte(cartes.find { it.nom == "CATS de Montpellier" })
         }
     }
@@ -100,17 +99,20 @@ fun UserHomePage(navController: NavHostController, userId: String) {
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
                 ) {
+                    Spacer(modifier = Modifier.height(32.dp))
+
                     Text(
                         text = if (userEmail.isNotEmpty()) "Bonjour $userEmail" else "Chargement...",
                         style = MaterialTheme.typography.titleLarge,
-                        color = darkModeColorTitle,
-                        modifier = Modifier.padding(vertical = 8.dp)
+                        color = darkModeColorTitle
                     )
+
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     // Menu déroulant pour sélectionner une carte
                     if (isLoadingCartes) {
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-                    } else if (!cartes.isNullOrEmpty()) {
+                    } else if (cartes.isNotEmpty()) {
                         CarteDropdownMenu(
                             cartes = cartes,
                             selectedCarte = selectedCarte,

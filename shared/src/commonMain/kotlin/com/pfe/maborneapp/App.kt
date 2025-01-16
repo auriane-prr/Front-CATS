@@ -80,7 +80,12 @@ fun AppNavigation(navController: NavHostController) {
         }
 
         composable("adminStatistique") { AdminStatistiquePage(navController) }
-        // Pages Admin
+        composable("newBorne/{carteId}") { backStackEntry ->
+            val carteId = backStackEntry.arguments?.getString("carteId") ?: ""
+            NewBornePage(navController, defaultCarteId = carteId)
+        }
+
+        // Pages User
         composable("userHome/{userId}") { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId") ?: ""
             UserHomePage(navController, userId)
@@ -97,25 +102,21 @@ fun AppNavigation(navController: NavHostController) {
             val userId = backStackEntry.arguments?.getString("userId") ?: ""
             NewReservationPage(navController, userId)
         }
-        composable("newBorne/{carteId}") { backStackEntry ->
-            val carteId = backStackEntry.arguments?.getString("carteId") ?: ""
-            NewBornePage(navController, defaultCarteId = carteId)
-        }
-
-
         composable(
-            route = "availableBornes/{startDate}/{endDate}/{userId}",
+            route = "availableBornes/{startDate}/{endDate}/{userId}/{carteId}",
             arguments = listOf(
                 navArgument("startDate") { type = NavType.StringType },
                 navArgument("endDate") { type = NavType.StringType },
-                navArgument("userId") { type = NavType.StringType }
+                navArgument("userId") { type = NavType.StringType },
+                navArgument("carteId") { type = NavType.StringType }
             )
         ) { backStackEntry ->
             val startDate = backStackEntry.arguments?.getString("startDate") ?: ""
             val endDate = backStackEntry.arguments?.getString("endDate") ?: ""
             val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            AvailableBornesPage(navController, startDate, endDate, userId)
+            val carteIdString = backStackEntry.arguments?.getString("carteId") ?: ""
+            val carteId = CarteId(carteIdString)
+            AvailableBornesPage(navController, startDate, endDate, userId, carteId)
         }
-
     }
 }

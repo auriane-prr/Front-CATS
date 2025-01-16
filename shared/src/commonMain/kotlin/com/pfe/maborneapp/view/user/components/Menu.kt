@@ -36,7 +36,6 @@ fun Menu(
         userViewModel.fetchUserEmail(userId)
     }
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
-    val greenColor = Color(0xFF045C3C)
     val menuBackgroundColor = Color(0xFFBDD3D0)
 
     Box(
@@ -107,8 +106,9 @@ fun Menu(
         IconButton(
             onClick = { onToggleMenu() },
             modifier = Modifier
-                .align(Alignment.TopEnd) // Place l'icône dans le coin supérieur droit
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .align(Alignment.TopEnd)
+                .padding(horizontal = 16.dp)
+                .padding(top = 24.dp)
                 .zIndex(1f)
         ) {
             Icon(

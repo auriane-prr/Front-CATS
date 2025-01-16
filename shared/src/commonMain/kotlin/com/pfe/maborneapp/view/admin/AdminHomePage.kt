@@ -16,24 +16,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.pfe.maborneapp.models.Carte
 import com.pfe.maborneapp.models.CarteId
 import com.pfe.maborneapp.utils.DarkContainerColor
 import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.view.admin.components.AdminMenu
 import com.pfe.maborneapp.view.admin.components.BorneListAdmin
-import com.pfe.maborneapp.view.components.image.MapView
 import com.pfe.maborneapp.view.components.image.NetworkImage
 import com.pfe.maborneapp.view.components.image.ZoomableImageView
-import com.pfe.maborneapp.view.admin.components.CreateBorneModal
-import com.pfe.maborneapp.viewmodel.CarteViewModel
-import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
 import com.pfe.maborneapp.viewmodel.factories.BorneViewModelFactory
 import com.pfe.maborneapp.viewmodel.BorneViewModel
-import com.pfe.maborneapp.models.CreateBorneRequest
-import com.pfe.maborneapp.models.TypeBorne
-import com.pfe.maborneapp.view.admin.components.CarteDropdownMenu
-import com.pfe.maborneapp.view.admin.components.CustomDropDown
+import com.pfe.maborneapp.view.components.CarteDropdownMenu
 import com.pfe.maborneapp.viewmodel.LocalCarteViewModel
 
 @Composable
@@ -42,7 +34,6 @@ fun AdminHomePage(navController: NavHostController) {
     val carteViewModel = LocalCarteViewModel.current
 
     val borneViewModel: BorneViewModel = viewModel(factory = BorneViewModelFactory())
-
 
     // États pour gérer les cartes, les bornes, et les erreurs
     val cartes by carteViewModel.carte.collectAsState()
@@ -70,7 +61,7 @@ fun AdminHomePage(navController: NavHostController) {
 
     // Sélectionner la carte par défaut (CATS de Montpellier) après le chargement des cartes
     LaunchedEffect(cartes) {
-        if (!cartes.isNullOrEmpty() && selectedCarte == null) {
+        if (cartes.isNotEmpty() && selectedCarte == null) {
             carteViewModel.setSelectedCarte(cartes.find { it.nom == "CATS de Montpellier" })
         }
     }

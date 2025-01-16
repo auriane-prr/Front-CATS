@@ -18,16 +18,14 @@ import com.pfe.maborneapp.models.CreateBorneRequest
 import com.pfe.maborneapp.models.TypeBorne
 import com.pfe.maborneapp.models.TypeBorneId
 import com.pfe.maborneapp.utils.DarkModeGreen
-import com.pfe.maborneapp.view.admin.components.CarteDropdownMenu
+import com.pfe.maborneapp.view.components.CarteDropdownMenu
 import com.pfe.maborneapp.view.admin.components.CustomDropDown
 import com.pfe.maborneapp.view.components.image.NetworkImage
 import com.pfe.maborneapp.view.components.image.ZoomableImageView
 import com.pfe.maborneapp.viewmodel.BorneViewModel
-import com.pfe.maborneapp.viewmodel.CarteViewModel
 import com.pfe.maborneapp.viewmodel.LocalCarteViewModel
 import com.pfe.maborneapp.viewmodel.TypeBorneViewModel
 import com.pfe.maborneapp.viewmodel.factories.BorneViewModelFactory
-import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
 import com.pfe.maborneapp.viewmodel.factories.TypeBorneViewModelFactory
 
 

@@ -13,8 +13,6 @@ import kotlinx.coroutines.launch
 
 class CarteViewModel(private val carteRepository: CarteRepository) : ViewModel() {
 
-
-
     private val _carte = MutableStateFlow<List<Carte>>(emptyList())
     val carte: StateFlow<List<Carte>> = _carte
 
@@ -42,7 +40,7 @@ class CarteViewModel(private val carteRepository: CarteRepository) : ViewModel()
     fun fetchCarteDetails(carteId: String? = null) {
         viewModelScope.launch {
             try {
-                val idToUse = carteId ?: defaultCarteId // Utilise le `carteId` dynamique ou par défaut
+                val idToUse = carteId ?: defaultCarteId
 
                 // Récupérer la date de dernière modification
                 val lastModified = carteRepository.fetchLastModified(idToUse)
@@ -78,6 +76,20 @@ class CarteViewModel(private val carteRepository: CarteRepository) : ViewModel()
             }
         }
     }
+
+    suspend fun fetchCarteById(carteId: String): Carte? {
+        println("DEBUG: fetchCarteById appelé avec carteId = $carteId")
+
+        return try {
+            val fetchedCarte = carteRepository.fetchCarteById(carteId)
+            println("DEBUG: Carte récupérée via API : ${fetchedCarte?.nom}")
+            fetchedCarte
+        } catch (e: Exception) {
+            println("Erreur lors de la récupération de la carte : ${e.message}")
+            null
+        }
+    }
+
 }
 
 
