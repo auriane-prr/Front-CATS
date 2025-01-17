@@ -83,6 +83,18 @@ fun NewReservationPage(navController: NavHostController, userId: String) {
             return
         }
 
+        val currentDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        val currentMinutes = currentDateTime.hour * 60 + currentDateTime.minute
+        val dateChosen = reservationViewModel.selectedDate.value.split("-").reversed().joinToString("-")
+        val currentDate = currentDateTime.date.toString()
+
+        if (dateChosen == currentDate && startMinutes < currentMinutes) {
+            alertMessage = "Veuillez entrer un horaire correct"
+            isAlertSuccess = false
+            showAlert = true
+            return
+        }
+
         // Si tout est valide, procéder à l'action
         val start = "${
             reservationViewModel.selectedDate.value.split("-").reversed().joinToString("-")
