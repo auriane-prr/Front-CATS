@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.pfe.maborneapp.utils.formatDateOnly
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpStatusCode
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -35,10 +37,13 @@ class ReservationViewModel(private val reservationRepository: ReservationReposit
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _cartes = MutableStateFlow<List<Carte>>(emptyList())
+    private val _deleteStatus = MutableStateFlow<Boolean?>(null)
+    val deleteStatus: StateFlow<Boolean?> = _deleteStatus
+
+    var lastErrorMessage: String? = null
+        private set
 
     fun fetchReservations(userId: String) {
-        println("DEBUG: Appel à fetchReservations avec userId = $userId")
         viewModelScope.launch {
             _isLoading.value = true
             try {
@@ -55,7 +60,6 @@ class ReservationViewModel(private val reservationRepository: ReservationReposit
     }
 
     fun fetchAvailableBornesByCarte(start: String, end: String, carteId: CarteId) {
-        println("DEBUG: Appel à fetchAvailableBornes avec start = $start et end = $end")
         viewModelScope.launch {
             try {
                 val response = reservationRepository.fetchAvailableBornesByCarte(start, end, carteId)
@@ -69,19 +73,15 @@ class ReservationViewModel(private val reservationRepository: ReservationReposit
     }
 
     fun createReservation(reservation: Reservation) {
-        println("DEBUG: Appel à createReservation")
         viewModelScope.launch {
-            try {
-                val response = reservationRepository.createReservation(reservation)
-                if (response != null) {
-                    println("DEBUG: Réservation créée avec succès")
-                    _creationStatus.value = true
-                } else {
-                    println("DEBUG: Échec de la création de la réservation")
-                    _creationStatus.value = false
-                }
-            } catch (e: Exception) {
-                println("DEBUG: Exception dans createReservation : ${e.message}")
+            val errorMessage = reservationRepository.createReservation(reservation)
+            if (errorMessage == null) {
+                println("DEBUG: Réservation créée avec succès")
+                lastErrorMessage = null
+                _creationStatus.value = true
+            } else {
+                println("DEBUG: Erreur lors de la création de la réservation - $errorMessage")
+                lastErrorMessage = errorMessage
                 _creationStatus.value = false
             }
         }
@@ -107,8 +107,21 @@ class ReservationViewModel(private val reservationRepository: ReservationReposit
         return Pair(upcomingReservations, pastReservations)
     }
 
-    fun formatReservationDate(dateTime: String): String {
-        return formatDateOnly(dateTime)
+    fun deleteReservation(reservationId: String, userId: String) {
+        viewModelScope.launch {
+            try {
+                reservationRepository.deleteReservation(reservationId)
+                _deleteStatus.value = true
+                fetchReservations(userId)
+            } catch (e: Exception) {
+                _deleteStatus.value = false
+            }
+        }
     }
+
+    fun resetDeleteStatus() {
+        _deleteStatus.value = null
+    }
+
 }
 

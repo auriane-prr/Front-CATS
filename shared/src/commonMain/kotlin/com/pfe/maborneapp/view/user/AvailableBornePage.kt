@@ -38,12 +38,12 @@ fun AvailableBornesPage(
     userId: String,
     carteId: CarteId,
 ) {
-    val reservationViewModel: ReservationViewModel = viewModel(factory = ReservationViewModelFactory())
+    val reservationViewModel: ReservationViewModel =
+        viewModel(factory = ReservationViewModelFactory())
     val carteViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
     val availableBornes by reservationViewModel.availableBornes.collectAsState()
     var selectedBorne by remember { mutableStateOf<Borne?>(null) }
     var selectedCarteName by remember { mutableStateOf<String?>(null) }
-    val selectedCarte by carteViewModel.selectedCarte.collectAsState()
 
     var showAlert by remember { mutableStateOf(false) }
     var alertMessage by remember { mutableStateOf("") }
@@ -51,7 +51,6 @@ fun AvailableBornesPage(
 
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
-    // Charger les bornes disponibles
     LaunchedEffect(startDate, endDate) {
         reservationViewModel.fetchAvailableBornesByCarte(startDate, endDate, carteId)
     }
@@ -112,15 +111,21 @@ fun AvailableBornesPage(
 
                 Button(
                     onClick = {
-                        selectedBorne?.let { borne ->
-                            val reservation = Reservation(
-                                id = "",
-                                borne = borne,
-                                user = User(userId, "user@example.com", "User"),
-                                dateDebut = startDate,
-                                dateFin = endDate
-                            )
-                            reservationViewModel.createReservation(reservation)
+                        if (selectedBorne == null) {
+                            isAlertSuccess = false
+                            alertMessage = "Veuillez sélectionner une borne à réserver."
+                            showAlert = true
+                        } else {
+                            selectedBorne?.let { borne ->
+                                val reservation = Reservation(
+                                    id = "",
+                                    borne = borne,
+                                    user = User(userId, "user@example.com", "User"),
+                                    dateDebut = startDate,
+                                    dateFin = endDate
+                                )
+                                reservationViewModel.createReservation(reservation)
+                            }
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = darkModeColorGreen),
@@ -178,7 +183,9 @@ fun AvailableBornesPage(
                                 .clickable { selectedBorne = borne }
                                 .padding(vertical = 8.dp)
                                 .background(
-                                    color = if (selectedBorne == borne) Color(0xFFBDD3D0) else Color(0xFFE0E0E0),
+                                    color = if (selectedBorne == borne) Color(0xFFBDD3D0) else Color(
+                                        0xFFE0E0E0
+                                    ),
                                     shape = RoundedCornerShape(8.dp)
                                 )
                                 .padding(16.dp),
@@ -200,15 +207,22 @@ fun AvailableBornesPage(
     val creationStatus by reservationViewModel.creationStatus.collectAsState()
     LaunchedEffect(creationStatus) {
         creationStatus?.let {
+            println("DEBUG: Création status = $it")
             if (it) {
                 isAlertSuccess = true
-                alertMessage = "Votre réservation a bien été prise en compte"
-                showAlert = true
+                alertMessage = "Votre réservation a bien été prise en compte."
             } else {
                 isAlertSuccess = false
-                alertMessage = "Erreur lors de la création de la réservation. Veuillez réessayer."
-                showAlert = true
+                // Vérifiez le message d'erreur exact
+                val errorMessage = reservationViewModel.lastErrorMessage
+                println("DEBUG: Message d'erreur reçu : $errorMessage")
+                alertMessage = when (errorMessage) {
+                    "L'utilisateur a déjà une réservation pour cette horaire." ->
+                        "Vous avez déjà une réservation de prévue pour ce créneau horaire."
+                    else -> "Erreur lors de la création de la réservation. Veuillez réessayer."
+                }
             }
+            showAlert = true
         }
     }
 
@@ -219,7 +233,9 @@ fun AvailableBornesPage(
             message = alertMessage,
             onDismiss = {
                 showAlert = false
-                navController.popBackStack("reservations/$userId", inclusive = false)
+                if (isAlertSuccess) {
+                    navController.popBackStack("reservations/$userId", inclusive = false)
+                }
             }
         )
     }

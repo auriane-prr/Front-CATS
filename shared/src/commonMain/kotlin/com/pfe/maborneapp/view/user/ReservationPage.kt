@@ -13,11 +13,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.view.user.components.Menu
 import com.pfe.maborneapp.models.Reservation
+import com.pfe.maborneapp.view.components.Alert
 import com.pfe.maborneapp.view.user.components.ReservationCard
 import com.pfe.maborneapp.viewmodel.factories.user.ReservationViewModelFactory
 import com.pfe.maborneapp.viewmodel.factories.user.UserViewModelFactory
@@ -35,12 +37,23 @@ fun ReservationPage(navController: NavHostController, userId: String) {
 
     val isLoading by reservationViewModel.isLoading.collectAsState()
 
+    // États pour gérer la pop-up, l'alerte et les actions
+    var showDialog by remember { mutableStateOf(false) }
+    var selectedReservationId by remember { mutableStateOf<String?>(null) }
+    var showAlert by remember { mutableStateOf(false) }
+    var alertMessage by remember { mutableStateOf("") }
+    var isAlertSuccess by remember { mutableStateOf(false) }
+    var isProcessingDelete by remember { mutableStateOf(false) }
+
+    val deleteStatus by reservationViewModel.deleteStatus.collectAsState()
+
+    // Charger les réservations à l'initialisation
     LaunchedEffect(userId) {
         userViewModel.fetchUserEmail(userId)
         reservationViewModel.fetchReservations(userId)
     }
 
-    // Mise à jour des listes triées
+    // Mettre à jour les listes triées lors de changements
     LaunchedEffect(reservations) {
         if (reservations != null) {
             upcomingReservations.clear()
@@ -50,6 +63,22 @@ fun ReservationPage(navController: NavHostController, userId: String) {
             pastReservations.addAll(past)
         }
     }
+
+    // Réagir aux changements d'état de suppression
+    LaunchedEffect(deleteStatus) {
+        deleteStatus?.let {
+            if (it) {
+                isAlertSuccess = true
+                alertMessage = "Réservation annulée avec succès."
+            } else {
+                isAlertSuccess = false
+                alertMessage = "Échec de l'annulation de la réservation."
+            }
+            showAlert = true // Afficher l'alerte
+            reservationViewModel.resetDeleteStatus()
+        }
+    }
+
 
     var isMenuOpen by remember { mutableStateOf(false) }
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
@@ -110,9 +139,16 @@ fun ReservationPage(navController: NavHostController, userId: String) {
                             Text(text = "Aucune réservation à venir.")
                         } else {
                             upcomingReservations.forEach { reservation ->
-                                ReservationCard(reservation = reservation)
+                                ReservationCard(
+                                    reservation = reservation,
+                                    onDelete = { reservationId ->
+                                        selectedReservationId = reservationId
+                                        showDialog = true
+                                    }
+                                )
                             }
                         }
+
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -150,7 +186,9 @@ fun ReservationPage(navController: NavHostController, userId: String) {
                             Text(text = "Aucune réservation passée.")
                         } else {
                             pastReservations.forEach { reservation ->
-                                ReservationCard(reservation = reservation)
+                                ReservationCard(
+                                    reservation = reservation,
+                                    onDelete = null)
                             }
                         }
                         Spacer(modifier = Modifier.height(16.dp))
@@ -167,7 +205,46 @@ fun ReservationPage(navController: NavHostController, userId: String) {
                     currentPage = "reservations",
                     userId = userId
                 )
+
+
             }
         }
     )
+
+    // Pop-up de confirmation
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Confirmer l'annulation") },
+            text = { Text("Êtes-vous sûr de vouloir annuler cette réservation ?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    selectedReservationId?.let {
+                        isProcessingDelete = true
+                        reservationViewModel.deleteReservation(it, userId)
+                    }
+                    showDialog = false
+                }) {
+                    Text("Oui", color = darkModeColorGreen, fontSize = 18.sp)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("Non", color = Color.Gray, fontSize = 18.sp)
+                }
+            }
+        )
+    }
+
+    // Alerte de succès ou d’échec
+    if (showAlert) {
+        Alert(
+            isSuccess = isAlertSuccess,
+            message = alertMessage,
+            onDismiss = {
+                showAlert = false
+                reservationViewModel.fetchReservations(userId) // Recharger les réservations après fermeture de l'alerte
+            }
+        )
+    }
 }
