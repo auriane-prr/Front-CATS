@@ -57,6 +57,8 @@ fun UserHomePage(navController: NavHostController, userId: String) {
 
     val carteId = CarteId(selectedCarte?.id ?: "")
 
+    val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
+
     // Charger les cartes au montage
     LaunchedEffect(Unit) {
         carteViewModel.fetchCartes()
@@ -111,7 +113,10 @@ fun UserHomePage(navController: NavHostController, userId: String) {
 
                     // Menu déroulant pour sélectionner une carte
                     if (isLoadingCartes) {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                        CircularProgressIndicator(
+                            color = darkModeColorGreen,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
                     } else if (cartes.isNotEmpty()) {
                         CarteDropdownMenu(
                             cartes = cartes,
@@ -148,7 +153,10 @@ fun UserHomePage(navController: NavHostController, userId: String) {
                         Spacer(modifier = Modifier.height(16.dp))
 
                         if (isLoadingBornes) {
-                            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                            CircularProgressIndicator(
+                                color = darkModeColorGreen,
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            )
                         } else {
                             etatBornes?.let {
                                 Text(text = "Bornes associées :",
