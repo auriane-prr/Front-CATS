@@ -112,7 +112,7 @@ fun NewReservationPage(navController: NavHostController, userId: String) {
             val formattedDate = "${dateParts[2]}-${dateParts[1]}-${dateParts[0]}"
             val selectedLocalDate = LocalDate.parse(formattedDate)
 
-            if (selectedLocalDate <= currentDate) {
+            if (selectedLocalDate < currentDate) {
                 alertMessage = "Veuillez entrer une date correcte"
                 isAlertSuccess = false
                 showAlert = true

@@ -152,6 +152,8 @@ fun UserHomePage(navController: NavHostController, userId: String) {
 
                         Spacer(modifier = Modifier.height(16.dp))
 
+                        Text(text = "Bornes :", fontSize = 20.sp)
+
                         if (isLoadingBornes) {
                             CircularProgressIndicator(
                                 color = darkModeColorGreen,
@@ -159,8 +161,6 @@ fun UserHomePage(navController: NavHostController, userId: String) {
                             )
                         } else {
                             etatBornes?.let {
-                                Text(text = "Bornes associées :",
-                                    fontSize = 20.sp)
                                 Spacer(modifier = Modifier.height(16.dp))
                                 BorneList(
                                     etatBornes = it,

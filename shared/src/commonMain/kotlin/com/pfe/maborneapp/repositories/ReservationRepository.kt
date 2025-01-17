@@ -1,6 +1,5 @@
 package com.pfe.maborneapp.repositories
 
-import com.pfe.maborneapp.models.Borne
 import com.pfe.maborneapp.models.CarteId
 import com.pfe.maborneapp.models.EtatBornes
 import com.pfe.maborneapp.models.IdReference
@@ -11,7 +10,6 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class ReservationRepository(private val client: HttpClient) {
@@ -37,12 +35,12 @@ class ReservationRepository(private val client: HttpClient) {
         }
     }
 
-    suspend fun createReservation(reservation: Reservation): HttpResponse? {
+    suspend fun createReservation(reservation: Reservation): String? {
         val reservationRequest = ReservationRequest(
             borne = IdReference(reservation.borne.id),
             user = IdReference(reservation.user._id),
-            dateDebut = reservation.dateDebut.replace("/", "-"), // Assurez-vous que le séparateur est un tiret
-            dateFin = reservation.dateFin.replace("/", "-")      // Assurez-vous que le séparateur est un tiret
+            dateDebut = reservation.dateDebut.replace("/", "-"),
+            dateFin = reservation.dateFin.replace("/", "-")
         )
         println("DEBUG: Envoi de la réservation : $reservationRequest")
 
@@ -51,19 +49,21 @@ class ReservationRepository(private val client: HttpClient) {
                 contentType(ContentType.Application.Json)
                 setBody(reservationRequest)
             }
+            println("DEBUG: Statut de la réponse : ${response.status}")
+            println("DEBUG: Corps de la réponse : ${response.bodyAsText()}")
+
             if (response.status == HttpStatusCode.OK || response.status == HttpStatusCode.Created) {
-                println("DEBUG: Réservation créée avec succès : ${response.bodyAsText()}")
-                response
-            } else {
-                println("Erreur lors de la création de la réservation : ${response.status} - ${response.bodyAsText()}")
                 null
+            } else {
+                val errorBody = response.bodyAsText()
+                println("DEBUG: Erreur lors de la création de la réservation - $errorBody")
+                errorBody
             }
         } catch (e: Exception) {
-            println("Erreur dans ReservationRepository : ${e.message}")
-            null
+            println("DEBUG: Exception lors de la création de la réservation : ${e.message}")
+            e.message ?: "Erreur inconnue"
         }
     }
-
 
     suspend fun fetchReservationsByUser(userId: String): List<Reservation>? {
         println("DEBUG: Démarrage de la récupération des réservations pour userId = $userId")
@@ -84,4 +84,13 @@ class ReservationRepository(private val client: HttpClient) {
         }
     }
 
+    suspend fun deleteReservation(reservationId: String): Boolean {
+        return try {
+            val response = client.delete("https://back-cats.onrender.com/reservation/$reservationId")
+            response.status == HttpStatusCode.OK
+        } catch (e: Exception) {
+            println("Erreur lors de la suppression de la réservation : ${e.message}")
+            false
+        }
+    }
 }
