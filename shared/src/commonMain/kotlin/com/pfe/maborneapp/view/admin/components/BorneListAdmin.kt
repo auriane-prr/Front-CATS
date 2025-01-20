@@ -22,7 +22,13 @@ import com.pfe.maborneapp.viewmodel.BorneViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BorneListAdmin(etatBornes: EtatBornes, viewModel: BorneViewModel, modifier: Modifier = Modifier, containerColor: Color,) {
+fun BorneListAdmin(
+    etatBornes: EtatBornes,
+    selectedCarteId: String, // Laisse l'ID comme paramètre obligatoire sans logique
+    viewModel: BorneViewModel,
+    modifier: Modifier = Modifier,
+    containerColor: Color,
+) {
     var selectedBorne by remember { mutableStateOf<Borne?>(null) }
     val darkModeColorTitle = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
@@ -42,16 +48,16 @@ fun BorneListAdmin(etatBornes: EtatBornes, viewModel: BorneViewModel, modifier: 
     ) {
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Combine toutes les bornes en une seule liste avec des libellés adaptés
-        val allBornes = listOf(
-            etatBornes.disponible.map { it to "Disponible" },
-            etatBornes.occupee.map { it to "Occupée" },
-            etatBornes.hs.map { it to "Hors Service" },
-            etatBornes.signalee.map { it to "Signalée" }
+        // Filtrer les bornes pour la carte sélectionnée
+        val filteredBornes = listOf(
+            etatBornes.disponible.filter { it.carte.id == selectedCarteId }.map { it to "Disponible" },
+            etatBornes.occupee.filter { it.carte.id == selectedCarteId }.map { it to "Occupée" },
+            etatBornes.hs.filter { it.carte.id == selectedCarteId }.map { it to "Hors Service" },
+            etatBornes.signalee.filter { it.carte.id == selectedCarteId }.map { it to "Signalée" }
         ).flatten()
 
-        // Afficher chaque borne
-        allBornes.forEachIndexed { index, (borne, label) ->
+        // Afficher chaque borne filtrée
+        filteredBornes.forEachIndexed { index, (borne, label) ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -91,7 +97,7 @@ fun BorneListAdmin(etatBornes: EtatBornes, viewModel: BorneViewModel, modifier: 
                 )
             }
 
-            if (index < allBornes.size - 1) {
+            if (index < filteredBornes.size - 1) {
                 Divider(
                     color = darkModeColorTitle.copy(alpha = 0.2f),
                     thickness = 1.dp,
@@ -107,6 +113,19 @@ fun BorneListAdmin(etatBornes: EtatBornes, viewModel: BorneViewModel, modifier: 
             onClose = { selectedBorne = null },
             onDelete = { id ->
                 viewModel.deleteBorne(id)
+            },
+            onUpdateStatus = { borneId, newStatus ->
+                viewModel.updateBorneStatus(
+                    borneId,
+                    newStatus,
+                    onSuccess = {
+                        println("DEBUG: Statut mis à jour avec succès pour la borne $borneId")
+                        selectedBorne = null  // Fermer la popup après mise à jour
+                    },
+                    onError = { error ->
+                        println("DEBUG: Erreur lors de la mise à jour du statut : $error")
+                    }
+                )
             }
         )
     }

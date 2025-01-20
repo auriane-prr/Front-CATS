@@ -166,6 +166,7 @@ fun AdminHomePage(navController: NavHostController) {
                                         Spacer(modifier = Modifier.height(16.dp))
                                         BorneListAdmin(
                                             etatBornes = it,
+                                            selectedCarteId = selectedCarte?.id ?: "",
                                             viewModel = borneViewModel,
                                             containerColor = if (isSystemInDarkTheme()) DarkContainerColor else MaterialTheme.colorScheme.surface,
                                         )
