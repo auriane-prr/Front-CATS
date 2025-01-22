@@ -1,6 +1,7 @@
 package com.pfe.maborneapp.view.admin
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -162,6 +163,7 @@ fun AdminHomePage(
                                 BorneListAdmin(
                                     etatBornes = bornes,
                                     viewModel = borneViewModel,
+                                    selectedCarteId = selectedCarte?.id ?: "",
                                     containerColor = if (isSystemInDarkTheme()) DarkContainerColor else MaterialTheme.colorScheme.surface
                                 )
                             } ?: Text(text = "Aucune borne disponible pour cette carte.")

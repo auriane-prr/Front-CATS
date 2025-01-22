@@ -96,6 +96,29 @@ class BorneViewModel(private val borneRepository: BorneRepository,
         }
     }
 
+    fun updateBorneStatus(borneId: String, newStatus: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val updatedBorne = borneRepository.updateBorneStatus(borneId, newStatus)
+                if (updatedBorne != null) {  // Vérifie si l'objet est non nul
+                    println("DEBUG: Statut de la borne mis à jour avec succès : $borneId -> $newStatus")
+                    fetchBornesByEtat()
+                    onSuccess()
+                } else {
+                    println("DEBUG: Échec de la mise à jour du statut")
+                    onError("Échec de la mise à jour du statut.")
+                }
+            } catch (e: Exception) {
+                println("DEBUG: Erreur lors de la mise à jour du statut : ${e.message}")
+                onError("Erreur : ${e.message}")
+            }
+        }
+    }
+
+    fun resetCreationStatus() {
+        _creationStatus.value = null
+    }
+
     fun resetErrorMessage() {
         _errorMessage.value = null
     }

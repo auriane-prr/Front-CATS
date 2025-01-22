@@ -2,6 +2,7 @@ package com.pfe.maborneapp.view.admin
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -9,7 +10,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.pfe.maborneapp.models.Carte
 import com.pfe.maborneapp.models.CarteId
 import com.pfe.maborneapp.models.CreateBorneRequest
@@ -18,13 +21,13 @@ import com.pfe.maborneapp.models.TypeBorneId
 import com.pfe.maborneapp.utils.*
 import com.pfe.maborneapp.view.components.CarteDropdownMenu
 import com.pfe.maborneapp.view.admin.components.CustomDropDown
-import com.pfe.maborneapp.view.components.image.NetworkImage
-import com.pfe.maborneapp.view.components.image.ZoomableImageView
+import com.pfe.maborneapp.view.components.Alert
+import com.pfe.maborneapp.view.components.image.*
 import com.pfe.maborneapp.viewmodel.*
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+
 fun NewBornePage(
     navController: NavController,
     defaultCarteId: String,
@@ -39,6 +42,7 @@ fun NewBornePage(
     val selectedCarte by carteViewModel.selectedCarte.collectAsState()
     var selectedTypeBorne by remember { mutableStateOf<TypeBorne?>(null) }
     var isSubmitting by remember { mutableStateOf(false) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
     var showZoomableMap by remember { mutableStateOf(false) }
 
     val cartes by carteViewModel.carte.collectAsState()
@@ -51,12 +55,21 @@ fun NewBornePage(
     val errorMessage by borneViewModel.errorMessage.collectAsState()
 
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
-    // Charger les cartes au montage
+
     LaunchedEffect(Unit) {
         carteViewModel.fetchCartes()
     }
 
-    // Sélectionner la carte par défaut avec l'ID passé
+    LaunchedEffect(Unit) {
+        coordX = ""
+        coordY = ""
+        numero = ""
+        selectedTypeBorne = null
+        isSubmitting = false
+        showSuccessDialog = false
+        borneViewModel.resetCreationStatus()
+    }
+
     LaunchedEffect(defaultCarteId, cartes) {
         if (cartes.isNotEmpty() && selectedCarte == null) {
             cartes.find { it.id == defaultCarteId }?.let { carte ->
@@ -66,7 +79,6 @@ fun NewBornePage(
         }
     }
 
-    // Charger les types de bornes pour la carte sélectionnée
     LaunchedEffect(selectedCarte) {
         selectedCarte?.let { typeBorneViewModel.fetchTypesBorne() }
     }
@@ -98,11 +110,11 @@ fun NewBornePage(
                         .padding(16.dp)
                         .fillMaxSize()
                 ) {
-                    // Menu déroulant pour sélectionner une carte
                     if (isLoadingCartes) {
                         CircularProgressIndicator(
                             modifier = Modifier.align(Alignment.CenterHorizontally),
-                            color = darkModeColorGreen)
+                            color = darkModeColorGreen
+                        )
                     } else if (cartes.isNotEmpty()) {
                         CarteDropdownMenu(
                             cartes = cartes,
@@ -115,17 +127,15 @@ fun NewBornePage(
                         )
                     } else {
                         Text(
-                            text = "Erreur lors du chargement des cartes.",
+                            "Erreur lors du chargement des cartes.",
                             color = Color.Red,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(32.dp))
 
-                    // Carte interactive
                     NetworkImage(
                         imageUrl = selectedCarteImageUrl,
                         //lastModified = selectedCarteLastModified,
@@ -138,7 +148,6 @@ fun NewBornePage(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Champ Numéro
                     OutlinedTextField(
                         value = numero,
                         onValueChange = { numero = it },
@@ -148,16 +157,16 @@ fun NewBornePage(
                             focusedBorderColor = darkModeColorGreen,
                             unfocusedBorderColor = darkModeColorGreen,
                             focusedLabelColor = darkModeColorGreen
-                    )
+                        )
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Menu déroulant pour les types de bornes
                     if (isLoadingTypesBorne) {
                         CircularProgressIndicator(
                             modifier = Modifier.align(Alignment.CenterHorizontally),
-                            color = darkModeColorGreen)
+                            color = darkModeColorGreen
+                        )
                     } else if (typesBorne.isNotEmpty()) {
                         CustomDropDown(
                             typesBorne = typesBorne,
@@ -166,7 +175,7 @@ fun NewBornePage(
                         )
                     } else {
                         Text(
-                            text = "Erreur lors du chargement des types de borne.",
+                            "Erreur lors du chargement des types de borne.",
                             color = Color.Red,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.fillMaxWidth()
@@ -175,11 +184,9 @@ fun NewBornePage(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Bouton de soumission
                     Button(
                         onClick = {
                             if (numero.isNotEmpty() && selectedTypeBorne != null && selectedCarte != null) {
-                                isSubmitting = true
                                 borneViewModel.createBorne(
                                     CreateBorneRequest(
                                         coord_x = coordX.toIntOrNull(),
@@ -189,40 +196,57 @@ fun NewBornePage(
                                         carte = CarteId(selectedCarte?.id ?: "")
                                     )
                                 )
+                                isSubmitting = true
                             }
                         },
                         enabled = numero.isNotEmpty() && selectedTypeBorne != null && !isSubmitting,
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = darkModeColorGreen)
+                        colors = ButtonDefaults.buttonColors(containerColor = if (isSubmitting) Color.Gray else darkModeColorGreen),
+                        shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
                             text = if (isSubmitting) "En cours..." else "Créer",
-                            color = Color.White
+                            color = Color.White,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
                         )
                     }
+
                 }
+            }
+        )
+    }
+
+    if (showSuccessDialog) {
+        Alert(
+            isSuccess = true,
+            message = "La borne a été créée avec succès.",
+            onDismiss = {
+                showSuccessDialog = false
+                borneViewModel.resetCreationStatus() // Réinitialise l'état
+                navController.navigate("adminHome")
             }
         )
     }
 
     LaunchedEffect(creationStatus) {
         if (creationStatus == true) {
-            navController.navigate("adminHome")
+            coordX = ""
+            coordY = ""
+            numero = ""
+            selectedTypeBorne = null
+            isSubmitting = false
+            showSuccessDialog = true
         } else if (creationStatus == false) {
             isSubmitting = false
         }
     }
 
     errorMessage?.let { message ->
-        AlertDialog(
-            onDismissRequest = { borneViewModel.resetErrorMessage() },
-            confirmButton = {
-                Button(onClick = { borneViewModel.resetErrorMessage() }) {
-                    Text("OK")
-                }
-            },
-            title = { Text("Erreur") },
-            text = { Text(message) }
+        Alert(
+            isSuccess = false,
+            message = message,
+            onDismiss = { borneViewModel.resetErrorMessage() }
         )
     }
 }

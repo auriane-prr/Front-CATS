@@ -5,7 +5,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -14,6 +14,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pfe.maborneapp.models.Signalement
 import com.pfe.maborneapp.utils.*
+import com.pfe.maborneapp.utils.DarkContainerColor
+import com.pfe.maborneapp.utils.DarkModeGreen
+import com.pfe.maborneapp.view.components.Alert
 
 @Composable
 fun SignalementPopup(
@@ -22,7 +25,12 @@ fun SignalementPopup(
     onUpdateStatus: (borneId: String, newStatus: String, signalementId: String?) -> Unit
 ) {
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
-    val darkModeBoackground = if (isSystemInDarkTheme()) DarkContainerColor else MaterialTheme.colorScheme.surface
+    val darkModeBackground = if (isSystemInDarkTheme()) DarkContainerColor else MaterialTheme.colorScheme.surface
+
+    var showConfirmationDialog by remember { mutableStateOf(false) }
+    var showSuccessAlert by remember { mutableStateOf(false) }
+    var actionType by remember { mutableStateOf("") }
+    var successMessage by remember { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
@@ -39,7 +47,6 @@ fun SignalementPopup(
                     color = darkModeColorGreen,
                     modifier = Modifier.weight(1f)
                 )
-
                 IconButton(
                     onClick = { onDismiss() },
                     modifier = Modifier
@@ -78,10 +85,8 @@ fun SignalementPopup(
                 ) {
                     Button(
                         onClick = {
-                            signalement.borne.id?.let { borneId ->
-                                onUpdateStatus(borneId, "hs", signalement.id)
-                                onDismiss()
-                            }
+                            actionType = "hs"
+                            showConfirmationDialog = true
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
                         modifier = Modifier
@@ -103,10 +108,8 @@ fun SignalementPopup(
 
                     Button(
                         onClick = {
-                            signalement.borne.id?.let { borneId ->
-                                onUpdateStatus(borneId, "Fonctionnelle", signalement.id)
-                                onDismiss()
-                            }
+                            actionType = "Fonctionnelle"
+                            showConfirmationDialog = true
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = darkModeColorGreen),
                         modifier = Modifier
@@ -130,15 +133,69 @@ fun SignalementPopup(
         },
         confirmButton = {},
         shape = RoundedCornerShape(16.dp),
-        containerColor = darkModeBoackground,
+        containerColor = darkModeBackground,
     )
+
+    if (showConfirmationDialog) {
+        AlertDialog(
+            onDismissRequest = { showConfirmationDialog = false },
+            title = {
+                Text(
+                    text = "Confirmation",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = darkModeColorGreen
+                )
+            },
+            text = {
+                Text(
+                    text = when (actionType) {
+                        "Fonctionnelle" -> "Voulez-vous déclarer cette borne comme Fonctionnelle ?"
+                        "hs" -> "Voulez-vous déclarer cette borne comme Hors Service ?"
+                        else -> ""
+                    },
+                    fontSize = 16.sp
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        signalement.borne.id?.let { borneId ->
+                            onUpdateStatus(borneId, actionType, signalement.id)
+                            successMessage = "Le statut de la borne a été mis à jour avec succès."
+                            showSuccessAlert = true
+                        }
+                        showConfirmationDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = darkModeColorGreen)
+                ) {
+                    Text("Oui", color = Color.White)
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showConfirmationDialog = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                ) {
+                    Text("Annuler")
+                }
+            }
+        )
+    }
+
+    if (showSuccessAlert) {
+        Alert(
+            isSuccess = true,
+            message = successMessage,
+            onDismiss = { showSuccessAlert = false }
+        )
+    }
 }
 
 
 @Composable
 fun DetailItem(label: String, value: String) {
     val darkModeTitle = if (isSystemInDarkTheme()) Color.White else Color(0xFF616161)
-    val darkModeValeur = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF212121)
+    val darkModeValue = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF212121)
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -152,7 +209,7 @@ fun DetailItem(label: String, value: String) {
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
-            color = darkModeValeur
+            color = darkModeValue
         )
     }
 }

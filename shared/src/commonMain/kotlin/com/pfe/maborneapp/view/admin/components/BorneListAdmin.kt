@@ -20,8 +20,16 @@ import com.pfe.maborneapp.utils.*
 import com.pfe.maborneapp.viewmodel.BorneViewModel
 
 @Composable
-fun BorneListAdmin(etatBornes: EtatBornes, viewModel: BorneViewModel, modifier: Modifier = Modifier, containerColor: Color,) {
+fun BorneListAdmin(
+    etatBornes: EtatBornes,
+    selectedCarteId: String,
+    viewModel: BorneViewModel,
+    modifier: Modifier = Modifier,
+    containerColor: Color,
+) {
     var selectedBorne by remember { mutableStateOf<Borne?>(null) }
+    var showSignalementAlert by remember { mutableStateOf(false) } // Gérer l'affichage de l'alerte pour les bornes signalées
+
     val darkModeColorTitle = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
     Column(
@@ -40,24 +48,27 @@ fun BorneListAdmin(etatBornes: EtatBornes, viewModel: BorneViewModel, modifier: 
     ) {
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Combine toutes les bornes en une seule liste avec des libellés adaptés
-        val allBornes = listOf(
-            etatBornes.disponible.map { it to "Disponible" },
-            etatBornes.occupee.map { it to "Occupée" },
-            etatBornes.hs.map { it to "Hors Service" },
-            etatBornes.signalee.map { it to "Signalée" }
+        val filteredBornes = listOf(
+            etatBornes.disponible.filter { it.carte.id == selectedCarteId }.map { it to "Disponible" },
+            etatBornes.occupee.filter { it.carte.id == selectedCarteId }.map { it to "Occupée" },
+            etatBornes.hs.filter { it.carte.id == selectedCarteId }.map { it to "Hors Service" },
+            etatBornes.signalee.filter { it.carte.id == selectedCarteId }.map { it to "Signalée" }
         ).flatten()
 
-        // Afficher chaque borne
-        allBornes.forEachIndexed { index, (borne, label) ->
+        filteredBornes.forEachIndexed { index, (borne, label) ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { selectedBorne = borne }
+                    .clickable {
+                        if (label == "Signalée") {
+                            showSignalementAlert = true  // Afficher l'alerte si la borne est signalée
+                        } else {
+                            selectedBorne = borne  // Sélectionner la borne pour gestion si non signalée
+                        }
+                    }
                     .padding(vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Pastille de couleur
                 Box(
                     modifier = Modifier
                         .size(16.dp)
@@ -74,14 +85,12 @@ fun BorneListAdmin(etatBornes: EtatBornes, viewModel: BorneViewModel, modifier: 
                 )
                 Spacer(modifier = Modifier.width(8.dp))
 
-                // Texte du statut et numéro de borne
                 Text(
                     text = "Borne ${borne.numero} - $label",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.weight(1f)
                 )
 
-                // Chevron
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
                     contentDescription = "Chevron",
@@ -89,7 +98,7 @@ fun BorneListAdmin(etatBornes: EtatBornes, viewModel: BorneViewModel, modifier: 
                 )
             }
 
-            if (index < allBornes.size - 1) {
+            if (index < filteredBornes.size - 1) {
                 Divider(
                     color = darkModeColorTitle.copy(alpha = 0.2f),
                     thickness = 1.dp,
@@ -99,12 +108,37 @@ fun BorneListAdmin(etatBornes: EtatBornes, viewModel: BorneViewModel, modifier: 
         }
     }
 
-    if (selectedBorne != null) {
+    // Gestion de l'alerte pour les bornes signalées
+    if (showSignalementAlert) {
+        AlertDialog(
+            onDismissRequest = { showSignalementAlert = false },
+            title = { Text("Attention") },
+            text = { Text("Cette borne est actuellement signalée. Veuillez vous rendre sur la page de signalement pour plus d'informations.") },
+            confirmButton = {
+                Button(onClick = { showSignalementAlert = false },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF045C3C)),) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
+    // Modal pour la gestion des bornes non signalées
+    selectedBorne?.let { borne ->
         BorneModalAdmin(
-            selectedBorne = selectedBorne,
+            selectedBorne = borne,
             onClose = { selectedBorne = null },
             onDelete = { id ->
                 viewModel.deleteBorne(id)
+            },
+            onUpdateStatus = { borneId, newStatus ->
+                viewModel.updateBorneStatus(
+                    borneId,
+                    newStatus,
+                    onSuccess = { println("DEBUG: Statut mis à jour avec succès pour la borne $borneId") },
+                    onError = { error -> println("DEBUG: Erreur lors de la mise à jour du statut : $error") }
+                )
+                selectedBorne = null  // Fermer la popup après mise à jour
             }
         )
     }
