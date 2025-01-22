@@ -1,6 +1,5 @@
 package com.pfe.maborneapp.view.user.components
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -12,10 +11,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pfe.maborneapp.models.Borne
-import com.pfe.maborneapp.utils.DarkModeGreen
+import com.pfe.maborneapp.utils.*
 import com.pfe.maborneapp.viewmodel.SignalementViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun SignalementModal(
     selectedBorne: Borne?,

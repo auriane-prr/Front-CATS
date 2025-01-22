@@ -1,122 +1,34 @@
 package com.pfe.maborneapp
 
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
-import androidx.navigation.NavHostController
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.pfe.maborneapp.models.CarteId
-import com.pfe.maborneapp.models.TypeBorne
-import com.pfe.maborneapp.repositories.CarteRepository
-import com.pfe.maborneapp.utils.ImageCache
-import com.pfe.maborneapp.utils.DarkThemeColors
-import com.pfe.maborneapp.utils.HttpClientFactoryImpl
-import com.pfe.maborneapp.utils.LightThemeColors
-import com.pfe.maborneapp.view.admin.AdminHomePage
-import com.pfe.maborneapp.view.user.UserHomePage
-import com.pfe.maborneapp.view.LoginPage
-import com.pfe.maborneapp.view.admin.AdminSignalementPage
-import com.pfe.maborneapp.view.admin.AdminStatistiquePage
-import com.pfe.maborneapp.view.admin.NewBornePage
-import com.pfe.maborneapp.view.user.AvailableBornesPage
-import com.pfe.maborneapp.view.user.ReservationPage
-import com.pfe.maborneapp.view.user.ProfilPage
-import com.pfe.maborneapp.view.user.NewReservationPage
-import com.pfe.maborneapp.viewmodel.CarteViewModel
-import com.pfe.maborneapp.viewmodel.LocalCarteViewModel
+import com.pfe.maborneapp.utils.*
+import com.pfe.maborneapp.viewmodel.*
+import com.pfe.maborneapp.viewmodel.user.*
 
+val localContext = staticCompositionLocalOf<Any?> { null }
 
 @Composable
-fun App(context: Any? = null) {
-    val carteViewModel: CarteViewModel = remember {
-        CarteViewModel(CarteRepository(HttpClientFactoryImpl().create()))
-    }
-
+fun App(
+    context: Any? = null,
+    userViewModel: UserViewModel,
+    borneViewModel: BorneViewModel,
+    signalementViewModel: SignalementViewModel,
+    carteViewModel: CarteViewModel,
+    reservationViewModel: ReservationViewModel,
+    typeBorneViewModel: TypeBorneViewModel
+) {
     AppTheme {
-        // Initialisation du cache
-        LaunchedEffect(context) {
-            if (context != null) {
-                ImageCache.initialize(context)
-            }
-        }
-
-        CompositionLocalProvider(LocalCarteViewModel provides carteViewModel) {
-            val navController = rememberNavController()
-            AppNavigation(navController)
-        }
-    }
-}
-
-
-@Composable
-fun AppTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
-    val colors = if (darkTheme) DarkThemeColors else LightThemeColors
-
-
-    MaterialTheme(
-        colorScheme = colors,
-        content = content
-    )
-}
-
-@Composable
-fun AppNavigation(navController: NavHostController) {
-    println("DEBUG, AppNavigation: Chargement de la navigation")
-    NavHost(navController, startDestination = "login") {
-        composable("login") { LoginPage(navController) }
-        // Pages Admin
-        composable("adminHome") { AdminHomePage(navController) }
-        composable(
-            route = "adminSignalement/{carteId}",
-            arguments = listOf(navArgument("carteId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val carteIdString = backStackEntry.arguments?.getString("carteId") ?: ""
-            val carteId = CarteId(carteIdString)
-            AdminSignalementPage(navController, defaultCarteId = carteId)
-        }
-
-        composable("adminStatistique") { AdminStatistiquePage(navController) }
-        composable("newBorne/{carteId}") { backStackEntry ->
-            val carteId = backStackEntry.arguments?.getString("carteId") ?: ""
-            NewBornePage(navController, defaultCarteId = carteId)
-        }
-
-        // Pages User
-        composable("userHome/{userId}") { backStackEntry ->
-            val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            UserHomePage(navController, userId)
-        }
-        composable("reservations/{userId}") { backStackEntry ->
-            val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            ReservationPage(navController, userId)
-        }
-        composable("profil/{userId}") { backStackEntry ->
-            val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            ProfilPage(navController, userId)
-        }
-        composable("newReservation/{userId}") { backStackEntry ->
-            val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            NewReservationPage(navController, userId)
-        }
-        composable(
-            route = "availableBornes/{startDate}/{endDate}/{userId}/{carteId}",
-            arguments = listOf(
-                navArgument("startDate") { type = NavType.StringType },
-                navArgument("endDate") { type = NavType.StringType },
-                navArgument("userId") { type = NavType.StringType },
-                navArgument("carteId") { type = NavType.StringType }
+        val navController = remember { NavController() }
+        CompositionLocalProvider(localContext provides context) {
+            AppNavigation(
+                navController = navController,
+                userViewModel = userViewModel,
+                borneViewModel = borneViewModel,
+                signalementViewModel = signalementViewModel,
+                carteViewModel = carteViewModel,
+                reservationViewModel = reservationViewModel,
+                typeBorneViewModel = typeBorneViewModel
             )
-        ) { backStackEntry ->
-            val startDate = backStackEntry.arguments?.getString("startDate") ?: ""
-            val endDate = backStackEntry.arguments?.getString("endDate") ?: ""
-            val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            val carteIdString = backStackEntry.arguments?.getString("carteId") ?: ""
-            val carteId = CarteId(carteIdString)
-            AvailableBornesPage(navController, startDate, endDate, userId, carteId)
         }
     }
 }

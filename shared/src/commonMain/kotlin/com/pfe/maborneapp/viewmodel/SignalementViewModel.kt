@@ -1,15 +1,16 @@
 package com.pfe.maborneapp.viewmodel
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.pfe.maborneapp.models.CarteId
-import com.pfe.maborneapp.models.Signalement
+import com.pfe.maborneapp.models.*
 import com.pfe.maborneapp.repositories.SignalementRepository
+import com.pfe.maborneapp.utils.provideViewModelScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class SignalementViewModel(private val repository: SignalementRepository) : ViewModel() {
+class SignalementViewModel(private val signalementRepository: SignalementRepository,
+                           private val viewModelScope: CoroutineScope = provideViewModelScope()
+) {
     private val _signalements = MutableStateFlow<List<Signalement>?>(null)
     val signalements: StateFlow<List<Signalement>?> = _signalements
 
@@ -20,7 +21,7 @@ class SignalementViewModel(private val repository: SignalementRepository) : View
         _isLoading.value = true  // Commence le chargement
         viewModelScope.launch {
             try {
-                _signalements.value = repository.getSignalements()
+                _signalements.value = signalementRepository.getSignalements()
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
@@ -33,7 +34,7 @@ class SignalementViewModel(private val repository: SignalementRepository) : View
         _isLoading.value = true  // Commence le chargement
         viewModelScope.launch {
             try {
-                _signalements.value = repository.getSignalementsByCarte(carteId)
+                _signalements.value = signalementRepository.getSignalementsByCarte(carteId)
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
@@ -50,7 +51,7 @@ class SignalementViewModel(private val repository: SignalementRepository) : View
     ) {
         viewModelScope.launch {
             try {
-                val result = repository.closeSignalement(signalementId)
+                val result = signalementRepository.closeSignalement(signalementId)
                 if (result) {
                     // Supprime le signalement fermé de la liste
                     _signalements.value = _signalements.value?.filterNot { it.id == signalementId }
@@ -76,7 +77,7 @@ class SignalementViewModel(private val repository: SignalementRepository) : View
     ) {
         viewModelScope.launch {
             try {
-                val updatedBorne = repository.updateBorneStatus(borneId, newStatus)
+                val updatedBorne = signalementRepository.updateBorneStatus(borneId, newStatus)
                 if (updatedBorne != null) {
                     println("DEBUG:Statut de la borne mis à jour avec succès : $updatedBorne")
                     onSuccess()
@@ -101,7 +102,7 @@ class SignalementViewModel(private val repository: SignalementRepository) : View
         println("DEBUG: signalerBorne appelé avec borneId=$borneId, userId=$userId, motif=$motif")
         viewModelScope.launch {
             try {
-                val result = repository.signalerBorne(borneId, userId, motif)
+                val result = signalementRepository.signalerBorne(borneId, userId, motif)
                 if (result) {
                     println("DEBUG: Signalement réussi")
                     onSuccess()

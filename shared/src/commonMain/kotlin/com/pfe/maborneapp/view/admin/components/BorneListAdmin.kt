@@ -3,7 +3,6 @@ package com.pfe.maborneapp.view.admin.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,10 +16,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.pfe.maborneapp.models.Borne
 import com.pfe.maborneapp.models.EtatBornes
-import com.pfe.maborneapp.utils.DarkModeGreen
+import com.pfe.maborneapp.utils.*
 import com.pfe.maborneapp.viewmodel.BorneViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BorneListAdmin(
     etatBornes: EtatBornes,

@@ -3,29 +3,13 @@ package com.pfe.maborneapp.view.components.image
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTransformGestures
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -35,8 +19,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import com.pfe.maborneapp.utils.DarkModeGreen
-import com.pfe.maborneapp.utils.loadImageBitmap
+import com.pfe.maborneapp.utils.*
+
 @Composable
 fun ZoomableImageView(
     imageUrl: String?,
@@ -45,17 +29,22 @@ fun ZoomableImageView(
     onClose: () -> Unit
 ) {
     var scale by remember { mutableStateOf(1f) }
-    var offsetX by remember { mutableStateOf(0f) } // Décalage horizontal
-    var offsetY by remember { mutableStateOf(0f) } // Décalage vertical
+    var offsetX by remember { mutableStateOf(0f) }
+    var offsetY by remember { mutableStateOf(0f) }
     var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
     var imageAspectRatio by remember { mutableStateOf(1f) }
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
-    LaunchedEffect(imageUrl) {
-        imageUrl?.let {
-            imageBitmap = loadImageBitmap(it, lastModified)
-            imageBitmap?.let { bitmap ->
-                imageAspectRatio = bitmap.width.toFloat() / bitmap.height.toFloat()
+    LaunchedEffect(imageUrl, lastModified) {
+        if (imageUrl != null) {
+            try {
+                //imageBitmap = loadImageBitmap(imageUrl, lastModified)
+                imageBitmap = loadImageBitmap(imageUrl)
+                imageBitmap?.let { bitmap ->
+                    imageAspectRatio = bitmap.width.toFloat() / bitmap.height.toFloat()
+                }
+            } catch (e: Exception) {
+                println("Erreur lors du chargement de l'image : ${e.message}")
             }
         }
     }
@@ -65,7 +54,6 @@ fun ZoomableImageView(
             .fillMaxSize()
             .background(Color.White),
         contentAlignment = Alignment.Center
-
     ) {
         Column {
             // Carte avec zoom
@@ -90,15 +78,15 @@ fun ZoomableImageView(
                             .pointerInput(Unit) {
                                 detectTransformGestures { _, pan, zoomChange, _ ->
                                     scale *= zoomChange
-                                    offsetX += pan.x* 3.0f
-                                    offsetY += pan.y* 3.0f
+                                    offsetX += pan.x * 3.0f
+                                    offsetY += pan.y * 3.0f
                                 }
                             },
-
                         contentScale = ContentScale.Fit
                     )
                 }
             }
+
             // Boutons de zoom
             Row(
                 modifier = Modifier
@@ -121,10 +109,14 @@ fun ZoomableImageView(
                 ) {
                     Icon(Icons.Default.Remove, contentDescription = "Zoom Out", tint = Color.White)
                 }
-                Button(onClick = onClose, colors = ButtonDefaults.buttonColors(containerColor = darkModeColorGreen)) {
+                Button(
+                    onClick = onClose,
+                    colors = ButtonDefaults.buttonColors(containerColor = darkModeColorGreen)
+                ) {
                     Text(text = "Fermer", color = Color.White)
                 }
             }
+
             Spacer(modifier = Modifier.weight(0.1f))
         }
     }

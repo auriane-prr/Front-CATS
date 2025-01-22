@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.compose.compiler)
+    id("org.jetbrains.compose") version "1.5.11"
 }
 
 kotlin {
@@ -35,36 +35,32 @@ kotlin {
         @OptIn(ExperimentalComposeLibrary::class) val commonMain by getting {
             resources.srcDirs("src/commonMain/resources")
             dependencies {
+                // Kotlinx
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.0")
-                implementation(libs.kotlinx.serialization.json)
                 implementation("io.ktor:ktor-client-core:2.3.0")
                 implementation("io.ktor:ktor-client-json:2.3.0")
                 implementation("io.ktor:ktor-client-content-negotiation:2.3.0")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.0")
                 implementation("io.ktor:ktor-client-logging:2.3.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
-                implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
-                implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
-
+                // JetBrains Compose
                 implementation("org.jetbrains.skiko:skiko:0.7.75")
                 implementation("org.jetbrains.compose.foundation:foundation:1.5.0")
                 implementation("org.jetbrains.compose.ui:ui-graphics:1.5.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-
-                implementation("androidx.compose.material3:material3:1.3.1")
-                implementation("androidx.compose.runtime:runtime:1.3.3")
-                implementation("androidx.compose.foundation:foundation:1.3.1")
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-
-                implementation("androidx.compose.material3:material3-window-size-class:1.3.1")
-
+                implementation("org.jetbrains.compose.runtime:runtime:1.5.0")
                 implementation(compose.foundation)
                 implementation(compose.material3)
                 implementation(compose.ui)
                 implementation(compose.materialIconsExtended)
                 implementation(compose.components.resources)
+
+                // Koin
+                //implementation("io.insert-koin:koin-core:3.5.0")
+
             }
+
         }
         val commonTest by getting {
             dependencies {
@@ -74,29 +70,29 @@ kotlin {
         val androidMain by getting {
             resources.srcDirs("src/commonMain/resources")
             dependencies {
-                implementation(libs.androidx.navigation.common)
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
-                implementation(libs.kotlinx.serialization.json)
-                implementation("io.ktor:ktor-client-okhttp:2.3.0")
-                implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.1")
-                implementation("androidx.compose.ui:ui-graphics:1.5.0")
+                implementation("androidx.navigation:navigation-compose:2.8.0-alpha10") // Android-only
+                implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.1") // Android-only
+                implementation("io.ktor:ktor-client-okhttp:2.3.0") // Android HTTP client
+                implementation("androidx.compose.material3:material3:1.3.1")
+                implementation("androidx.compose.material3:material3-window-size-class:1.3.1")
+                //implementation("io.insert-koin:koin-compose:3.5.0")
             }
         }
 
         val iosArm64Main by getting
         val iosSimulatorArm64Main by getting
+
         val iosMain by creating {
             dependsOn(commonMain)
             resources.srcDirs("src/commonMain/resources")
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
-                implementation(libs.kotlinx.serialization.json)
-                implementation("io.ktor:ktor-client-darwin:2.3.0")
-                implementation("org.jetbrains.skiko:skiko:0.7.75")
-
+                implementation("io.ktor:ktor-client-darwin:2.3.0") // iOS HTTP client
+                implementation("org.jetbrains.skiko:skiko:0.7.75") // Graphismes multiplateformes
             }
         }
+
     }
 
     tasks.withType<Copy> {

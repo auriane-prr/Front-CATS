@@ -1,10 +1,6 @@
 package com.pfe.maborneapp.repositories
 
-import com.pfe.maborneapp.models.CarteId
-import com.pfe.maborneapp.models.EtatBornes
-import com.pfe.maborneapp.models.IdReference
-import com.pfe.maborneapp.models.Reservation
-import com.pfe.maborneapp.models.ReservationRequest
+import com.pfe.maborneapp.models.*
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*

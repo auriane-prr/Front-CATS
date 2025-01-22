@@ -1,6 +1,5 @@
 package com.pfe.maborneapp.view.admin.components
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -16,8 +15,8 @@ import com.pfe.maborneapp.models.Borne
 import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.view.components.Alert
 import kotlinx.coroutines.delay
+import com.pfe.maborneapp.utils.*
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BorneModalAdmin(
     selectedBorne: Borne?,

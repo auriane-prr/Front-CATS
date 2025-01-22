@@ -2,7 +2,6 @@ package com.pfe.maborneapp.view.user
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,11 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import com.pfe.maborneapp.utils.DarkModeGreen
-import com.pfe.maborneapp.viewmodel.factories.user.ReservationViewModelFactory
+import com.pfe.maborneapp.utils.*
 import com.pfe.maborneapp.viewmodel.user.ReservationViewModel
 import com.pfe.maborneapp.models.Borne
 import com.pfe.maborneapp.models.CarteId
@@ -27,23 +22,25 @@ import com.pfe.maborneapp.models.Reservation
 import com.pfe.maborneapp.models.User
 import com.pfe.maborneapp.view.components.Alert
 import com.pfe.maborneapp.viewmodel.CarteViewModel
-import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
+import com.pfe.maborneapp.viewmodel.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AvailableBornesPage(
-    navController: NavHostController,
-    startDate: String,
-    endDate: String,
-    userId: String,
-    carteId: CarteId,
+    navController: NavController,
+    reservationViewModel: ReservationViewModel,
+    carteViewModel: CarteViewModel,
+    userViewModel: UserViewModel,
 ) {
-    val reservationViewModel: ReservationViewModel =
-        viewModel(factory = ReservationViewModelFactory())
-    val carteViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
+
+    val userId by userViewModel.userId.collectAsState()
     val availableBornes by reservationViewModel.availableBornes.collectAsState()
     var selectedBorne by remember { mutableStateOf<Borne?>(null) }
     var selectedCarteName by remember { mutableStateOf<String?>(null) }
+
+    val startDate by reservationViewModel.startTime.collectAsState()
+    val endDate by reservationViewModel.endTime.collectAsState()
+    val selectedCarte by reservationViewModel.selectedCarte.collectAsState()
 
     var showAlert by remember { mutableStateOf(false) }
     var alertMessage by remember { mutableStateOf("") }
@@ -51,23 +48,17 @@ fun AvailableBornesPage(
 
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
-    LaunchedEffect(startDate, endDate) {
-        reservationViewModel.fetchAvailableBornesByCarte(startDate, endDate, carteId)
-    }
-
-    LaunchedEffect(carteId) {
-        try {
-            val carte = carteViewModel.fetchCarteById(carteId._id)
-            if (carte != null) {
-                selectedCarteName = carte.nom
-                println("DEBUG: Carte trouvée : ${carte.nom}")
-            } else {
-                println("DEBUG: Aucune carte trouvée pour l'ID ${carteId._id}")
-            }
-        } catch (e: Exception) {
-            println("Erreur lors de la récupération de la carte : ${e.message}")
+    LaunchedEffect(startDate, endDate, selectedCarte) {
+        selectedCarte?.let { carte ->
+            reservationViewModel.fetchAvailableBornesByCarte(startDate, endDate, CarteId(carte.id))
         }
     }
+
+    LaunchedEffect(selectedCarte) {
+        selectedCarteName = selectedCarte?.nom
+        println("DEBUG: Carte sélectionnée : ${selectedCarte?.nom}")
+    }
+
 
     // Formater les dates
     fun formatDateRange(start: String, end: String): String {
@@ -89,7 +80,9 @@ fun AvailableBornesPage(
             TopAppBar(
                 title = { Text("Bornes disponibles") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = {
+                        navController.navigateAndClear("newReservation", reservationViewModel)
+                    }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Retour")
                     }
                 }
@@ -103,7 +96,7 @@ fun AvailableBornesPage(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 OutlinedButton(
-                    onClick = { navController.popBackStack() },
+                    onClick = { navController.navigateAndClear("reservations", reservationViewModel) },
                     modifier = Modifier.weight(1f).padding(end = 8.dp)
                 ) {
                     Text("Annuler", color = Color.Gray)
@@ -211,18 +204,15 @@ fun AvailableBornesPage(
             if (it) {
                 isAlertSuccess = true
                 alertMessage = "Votre réservation a bien été prise en compte."
+                reservationViewModel.clearReservationDetailsAndState() // Réinitialise tous les états
+                navController.navigateAndClear("reservations", reservationViewModel)
             } else {
                 isAlertSuccess = false
-                // Vérifiez le message d'erreur exact
-                val errorMessage = reservationViewModel.lastErrorMessage
-                println("DEBUG: Message d'erreur reçu : $errorMessage")
-                alertMessage = when (errorMessage) {
-                    "L'utilisateur a déjà une réservation pour cette horaire." ->
-                        "Vous avez déjà une réservation de prévue pour ce créneau horaire."
-                    else -> "Erreur lors de la création de la réservation. Veuillez réessayer."
-                }
+                alertMessage = reservationViewModel.lastErrorMessage
+                    ?: "Erreur lors de la création de la réservation. Veuillez réessayer."
             }
             showAlert = true
+            reservationViewModel.resetCreationStatus() // Réinitialise le statut de création
         }
     }
 
@@ -234,7 +224,7 @@ fun AvailableBornesPage(
             onDismiss = {
                 showAlert = false
                 if (isAlertSuccess) {
-                    navController.popBackStack("reservations/$userId", inclusive = false)
+                    navController.navigateAndClear("reservations", reservationViewModel)
                 }
             }
         )

@@ -11,17 +11,20 @@ class LoginRepository(private val client: HttpClient) {
     private val json = Json { ignoreUnknownKeys = true }
 
     suspend fun login(email: String): User? {
+        println("DEBUG: LoginRepository -> login() appelé avec l'email : $email")
         try {
             val response: HttpResponse = client.post("https://back-cats.onrender.com/auth/login") {
                 contentType(ContentType.Application.Json)
                 setBody("""{"mail":"$email"}""")
             }
+            println("DEBUG: Réponse du serveur : ${response.status}, body=${response.bodyAsText()}")
             if (response.status == HttpStatusCode.OK) {
                 return json.decodeFromString(User.serializer(), response.bodyAsText())
             }
         } catch (e: Exception) {
-            println("Erreur dans LoginRepository : ${e.message}")
+            println("DEBUG: Erreur dans LoginRepository : ${e.message}")
         }
         return null
     }
+
 }

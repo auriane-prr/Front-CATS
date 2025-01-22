@@ -1,7 +1,6 @@
 package com.pfe.maborneapp.view.admin.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -12,29 +11,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.navigation.NavHostController
 import androidx.compose.ui.Alignment
 import com.pfe.maborneapp.models.CarteId
-import com.pfe.maborneapp.utils.DarkModeGreen
+import com.pfe.maborneapp.utils.*
+import com.pfe.maborneapp.viewmodel.*
 
 @Composable
 fun AdminMenu(
-    navController: NavHostController,
+    navController: NavController,
     isMenuOpen: Boolean,
     onToggleMenu: () -> Unit,
     currentPage: String,
-    carteId: CarteId
+    userViewModel: UserViewModel,
+    carteViewModel: CarteViewModel
 ) {
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
     val menuBackgroundColor = Color(0xFFBDD3D0)
 
     Box(
-        modifier = Modifier.fillMaxSize() // Parent qui prend toute la taille de l'écran
+        modifier = Modifier.fillMaxSize()
     ) {
         if (isMenuOpen) {
             Box(
                 modifier = Modifier
-                    .align(Alignment.TopEnd) // Place le menu en haut à droite
+                    .align(Alignment.TopEnd)
                     .height(250.dp)
                     .width(220.dp)
                     .background(menuBackgroundColor, RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))
@@ -57,7 +57,13 @@ fun AdminMenu(
                     Divider(color = darkModeColorGreen, thickness = 1.dp)
 
                     // Signalement
-                    TextButton(onClick = { navController.navigate("adminSignalement/${carteId._id}") }) {
+                    TextButton(onClick = {
+                        carteViewModel.selectedCarte.value?.id?.let { carteId ->
+                            carteViewModel.setSelectedCarteId(carteId)
+                            navController.navigate("adminSignalement")
+                        }
+                    })
+                    {
                         Text(
                             text = "Signalement",
                             style = MaterialTheme.typography.bodyLarge,
@@ -77,7 +83,11 @@ fun AdminMenu(
                     Divider(color = darkModeColorGreen, thickness = 1.dp)
 
                     // Déconnexion
-                    TextButton(onClick = { navController.navigate("login") }) {
+                    TextButton(onClick = {
+                        userViewModel.logout()
+                        navController.navigate("login")
+                    })
+                    {
                         Text(
                             text = "Déconnexion",
                             style = MaterialTheme.typography.bodyLarge,

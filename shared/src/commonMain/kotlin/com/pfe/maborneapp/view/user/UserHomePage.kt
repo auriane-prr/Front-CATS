@@ -1,7 +1,6 @@
 package com.pfe.maborneapp.view.user
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -10,35 +9,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.pfe.maborneapp.utils.DarkContainerColor
-import com.pfe.maborneapp.utils.DarkModeGreen
-import com.pfe.maborneapp.view.user.components.BorneList
-import com.pfe.maborneapp.view.user.components.Menu
-import com.pfe.maborneapp.viewmodel.factories.BorneViewModelFactory
-import com.pfe.maborneapp.viewmodel.factories.SignalementViewModelFactory
-import com.pfe.maborneapp.viewmodel.factories.user.UserViewModelFactory
+import com.pfe.maborneapp.utils.*
+import com.pfe.maborneapp.view.user.components.*
 import com.pfe.maborneapp.viewmodel.BorneViewModel
-import com.pfe.maborneapp.viewmodel.user.UserViewModel
-import com.pfe.maborneapp.viewmodel.SignalementViewModel
-import com.pfe.maborneapp.view.components.Alert
+import com.pfe.maborneapp.view.components.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import com.pfe.maborneapp.models.CarteId
-import com.pfe.maborneapp.view.components.CarteDropdownMenu
-import com.pfe.maborneapp.view.components.image.NetworkImage
-import com.pfe.maborneapp.view.components.image.ZoomableImageView
-import com.pfe.maborneapp.viewmodel.LocalCarteViewModel
+import com.pfe.maborneapp.utils.NavController
+import com.pfe.maborneapp.view.components.image.*
+import com.pfe.maborneapp.viewmodel.*
 
 @Composable
-fun UserHomePage(navController: NavHostController, userId: String) {
+fun UserHomePage(
+    navController: NavController,
+    userViewModel: UserViewModel,
+    borneViewModel: BorneViewModel,
+    signalementViewModel: SignalementViewModel,
+    carteViewModel: CarteViewModel
+) {
     val darkModeColorTitle = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
-    val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory())
-    val borneViewModel: BorneViewModel = viewModel(factory = BorneViewModelFactory())
-    val signalementViewModel: SignalementViewModel = viewModel(factory = SignalementViewModelFactory())
-    val carteViewModel = LocalCarteViewModel.current
 
+    val userId by userViewModel.userId.collectAsState()
     val userEmail by userViewModel.userEmail.collectAsState()
     val selectedCarteImageUrl by carteViewModel.selectedCarteImageUrl.collectAsState()
     val selectedCarteLastModified by carteViewModel.selectedCarteLastModified.collectAsState()
@@ -64,20 +56,24 @@ fun UserHomePage(navController: NavHostController, userId: String) {
         carteViewModel.fetchCartes()
     }
 
-    // Sélectionner la carte par défaut (CATS de Montpellier) après le chargement des cartes
     LaunchedEffect(cartes) {
         if (cartes.isNotEmpty() && selectedCarte == null) {
-            carteViewModel.setSelectedCarte(cartes.find { it.nom == "CATS de Montpellier" })
+            val defaultCarte = cartes.find { it.nom == "CATS de Montpellier" }
+            if (defaultCarte != null) {
+                carteViewModel.setSelectedCarte(defaultCarte) // Sélectionne la carte par défaut
+                borneViewModel.fetchBornesByEtatAndCarte(CarteId(defaultCarte.id)) // Charge les bornes associées
+            } else {
+                println("DEBUG: Aucune carte par défaut trouvée.")
+            }
         }
     }
 
     // Charger les détails de la carte sélectionnée
     LaunchedEffect(selectedCarte) {
         selectedCarte?.let {
-            println("DEBUG: Chargement des bornes pour la carte sélectionnée - ID: ${it.id}")
+            println("DEBUG: Chargement des détails pour la carte sélectionnée - ID: ${it.id}")
             carteViewModel.fetchCarteDetails(it.id)
-            borneViewModel.fetchBornesByEtatAndCarte(CarteId(it.id))
-        } ?: println("DEBUG: Aucune carte sélectionnée")
+        }
     }
 
     LaunchedEffect(userId) {
@@ -139,11 +135,12 @@ fun UserHomePage(navController: NavHostController, userId: String) {
 
                     // Affichage de la carte sélectionnée
                     selectedCarte?.let {
+
                         Spacer(modifier = Modifier.height(16.dp))
 
                         NetworkImage(
                             imageUrl = selectedCarteImageUrl,
-                            lastModified = selectedCarteLastModified,
+                            //lastModified = selectedCarteLastModified,
                             contentDescription = "Carte Image",
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -190,8 +187,9 @@ fun UserHomePage(navController: NavHostController, userId: String) {
                     navController = navController,
                     isMenuOpen = isMenuOpen,
                     onToggleMenu = { isMenuOpen = !isMenuOpen },
-                    currentPage = "home",
-                    userId = userId
+                    currentPage = "userHome",
+                    userId = userId,
+                    userViewModel = userViewModel
                 )
             }
         )

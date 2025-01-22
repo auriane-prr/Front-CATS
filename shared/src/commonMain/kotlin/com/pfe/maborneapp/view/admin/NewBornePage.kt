@@ -1,7 +1,6 @@
 package com.pfe.maborneapp.view.admin
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -14,36 +13,33 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import com.pfe.maborneapp.models.Carte
 import com.pfe.maborneapp.models.CarteId
 import com.pfe.maborneapp.models.CreateBorneRequest
 import com.pfe.maborneapp.models.TypeBorne
 import com.pfe.maborneapp.models.TypeBorneId
-import com.pfe.maborneapp.utils.DarkModeGreen
+import com.pfe.maborneapp.utils.*
 import com.pfe.maborneapp.view.components.CarteDropdownMenu
 import com.pfe.maborneapp.view.admin.components.CustomDropDown
 import com.pfe.maborneapp.view.components.Alert
-import com.pfe.maborneapp.view.components.image.NetworkImage
-import com.pfe.maborneapp.view.components.image.ZoomableImageView
-import com.pfe.maborneapp.viewmodel.BorneViewModel
-import com.pfe.maborneapp.viewmodel.LocalCarteViewModel
-import com.pfe.maborneapp.viewmodel.TypeBorneViewModel
-import com.pfe.maborneapp.viewmodel.factories.BorneViewModelFactory
-import com.pfe.maborneapp.viewmodel.factories.TypeBorneViewModelFactory
+import com.pfe.maborneapp.view.components.image.*
+import com.pfe.maborneapp.viewmodel.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewBornePage(navController: NavHostController, defaultCarteId: String) {
-    val borneViewModel: BorneViewModel = viewModel(factory = BorneViewModelFactory())
-    val carteViewModel = LocalCarteViewModel.current
-    val typeBorneViewModel: TypeBorneViewModel = viewModel(factory = TypeBorneViewModelFactory())
 
+fun NewBornePage(
+    navController: NavController,
+    defaultCarteId: String,
+    borneViewModel: BorneViewModel,
+    carteViewModel: CarteViewModel,
+    typeBorneViewModel: TypeBorneViewModel
+) {
+    // États pour les champs de la borne et les cartes
     var coordX by remember { mutableStateOf("") }
     var coordY by remember { mutableStateOf("") }
     var numero by remember { mutableStateOf("") }
-    var selectedCarte by remember { mutableStateOf<Carte?>(null) }
+    val selectedCarte by carteViewModel.selectedCarte.collectAsState()
     var selectedTypeBorne by remember { mutableStateOf<TypeBorne?>(null) }
     var isSubmitting by remember { mutableStateOf(false) }
     var showSuccessDialog by remember { mutableStateOf(false) }
@@ -64,11 +60,22 @@ fun NewBornePage(navController: NavHostController, defaultCarteId: String) {
         carteViewModel.fetchCartes()
     }
 
+    LaunchedEffect(Unit) {
+        coordX = ""
+        coordY = ""
+        numero = ""
+        selectedTypeBorne = null
+        isSubmitting = false
+        showSuccessDialog = false
+        borneViewModel.resetCreationStatus()
+    }
+
     LaunchedEffect(defaultCarteId, cartes) {
-        if (!cartes.isNullOrEmpty() && selectedCarte == null) {
-            val carte = cartes.find { it.id == defaultCarteId }
-            selectedCarte = carte
-            carte?.let { carteViewModel.fetchCarteDetails(it.id) }
+        if (cartes.isNotEmpty() && selectedCarte == null) {
+            cartes.find { it.id == defaultCarteId }?.let { carte ->
+                carteViewModel.setSelectedCarte(carte)
+                carteViewModel.fetchCarteDetails(carte.id)
+            }
         }
     }
 
@@ -90,7 +97,7 @@ fun NewBornePage(navController: NavHostController, defaultCarteId: String) {
                 TopAppBar(
                     title = { Text("Nouvelle Borne") },
                     navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
+                        IconButton(onClick = { navController.navigate("adminHome") }) {
                             Icon(Icons.Default.ArrowBack, contentDescription = "Retour")
                         }
                     }
@@ -108,11 +115,15 @@ fun NewBornePage(navController: NavHostController, defaultCarteId: String) {
                             modifier = Modifier.align(Alignment.CenterHorizontally),
                             color = darkModeColorGreen
                         )
-                    } else if (!cartes.isNullOrEmpty()) {
+                    } else if (cartes.isNotEmpty()) {
                         CarteDropdownMenu(
                             cartes = cartes,
                             selectedCarte = selectedCarte,
-                            onCarteSelected = { selectedCarte = it }
+                            onCarteSelected = { carte ->
+                                carteViewModel.setSelectedCarte(carte)
+                                carteViewModel.fetchCarteDetails(carte.id)
+                                typeBorneViewModel.fetchTypesBorne() // Rafraîchir les types de bornes après sélection
+                            }
                         )
                     } else {
                         Text(
@@ -123,11 +134,11 @@ fun NewBornePage(navController: NavHostController, defaultCarteId: String) {
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(32.dp))
 
                     NetworkImage(
                         imageUrl = selectedCarteImageUrl,
-                        lastModified = selectedCarteLastModified,
+                        //lastModified = selectedCarteLastModified,
                         contentDescription = "Carte Image",
                         modifier = Modifier
                             .fillMaxWidth()
@@ -156,7 +167,7 @@ fun NewBornePage(navController: NavHostController, defaultCarteId: String) {
                             modifier = Modifier.align(Alignment.CenterHorizontally),
                             color = darkModeColorGreen
                         )
-                    } else if (!typesBorne.isNullOrEmpty()) {
+                    } else if (typesBorne.isNotEmpty()) {
                         CustomDropDown(
                             typesBorne = typesBorne,
                             selectedType = selectedTypeBorne,
@@ -212,13 +223,19 @@ fun NewBornePage(navController: NavHostController, defaultCarteId: String) {
             message = "La borne a été créée avec succès.",
             onDismiss = {
                 showSuccessDialog = false
-                navController.navigate("adminHome") { popUpTo("adminHome") { inclusive = true } }
+                borneViewModel.resetCreationStatus() // Réinitialise l'état
+                navController.navigate("adminHome")
             }
         )
     }
 
     LaunchedEffect(creationStatus) {
         if (creationStatus == true) {
+            coordX = ""
+            coordY = ""
+            numero = ""
+            selectedTypeBorne = null
+            isSubmitting = false
             showSuccessDialog = true
         } else if (creationStatus == false) {
             isSubmitting = false
@@ -233,4 +250,3 @@ fun NewBornePage(navController: NavHostController, defaultCarteId: String) {
         )
     }
 }
-

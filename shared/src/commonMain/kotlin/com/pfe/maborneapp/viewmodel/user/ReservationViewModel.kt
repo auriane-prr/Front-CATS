@@ -1,29 +1,24 @@
 package com.pfe.maborneapp.viewmodel.user
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.pfe.maborneapp.models.Borne
-import com.pfe.maborneapp.models.Carte
-import com.pfe.maborneapp.models.CarteId
-import com.pfe.maborneapp.models.Reservation
+import com.pfe.maborneapp.models.*
+import com.pfe.maborneapp.utils.*
 import com.pfe.maborneapp.repositories.ReservationRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import com.pfe.maborneapp.utils.formatDateOnly
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.HttpStatusCode
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.*
 
-class ReservationViewModel(private val reservationRepository: ReservationRepository) : ViewModel() {
-    var selectedDate = mutableStateOf("")
-    var startTime = mutableStateOf("")
-    var endTime = mutableStateOf("")
-    val selectedCarte = mutableStateOf<Carte?>(null)
+class ReservationViewModel(
+    private val reservationRepository: ReservationRepository,
+    private val viewModelScope: CoroutineScope = provideViewModelScope()
+) {
+
+    val selectedDate = MutableStateFlow("")
+    val startTime = MutableStateFlow("")
+    val endTime = MutableStateFlow("")
+    val selectedCarte = MutableStateFlow<Carte?>(null)
 
     private val _reservations = MutableStateFlow<List<Reservation>?>(null)
     val reservations: StateFlow<List<Reservation>?> = _reservations
@@ -42,6 +37,13 @@ class ReservationViewModel(private val reservationRepository: ReservationReposit
 
     var lastErrorMessage: String? = null
         private set
+
+    fun setupReservationDetails(date: String, start: String, end: String, carte: Carte) {
+        selectedDate.value = date
+        startTime.value = start
+        endTime.value = end
+        selectedCarte.value = carte
+    }
 
     fun fetchReservations(userId: String) {
         viewModelScope.launch {
@@ -123,5 +125,18 @@ class ReservationViewModel(private val reservationRepository: ReservationReposit
         _deleteStatus.value = null
     }
 
-}
+    fun clearReservationDetailsAndState() {
+        selectedDate.value = ""
+        startTime.value = ""
+        endTime.value = ""
+        selectedCarte.value = null
+        _availableBornes.value = null
+        _creationStatus.value = null
+        lastErrorMessage = null
+    }
 
+    fun resetCreationStatus() {
+        _creationStatus.value = null
+    }
+
+}

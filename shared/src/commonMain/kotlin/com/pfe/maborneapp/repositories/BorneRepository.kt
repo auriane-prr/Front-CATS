@@ -1,11 +1,7 @@
 package com.pfe.maborneapp.repositories
 
-import com.pfe.maborneapp.models.Borne
-import com.pfe.maborneapp.models.CarteId
-import com.pfe.maborneapp.models.CreateBorneRequest
-import com.pfe.maborneapp.models.EtatBornes
+import com.pfe.maborneapp.models.*
 import io.ktor.client.*
-import io.ktor.client.call.body
 import io.ktor.client.request.*
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*

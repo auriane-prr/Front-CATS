@@ -1,14 +1,14 @@
 package com.pfe.maborneapp.viewmodel
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.pfe.maborneapp.models.TypeBorne
 import com.pfe.maborneapp.repositories.TypeBorneRepository
+import com.pfe.maborneapp.utils.provideViewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineScope
 
-class TypeBorneViewModel(private val repository: TypeBorneRepository) : ViewModel() {
+class TypeBorneViewModel(private val typeBorneRepository: TypeBorneRepository,private val viewModelScope: CoroutineScope = provideViewModelScope()) {
     private val _typesBorne = MutableStateFlow<List<TypeBorne>>(emptyList())
     val typesBorne: StateFlow<List<TypeBorne>> = _typesBorne
 
@@ -23,7 +23,7 @@ class TypeBorneViewModel(private val repository: TypeBorneRepository) : ViewMode
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val fetchTypeBorne =repository.fetchTypesBorne()
+                val fetchTypeBorne =typeBorneRepository.fetchTypesBorne()
                 if (fetchTypeBorne != null) {
                     println("DEBUG: Types de bornes chargés avec succès : $fetchTypeBorne")
                     _typesBorne.value = fetchTypeBorne

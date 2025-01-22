@@ -1,7 +1,6 @@
 package com.pfe.maborneapp.repositories
 
-import com.pfe.maborneapp.models.Carte
-import com.pfe.maborneapp.models.TypeBorne
+import com.pfe.maborneapp.models.*
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*

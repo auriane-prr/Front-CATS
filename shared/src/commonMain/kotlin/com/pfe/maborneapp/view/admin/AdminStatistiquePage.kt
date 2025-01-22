@@ -5,12 +5,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
 import com.pfe.maborneapp.models.CarteId
+import com.pfe.maborneapp.utils.NavController
 import com.pfe.maborneapp.view.admin.components.AdminMenu
+import com.pfe.maborneapp.viewmodel.CarteViewModel
+import com.pfe.maborneapp.viewmodel.UserViewModel
 
 @Composable
-fun AdminStatistiquePage(navController: NavHostController) {
+fun AdminStatistiquePage(navController: NavController, userViewModel: UserViewModel, carteViewModel: CarteViewModel) {
     var isMenuOpen by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -36,7 +38,8 @@ fun AdminStatistiquePage(navController: NavHostController) {
                     isMenuOpen = isMenuOpen,
                     onToggleMenu = { isMenuOpen = !isMenuOpen },
                     currentPage = "adminStatistique",
-                    carteId = CarteId("0")
+                    userViewModel = userViewModel,
+                    carteViewModel = carteViewModel
                 )
             }
         }
