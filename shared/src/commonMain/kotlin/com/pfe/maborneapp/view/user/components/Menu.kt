@@ -9,32 +9,28 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.navigation.NavHostController
-import androidx.compose.ui.Alignment
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pfe.maborneapp.utils.DarkModeGreen
-import com.pfe.maborneapp.viewmodel.factories.user.UserViewModelFactory
-import com.pfe.maborneapp.viewmodel.user.UserViewModel
+import com.pfe.maborneapp.utils.NavController
+import com.pfe.maborneapp.viewmodel.UserViewModel
 
 @Composable
 fun Menu(
-    navController: NavHostController,
+    navController: NavController,
     isMenuOpen: Boolean,
     onToggleMenu: () -> Unit,
     currentPage: String,
-    userId: String
+    userId: String,
+    userViewModel: UserViewModel
 ) {
-    val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory())
-
     LaunchedEffect(userId) {
         userViewModel.fetchUserEmail(userId)
     }
+
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
     val menuBackgroundColor = Color(0xFFBDD3D0)
 
@@ -57,7 +53,7 @@ fun Menu(
                     Spacer(modifier = Modifier.height(32.dp))
 
                     // Accueil
-                    TextButton(onClick = { navController.navigate("userHome/$userId") }) {
+                    TextButton(onClick = { navController.navigate("userHome") }) {
                         Text(
                             text = "Accueil",
                             style = MaterialTheme.typography.bodyLarge,
@@ -67,7 +63,7 @@ fun Menu(
                     Divider(color = darkModeColorGreen, thickness = 1.dp)
 
                     // Réservations
-                    TextButton(onClick = { navController.navigate("reservations/$userId") }) {
+                    TextButton(onClick = { navController.navigate("reservations")}) {
                         Text(
                             text = "Réservations",
                             style = MaterialTheme.typography.bodyLarge,
@@ -75,22 +71,20 @@ fun Menu(
                         )
                     }
                     Divider(color = darkModeColorGreen, thickness = 1.dp)
-/*
-                    // Profil
-                    TextButton(onClick = { navController.navigate("profil/$userId") }) {
+
+                    /*
+                    // Conditions utilisation
                         Text(
-                            text = "Profil",
+                            text = "Conditions utilisation",
                             style = MaterialTheme.typography.bodyLarge,
                             color = if (currentPage == "profil") darkModeColorGreen else Color.Black
                         )
-                    }
                     Divider(color = darkModeColorGreen, thickness = 1.dp)*/
 
                     // Déconnexion
                     TextButton(onClick = {
-                        navController.navigate("login") {
-                            popUpTo("userHome") { inclusive = true }
-                        }
+                        userViewModel.logout()
+                        navController.navigate("login")
                     }) {
                         Text(
                             text = "Déconnexion",

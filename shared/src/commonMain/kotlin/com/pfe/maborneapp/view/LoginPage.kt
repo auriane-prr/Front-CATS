@@ -1,8 +1,6 @@
 package com.pfe.maborneapp.view
 
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.pfe.maborneapp.viewmodel.LoginViewModel
-import com.pfe.maborneapp.viewmodel.factories.LoginViewModelFactory
+import com.pfe.maborneapp.viewmodel.UserViewModel
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -12,22 +10,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.graphics.ImageBitmap
-import com.pfe.maborneapp.utils.DarkModeGreen
-import com.pfe.maborneapp.utils.loadImageBitmap
 import com.pfe.maborneapp.view.components.Alert
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import com.pfe.maborneapp.utils.*
 
 @Composable
-fun LoginPage(navController: NavHostController) {
+fun LoginPage(navController: NavController, viewModel: UserViewModel) {
     println("DEBUG, LoginPage: Composable affiché")
-
-    val viewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory())
 
     var mail by remember { mutableStateOf("") }
     val userRole by viewModel.userRole.collectAsState()
@@ -40,12 +34,12 @@ fun LoginPage(navController: NavHostController) {
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
 
     LaunchedEffect(userRole) {
+        println("DEBUG: LaunchedEffect -> userRole=$userRole")
         if (userRole.isNotEmpty()) {
             val userId = viewModel.userId.value
-            val route = if (userRole == "Admin") "adminHome" else "userHome/$userId"
-            navController.navigate(route) {
-                popUpTo("login") { inclusive = true }
-            }
+            println("DEBUG: Navigation vers $userRole avec userId=$userId")
+            val route = if (userRole == "Admin") "adminHome" else "userHome"
+            navController.navigate(route)
         }
     }
 
@@ -120,12 +114,14 @@ fun LoginPage(navController: NavHostController) {
                 } else {
                     Button(
                         onClick = {
+                            println("DEBUG: Tentative de connexion avec l'email : $mail")
                             viewModel.login(mail) { message, isSuccess ->
+                                println("DEBUG: Callback de login : message=$message, isSuccess=$isSuccess")
                                 alertMessage = message
                                 alertIsSuccess = isSuccess
                                 alertVisible = true
                             }
-                        },
+                                  },
                         modifier = Modifier
                             .height(48.dp)
                             .fillMaxWidth(),

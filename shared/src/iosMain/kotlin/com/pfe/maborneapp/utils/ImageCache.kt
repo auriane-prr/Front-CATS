@@ -1,43 +1,110 @@
 package com.pfe.maborneapp.utils
 
 import androidx.compose.ui.graphics.ImageBitmap
-import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.usePinned
-import org.jetbrains.skia.Image
+import kotlinx.cinterop.*
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import platform.Foundation.*
-import platform.posix.memcpy
+import platform.UIKit.UIImage
 
-class ImageCache {
-    /*private val cache = mutableMapOf<String, Pair<ImageBitmap, String>>() // Map (URL -> (Image, LastModified))
-    private val cacheDir = NSSearchPathForDirectoriesInDomains(
-        NSCachesDirectory,
-        NSUserDomainMask,
-        true
-    ).firstOrNull() as? String ?: throw IllegalStateException("Cache directory not found")
+actual object ImageCache {
+    private val cache = mutableMapOf<String, Pair<ImageBitmap, String>>() // Map (URL -> (ImageBitmap, LastModified))
 
+    private val cacheDirName = "image_cache"
+    private val metaFileName = "image_metadata.json"
+
+    private val fileManager: NSFileManager = NSFileManager.defaultManager
+
+    private fun getCacheDir(): String {
+        val cacheDir = NSSearchPathForDirectoriesInDomains(
+            NSCachesDirectory,
+            NSUserDomainMask,
+            true
+        ).firstOrNull() as? String ?: throw IllegalStateException("Failed to get cache directory")
+        return "$cacheDir/$cacheDirName"
+    }
+
+    @OptIn(ExperimentalForeignApi::class)
     actual fun initialize(context: Any?) {
-        // Aucune initialisation particulière requise pour iOS
+        // Créer le dossier de cache si nécessaire
+        val cacheDir = getCacheDir()
+        if (!fileManager.fileExistsAtPath(cacheDir)) {
+            fileManager.createDirectoryAtPath(cacheDir, withIntermediateDirectories = true, attributes = null, error = null)
+        }
+        loadCache()
     }
 
     actual fun getCachedImage(url: String): Pair<ImageBitmap, String>? {
         return cache[url]
     }
 
+    @OptIn(ExperimentalForeignApi::class)
     actual fun cacheImage(url: String, imageData: ByteArray, lastModified: String) {
-        // Sauvegarde de l'image dans le répertoire de cache
-        val filePath = "$cacheDir/${url.hashCode()}"
-        val nsData = NSData.create(imageData)
-        nsData.writeToFile(filePath, true)
+        val cacheDir = getCacheDir()
+        val imageFilePath = "$cacheDir/${url.hashCode()}"
 
-        // Conversion en ImageBitmap
-        val image = Image.makeFromEncoded(imageData)
-        val bitmap = ImageBitmap(image.width, image.height) // Vous devrez convertir cela
+        // Écriture de l'image sur le disque
+        NSData.dataWithBytes(imageData.refTo(0).getPointer(MemScope()), imageData.size.toULong()).writeToFile(imageFilePath, atomically = true)
 
-        cache[url] = Pair(bitmap, lastModified)
+        // Conversion des données en UIImage puis en ImageBitmap
+        val uiImage = UIImage.imageWithContentsOfFile(imageFilePath)
+            ?: throw IllegalArgumentException("Failed to decode image from file")
+        val imageBitmap = uiImage.toImageBitmap()
+
+        // Mise à jour du cache en mémoire
+        cache[url] = Pair(imageBitmap, lastModified)
+        saveMetadata()
     }
 
+    @OptIn(ExperimentalForeignApi::class)
     actual fun clearCache() {
-        val fileManager = NSFileManager.defaultManager
+        cache.clear()
+
+        val cacheDir = getCacheDir()
         fileManager.removeItemAtPath(cacheDir, null)
-    }*/
+
+        saveMetadata()
+    }
+
+    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+    private fun saveMetadata() {
+        val metadata = cache.mapValues { it.value.second }
+        val metadataJson = Json.encodeToString(metadata)
+        val metaFilePath = "${getCacheDir()}/$metaFileName"
+
+        val byteArray = metadataJson.encodeToByteArray()
+        byteArray.usePinned {
+            NSData.dataWithBytes(it.addressOf(0), byteArray.size.toULong())
+                .writeToFile(metaFilePath, atomically = true)
+        }
+    }
+
+    @OptIn(ExperimentalForeignApi::class)
+    private fun loadCache() {
+        val metaFilePath = "${getCacheDir()}/$metaFileName"
+        if (!fileManager.fileExistsAtPath(metaFilePath)) return
+
+        try {
+            val metadataJson = NSString.stringWithContentsOfFile(
+                metaFilePath,
+                encoding = NSUTF8StringEncoding,
+                error = null
+            )
+
+            metadataJson?.let { Json.decodeFromString<Map<String, String>?>(it) }
+                ?.forEach { (url, lastModified) ->
+                    val imageFilePath = "${getCacheDir()}/${url.hashCode()}"
+                    if (fileManager.fileExistsAtPath(imageFilePath)) {
+                        val uiImage = UIImage.imageWithContentsOfFile(imageFilePath)
+                        if (uiImage != null) {
+                            val imageBitmap = uiImage.toImageBitmap()
+                            cache[url] = Pair(imageBitmap, lastModified)
+                        }
+                    }
+                }
+        } catch (e: Exception) {
+            println("Erreur lors du chargement du cache : ${e.message}")
+        }
+    }
 }

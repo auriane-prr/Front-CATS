@@ -1,17 +1,16 @@
 package com.pfe.maborneapp.viewmodel
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.pfe.maborneapp.models.Borne
-import com.pfe.maborneapp.models.CarteId
-import com.pfe.maborneapp.models.CreateBorneRequest
-import com.pfe.maborneapp.models.EtatBornes
+import com.pfe.maborneapp.models.*
 import com.pfe.maborneapp.repositories.BorneRepository
+import com.pfe.maborneapp.utils.provideViewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineScope
 
-class BorneViewModel(private val repository: BorneRepository) : ViewModel() {
+class BorneViewModel(private val borneRepository: BorneRepository,
+                     private val viewModelScope: CoroutineScope = provideViewModelScope()
+) {
     private val _etatBornes = MutableStateFlow<EtatBornes?>(null)
     val etatBornes: StateFlow<EtatBornes?> = _etatBornes
 
@@ -29,11 +28,11 @@ class BorneViewModel(private val repository: BorneRepository) : ViewModel() {
             println("DEBUG: Appel à createBorne avec request = $request")
             _creationStatus.value = null // Réinitialise l'état
             try {
-                val newBorne = repository.createBorne(request)
+                val newBorne = borneRepository.createBorne(request)
                 if (newBorne != null) {
                     println("DEBUG: Réservation créée avec succès")
                     _creationStatus.value = true
-                    fetchBornesByEtat() // Actualiser les bornes après création
+                    fetchBornesByEtatAndCarte(request.carte)
                 } else {
                     println("DEBUG: Échec de la création de la réservation")
                     _creationStatus.value = false
@@ -48,7 +47,7 @@ class BorneViewModel(private val repository: BorneRepository) : ViewModel() {
 
     fun deleteBorne(borneId: String) {
         viewModelScope.launch {
-            val success = repository.deleteBorne(borneId)
+            val success = borneRepository.deleteBorne(borneId)
             if (success) {
                 fetchBornesByEtat()  // Rafraîchir la liste après suppression
                 _errorMessage.value = "Borne supprimée avec succès."
@@ -58,13 +57,11 @@ class BorneViewModel(private val repository: BorneRepository) : ViewModel() {
         }
     }
 
-
-
     fun fetchBornesByEtat() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val fetchedEtatBornes = repository.fetchBornesByEtat()
+                val fetchedEtatBornes = borneRepository.fetchBornesByEtat()
                 if (fetchedEtatBornes != null) {
                     println("DEBUG, Bornes chargées avec succès : $fetchedEtatBornes")
                     _etatBornes.value = fetchedEtatBornes
@@ -78,12 +75,13 @@ class BorneViewModel(private val repository: BorneRepository) : ViewModel() {
             }
         }
     }
+
     fun fetchBornesByEtatAndCarte(carteId: CarteId) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
                 println("DEBUG: Appel à fetchBornesByEtatAndCarte avec carteId = $carteId")
-                val fetchedEtatBornes = repository.fetchBornesByEtatAndCarte(carteId)
+                val fetchedEtatBornes = borneRepository.fetchBornesByEtatAndCarte(carteId)
                 if (fetchedEtatBornes != null) {
                     println("DEBUG, Bornes chargées avec succès : $fetchedEtatBornes")
                     _etatBornes.value = fetchedEtatBornes

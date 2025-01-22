@@ -1,22 +1,17 @@
 package com.pfe.maborneapp.view.admin.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.BlurEffect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.pfe.maborneapp.models.Borne
-import com.pfe.maborneapp.utils.DarkModeGreen
+import com.pfe.maborneapp.utils.*
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BorneModalAdmin(
     selectedBorne: Borne?,
@@ -29,7 +24,6 @@ fun BorneModalAdmin(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .graphicsLayer { renderEffect = BlurEffect(20f, 20f) }
                 .background(Color.Black.copy(alpha = 0.4f)),
             contentAlignment = Alignment.Center
         ) {

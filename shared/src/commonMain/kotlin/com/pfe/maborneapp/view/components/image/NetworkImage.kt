@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun NetworkImage(
     imageUrl: String?,
-    lastModified: String? = null,
+    //lastModified: String? = null,
     contentDescription: String,
     modifier: Modifier = Modifier
 ) {
@@ -29,12 +29,29 @@ fun NetworkImage(
 
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(imageUrl) {
+    /*LaunchedEffect(imageUrl) {
         if (imageUrl != null && lastModified != null) {
             coroutineScope.launch {
                 try {
                     println("DEBUG, NetworkImage - Chargement de l'image depuis : $imageUrl")
                     val bitmap = loadImageBitmap(imageUrl, lastModified)
+                    imageBitmap = bitmap
+                    // Calcul dynamique du ratio largeur/hauteur
+                    imageAspectRatio = bitmap.width.toFloat() / bitmap.height.toFloat()
+                    println("DEBUG, Ratio calculé : $imageAspectRatio")
+                } catch (e: Exception) {
+                    println("Erreur lors du chargement de l'image : ${e.message}")
+                }
+            }
+        }
+    }*/
+
+    LaunchedEffect(imageUrl) {
+        if (imageUrl != null ) {
+            coroutineScope.launch {
+                try {
+                    println("DEBUG, NetworkImage - Chargement de l'image depuis : $imageUrl")
+                    val bitmap = loadImageBitmap(imageUrl)
                     imageBitmap = bitmap
                     // Calcul dynamique du ratio largeur/hauteur
                     imageAspectRatio = bitmap.width.toFloat() / bitmap.height.toFloat()

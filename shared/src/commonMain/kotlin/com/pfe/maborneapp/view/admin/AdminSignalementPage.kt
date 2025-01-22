@@ -1,7 +1,5 @@
 package com.pfe.maborneapp.view.admin
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -11,29 +9,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import com.pfe.maborneapp.models.CarteId
-import com.pfe.maborneapp.utils.DarkModeGreen
+import com.pfe.maborneapp.utils.*
 import com.pfe.maborneapp.view.admin.components.AdminMenu
 import com.pfe.maborneapp.view.components.CarteDropdownMenu
 import com.pfe.maborneapp.view.admin.components.SignalementList
-import com.pfe.maborneapp.viewmodel.LocalCarteViewModel
-import com.pfe.maborneapp.viewmodel.SignalementViewModel
-import com.pfe.maborneapp.viewmodel.factories.SignalementViewModelFactory
+import com.pfe.maborneapp.viewmodel.*
+
 @Composable
-fun AdminSignalementPage(navController: NavHostController, defaultCarteId: CarteId) {
+fun AdminSignalementPage(
+    navController: NavController,
+    carteViewModel: CarteViewModel,
+    signalementViewModel: SignalementViewModel,
+    userViewModel: UserViewModel
+) {
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
-
-
-    val viewModel: SignalementViewModel = viewModel(factory = SignalementViewModelFactory())
-    val carteViewModel = LocalCarteViewModel.current
 
     val cartes by carteViewModel.carte.collectAsState()
     val selectedCarte by carteViewModel.selectedCarte.collectAsState()
-    val signalements by viewModel.signalements.collectAsState()
+    val signalements by signalementViewModel.signalements.collectAsState()
     val isLoadingCartes by carteViewModel.isLoading.collectAsState()
-    val isLoadingSignalements by viewModel.isLoading.collectAsState()
+    val isLoadingSignalements by signalementViewModel.isLoading.collectAsState()
     val errorLoadingCartes by carteViewModel.errorMessage.collectAsState()
 
     var isMenuOpen by remember { mutableStateOf(false) }
@@ -46,18 +42,20 @@ fun AdminSignalementPage(navController: NavHostController, defaultCarteId: Carte
 
     // Sélectionner la carte par défaut si aucune n'est sélectionnée
     LaunchedEffect(cartes) {
-        if (!cartes.isNullOrEmpty() && selectedCarte == null) {
+        if (cartes.isNotEmpty() && selectedCarte == null) {
             carteViewModel.setSelectedCarte(cartes.find { it.nom == "CATS de Montpellier" })
         }
     }
 
-    // Charger les signalements pour la carte sélectionnée
-    LaunchedEffect(selectedCarte) {
-        selectedCarte?.let {
-            println("DEBUG: Chargement des signalements pour la carte sélectionnée - ID: ${it.id}")
-            viewModel.fetchSignalementsByCarte(CarteId(it.id))
+    val selectedCarteId by carteViewModel.selectedCarteId.collectAsState()
+
+    LaunchedEffect(selectedCarteId) {
+        selectedCarteId?.let { carteId ->
+            println("DEBUG: Chargement des signalements pour la carte sélectionnée - ID: $carteId")
+            signalementViewModel.fetchSignalementsByCarte(CarteId(carteId))
         } ?: println("DEBUG: Aucune carte sélectionnée")
     }
+
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -82,13 +80,13 @@ fun AdminSignalementPage(navController: NavHostController, defaultCarteId: Carte
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         color = darkModeColorGreen)
-                } else if (!cartes.isNullOrEmpty()) {
+                } else if (cartes.isNotEmpty()) {
                     CarteDropdownMenu(
                         cartes = cartes,
                         selectedCarte = selectedCarte,
                         onCarteSelected = {
                             carteViewModel.setSelectedCarte(it)
-                            viewModel.fetchSignalementsByCarte(CarteId(it.id)) // Recharger les signalements
+                            signalementViewModel.fetchSignalementsByCarte(CarteId(it.id)) // Recharger les signalements
                         }
                     )
                 } else {
@@ -118,18 +116,19 @@ fun AdminSignalementPage(navController: NavHostController, defaultCarteId: Carte
                     SignalementList(
                         signalements = signalements!!,
                         onUpdateStatus = { borneId, newStatus, signalementId ->
-                            viewModel.updateBorneStatus(
+                            signalementViewModel.updateBorneStatus(
                                 borneId,
                                 newStatus,
                                 onSuccess = {
-                                    // Une fois la borne mise à jour, fermer le signalement associé
                                     signalementId?.let {
-                                        viewModel.closeSignalement(
+                                        signalementViewModel.closeSignalement(
                                             it,
                                             onSuccess = {
-                                                viewModel.fetchSignalementsByCarte(
-                                                    CarteId(selectedCarte?.id ?: defaultCarteId._id)
-                                                )
+                                                selectedCarte?.let { carte ->
+                                                    signalementViewModel.fetchSignalementsByCarte(
+                                                        CarteId(carte.id)
+                                                    )
+                                                }
                                             },
                                             onError = { error ->
                                                 errorMessage = error
@@ -153,7 +152,8 @@ fun AdminSignalementPage(navController: NavHostController, defaultCarteId: Carte
                 isMenuOpen = isMenuOpen,
                 onToggleMenu = { isMenuOpen = !isMenuOpen },
                 currentPage = "adminSignalement",
-                carteId = defaultCarteId
+                carteViewModel = carteViewModel,
+                userViewModel = userViewModel
             )
         }
     )

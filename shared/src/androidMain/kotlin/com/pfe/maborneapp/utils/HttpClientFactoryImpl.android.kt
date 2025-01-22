@@ -21,13 +21,10 @@ actual class HttpClientFactoryImpl {
                 }
             }
             install(ContentNegotiation) {
-                json(Json {
-                    ignoreUnknownKeys = true // Ignore les clés inconnues dans le JSON
-                    isLenient = true // Permet une tolérance pour des JSON légèrement incorrects
-                })
+                json(Json { ignoreUnknownKeys = true })
             }
             install(Logging) {
-                level = LogLevel.BODY // Affiche les détails des requêtes et des réponses
+                level = LogLevel.BODY
             }
         }
     }

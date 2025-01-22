@@ -1,17 +1,17 @@
 package com.pfe.maborneapp.viewmodel
 
 import androidx.compose.runtime.compositionLocalOf
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.pfe.maborneapp.models.Carte
-import com.pfe.maborneapp.models.TypeBorne
 import com.pfe.maborneapp.repositories.CarteRepository
+import com.pfe.maborneapp.utils.provideViewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineScope
 
-
-class CarteViewModel(private val carteRepository: CarteRepository) : ViewModel() {
+class CarteViewModel(private val carteRepository: CarteRepository,
+                     private val viewModelScope: CoroutineScope = provideViewModelScope()
+) {
 
     private val _carte = MutableStateFlow<List<Carte>>(emptyList())
     val carte: StateFlow<List<Carte>> = _carte
@@ -31,7 +31,18 @@ class CarteViewModel(private val carteRepository: CarteRepository) : ViewModel()
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val defaultCarteId = "6763ed3c4545c40e2a6c7e80" // ID de la carte par défaut
+    private val defaultCarteId = "6763ed3c4545c40e2a6c7e80"
+
+    private val _selectedCarteId = MutableStateFlow<String?>(null)
+    val selectedCarteId: StateFlow<String?> = _selectedCarteId
+
+    fun setSelectedCarteId(carteId: String) {
+        _selectedCarteId.value = carteId
+        viewModelScope.launch {
+            val carte = fetchCarteById(carteId)
+            _selectedCarte.value = carte
+        }
+    }
 
     fun setSelectedCarte(carte: Carte?) {
         _selectedCarte.value = carte
@@ -40,19 +51,11 @@ class CarteViewModel(private val carteRepository: CarteRepository) : ViewModel()
     fun fetchCarteDetails(carteId: String? = null) {
         viewModelScope.launch {
             try {
-                val idToUse = carteId ?: defaultCarteId
-
-                // Récupérer la date de dernière modification
-                val lastModified = carteRepository.fetchLastModified(idToUse)
-                _selectedCarteLastModified.value = lastModified
-
-                // Récupérer l'URL de l'image
-                val imageUrl = carteRepository.fetchCarteImageUrl(idToUse)
-                _selectedCarteImageUrl.value = imageUrl
-
-                println("DEBUG: fetchCarteDetails - Chargé : $idToUse avec URL $imageUrl et lastModified $lastModified")
+                val idToUse = carteId ?: _selectedCarteId.value ?: defaultCarteId
+                _selectedCarteLastModified.value = carteRepository.fetchLastModified(idToUse)
+                _selectedCarteImageUrl.value = carteRepository.fetchCarteImageUrl(idToUse)
             } catch (e: Exception) {
-                println("DEBUG:Erreur dans fetchCarteDetails : ${e.message}")
+                _errorMessage.value = "Erreur lors du chargement des détails de la carte : ${e.message}"
             }
         }
     }
@@ -91,7 +94,6 @@ class CarteViewModel(private val carteRepository: CarteRepository) : ViewModel()
     }
 
 }
-
 
 val LocalCarteViewModel = compositionLocalOf<CarteViewModel> {
     error("CarteViewModel not provided")

@@ -1,6 +1,5 @@
 package com.pfe.maborneapp.view.user
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -14,23 +13,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import com.pfe.maborneapp.utils.DarkModeGreen
+import com.pfe.maborneapp.utils.*
 import com.pfe.maborneapp.view.user.components.Menu
 import com.pfe.maborneapp.models.Reservation
 import com.pfe.maborneapp.view.components.Alert
 import com.pfe.maborneapp.view.user.components.ReservationCard
-import com.pfe.maborneapp.viewmodel.factories.user.ReservationViewModelFactory
-import com.pfe.maborneapp.viewmodel.factories.user.UserViewModelFactory
-import com.pfe.maborneapp.viewmodel.user.ReservationViewModel
-import com.pfe.maborneapp.viewmodel.user.UserViewModel
+import com.pfe.maborneapp.viewmodel.UserViewModel
+import com.pfe.maborneapp.viewmodel.user.*
 
 @Composable
-fun ReservationPage(navController: NavHostController, userId: String) {
-    val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory())
-    val reservationViewModel: ReservationViewModel = viewModel(factory = ReservationViewModelFactory())
+fun ReservationPage(
+    navController: NavController,
+    userViewModel: UserViewModel,
+    reservationViewModel: ReservationViewModel
+) {
 
+    val userId by userViewModel.userId.collectAsState()
     val reservations by reservationViewModel.reservations.collectAsState()
     val upcomingReservations = remember { mutableStateListOf<Reservation>() }
     val pastReservations = remember { mutableStateListOf<Reservation>() }
@@ -88,7 +86,7 @@ fun ReservationPage(navController: NavHostController, userId: String) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navController.navigate("newReservation/$userId")
+                    navController.navigateAndClear("newReservation", reservationViewModel)
                 },
                 containerColor = darkModeColorGreen,
                 contentColor = Color.White,
@@ -203,10 +201,9 @@ fun ReservationPage(navController: NavHostController, userId: String) {
                     isMenuOpen = isMenuOpen,
                     onToggleMenu = { isMenuOpen = !isMenuOpen },
                     currentPage = "reservations",
-                    userId = userId
+                    userId = userId,
+                    userViewModel = userViewModel
                 )
-
-
             }
         }
     )
@@ -243,7 +240,7 @@ fun ReservationPage(navController: NavHostController, userId: String) {
             message = alertMessage,
             onDismiss = {
                 showAlert = false
-                reservationViewModel.fetchReservations(userId) // Recharger les réservations après fermeture de l'alerte
+                reservationViewModel.fetchReservations(userId)
             }
         )
     }

@@ -1,17 +1,12 @@
 package com.pfe.maborneapp.repositories
 
-import com.pfe.maborneapp.models.CarteId
-import com.pfe.maborneapp.models.Signalement
+import com.pfe.maborneapp.models.*
 import kotlinx.serialization.Serializable
 import io.ktor.client.*
-import io.ktor.client.call.body
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.*
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
@@ -27,7 +22,7 @@ class SignalementRepository(private val httpClient: HttpClient) {
     private val json = Json { ignoreUnknownKeys = true }
 
     suspend fun updateBorneStatus(borneId: String, newStatus: String): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.Default) {
             try {
                 val response = httpClient.put("https://back-cats.onrender.com/borne/$borneId/status/$newStatus") {
                     contentType(ContentType.Application.Json)
@@ -67,7 +62,7 @@ class SignalementRepository(private val httpClient: HttpClient) {
 
 
     suspend fun signalerBorne(borneId: String, userId: String, motif: String): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.Default) {
             val requestBody = SignalementRequest(
                 borne = mapOf("_id" to borneId),
                 user = mapOf("_id" to userId),

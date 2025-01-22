@@ -29,7 +29,7 @@ fun MapView(
     } else {
         NetworkImage(
             imageUrl = imageUrl,
-            lastModified = lastModified,
+            //lastModified = lastModified,
             contentDescription = contentDescription,
             modifier = Modifier
                 .fillMaxWidth()

@@ -2,7 +2,6 @@ package com.pfe.maborneapp.view.user
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
@@ -15,25 +14,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import com.pfe.maborneapp.models.Carte
 import com.pfe.maborneapp.models.CarteId
-import com.pfe.maborneapp.utils.DarkModeGreen
-import com.pfe.maborneapp.view.components.CarteDropdownMenu
+import com.pfe.maborneapp.utils.*
 import com.pfe.maborneapp.view.components.Alert
 import com.pfe.maborneapp.view.user.components.TimePickerDialog
 import com.pfe.maborneapp.viewmodel.CarteViewModel
-import com.pfe.maborneapp.viewmodel.factories.CarteViewModelFactory
-import com.pfe.maborneapp.viewmodel.factories.user.ReservationViewModelFactory
+import com.pfe.maborneapp.viewmodel.UserViewModel
 import com.pfe.maborneapp.viewmodel.user.ReservationViewModel
 import kotlinx.datetime.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewReservationPage(navController: NavHostController, userId: String) {
-    val reservationViewModel: ReservationViewModel = viewModel(factory = ReservationViewModelFactory())
-    val carteViewModel: CarteViewModel = viewModel(factory = CarteViewModelFactory())
+fun NewReservationPage(
+    navController: NavController,
+    reservationViewModel: ReservationViewModel,
+    carteViewModel: CarteViewModel
+) {
 
     var showStartTimePicker by remember { mutableStateOf(false) }
     var showEndTimePicker by remember { mutableStateOf(false) }
@@ -48,9 +44,9 @@ fun NewReservationPage(navController: NavHostController, userId: String) {
     var alertMessage by remember { mutableStateOf("") }
     var isAlertSuccess by remember { mutableStateOf(false) }
 
-    val selectedDate = reservationViewModel.selectedDate.value
-    val startTime = reservationViewModel.startTime.value
-    val endTime = reservationViewModel.endTime.value
+    val selectedDate by reservationViewModel.selectedDate.collectAsState()
+    val startTime by reservationViewModel.startTime.collectAsState()
+    val endTime by reservationViewModel.endTime.collectAsState()
 
     val cartes by carteViewModel.carte.collectAsState()
     var showCarteDropdown by remember { mutableStateOf(false) }
@@ -79,27 +75,20 @@ fun NewReservationPage(navController: NavHostController, userId: String) {
         if (endMinutes <= startMinutes) {
             alertMessage = "Veuillez entrer des horaires corrects"
             isAlertSuccess = false
-            showAlert = true
             return
         }
 
-        // Si tout est valide, procéder à l'action
-        val start = "${
-            reservationViewModel.selectedDate.value.split("-").reversed().joinToString("-")
-        }T${reservationViewModel.startTime.value}:00"
-        val end =
-            "${reservationViewModel.selectedDate.value.split("-").reversed().joinToString("-")}T${reservationViewModel.endTime.value}:00"
-        val carteId = selectedCarte.value?.id ?: ""
+        // Appel de la méthode `setupReservationDetails` pour configurer les détails
+        val start = "${reservationViewModel.selectedDate.value.split("-").reversed().joinToString("-")}T${reservationViewModel.startTime.value}:00"
+        val end = "${reservationViewModel.selectedDate.value.split("-").reversed().joinToString("-")}T${reservationViewModel.endTime.value}:00"
 
-        println("DEBUG, Bouton cliqué avec start: $start, end: $end, carteId: $carteId")
-
-        if (carteId.isNotEmpty()) {
-            reservationViewModel.fetchAvailableBornesByCarte(start, end, CarteId(carteId))
+        selectedCarte.value?.let {
+            reservationViewModel.setupReservationDetails(reservationViewModel.selectedDate.value, start, end, it)
+            reservationViewModel.fetchAvailableBornesByCarte(start, end, CarteId(it.id))
         }
 
-        val route = "availableBornes/$start/$end/$userId/$carteId"
-        reservationViewModel.selectedCarte.value = cartes.find { it.id == carteId }
-        navController.navigate(route)
+        // Navigation vers la page "availableBornes"
+        navController.navigate("availableBornes")
     }
 
     // Fonction de validation des dates
@@ -133,7 +122,7 @@ fun NewReservationPage(navController: NavHostController, userId: String) {
                 title = { Text("Nouvelle réservation") },
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.popBackStack()
+                        navController.navigateAndClear("reservations", reservationViewModel)
                     }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Retour")
                     }
@@ -207,7 +196,7 @@ fun NewReservationPage(navController: NavHostController, userId: String) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (selectedDate.isEmpty()) "Sélectionnez une date" else selectedDate,
+                        text = selectedDate.ifEmpty { "Sélectionnez une date" },
                         modifier = Modifier.weight(1f),
                         color = Color.Black,
                         style = MaterialTheme.typography.bodyLarge,
@@ -232,7 +221,7 @@ fun NewReservationPage(navController: NavHostController, userId: String) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (startTime.isEmpty()) "Sélectionnez une heure de début" else startTime,
+                        text = startTime.ifEmpty { "Sélectionnez une heure de début" },
                         modifier = Modifier.weight(1f),
                         color = Color.Black,
                         style = MaterialTheme.typography.bodyLarge
@@ -257,7 +246,7 @@ fun NewReservationPage(navController: NavHostController, userId: String) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (endTime.isEmpty()) "Sélectionnez une heure de fin" else endTime,
+                        text = endTime.ifEmpty { "Sélectionnez une heure de fin" },
                         modifier = Modifier.weight(1f),
                         color = Color.Black,
                         style = MaterialTheme.typography.bodyLarge
@@ -305,21 +294,14 @@ fun NewReservationPage(navController: NavHostController, userId: String) {
                                 if (millis != null) {
                                     val localDate = Instant.fromEpochMilliseconds(millis)
                                         .toLocalDateTime(TimeZone.currentSystemDefault()).date
-
-                                    // Mettre à jour la date dans le ViewModel
                                     val formattedDate = listOf(
                                         localDate.dayOfMonth.toString().padStart(2, '0'),
                                         localDate.monthNumber.toString().padStart(2, '0'),
                                         localDate.year.toString()
                                     ).joinToString("-")
-
-                                    // Mettre à jour le ViewModel avec la nouvelle date
                                     reservationViewModel.selectedDate.value = formattedDate
-
                                     println("DEBUG, Date sélectionnée : ${reservationViewModel.selectedDate.value}")
                                 }
-
-                                // Valider la date après la mise à jour
                                 validateDateAndCloseDialog()
                             }
                         ) {
@@ -384,7 +366,7 @@ fun NewReservationPage(navController: NavHostController, userId: String) {
     LaunchedEffect(creationStatus) {
         if (creationStatus == true) {
             println("DEBUG, Création de réservation réussie, retour à la page précédente")
-            navController.popBackStack()
+            navController.goBack()
         }
     }
 }
