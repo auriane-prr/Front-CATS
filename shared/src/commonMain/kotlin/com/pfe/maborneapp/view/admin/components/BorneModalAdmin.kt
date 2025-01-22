@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 import com.pfe.maborneapp.models.Borne
 import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.view.components.Alert
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,10 +26,17 @@ fun BorneModalAdmin(
     onDelete: (String) -> Unit
 ) {
     val darkModeColorGreen = if (isSystemInDarkTheme()) DarkModeGreen else Color(0xFF045C3C)
-
-    // États pour afficher les alertes de confirmation
     var showConfirmationDialog by remember { mutableStateOf(false) }
     var actionType by remember { mutableStateOf("") }
+    var successMessage by remember { mutableStateOf("") }
+    var showAlert by remember { mutableStateOf(false)}
+
+    LaunchedEffect(showAlert) {
+        if (showAlert) {
+            delay(2000)  // Affiche le message de succès pendant 2 secondes
+            showAlert = false  // Réinitialise le flag après l'affichage
+        }
+    }
 
     if (selectedBorne != null) {
         AlertDialog(
@@ -105,7 +113,6 @@ fun BorneModalAdmin(
         )
     }
 
-    // Affichage de la confirmation avec les boutons "Oui" et "Annuler"
     if (showConfirmationDialog) {
         AlertDialog(
             onDismissRequest = { showConfirmationDialog = false },
@@ -120,8 +127,8 @@ fun BorneModalAdmin(
                 Text(
                     text = when (actionType) {
                         "delete" -> "Voulez-vous vraiment supprimer cette borne ?"
-                        "Fonctionnelle" -> "Voulez-vous déclarer cette borne comme Fonctionnelle ?"
-                        "hs" -> "Voulez-vous déclarer cette borne comme Hors Service ?"
+                        "Fonctionnelle" -> "Confirmez-vous déclarer cette borne comme fonctionnelle ?"
+                        "hs" -> "Confirmez-vous déclarer cette borne comme hors service ?"
                         else -> ""
                     },
                     fontSize = 16.sp
@@ -133,12 +140,14 @@ fun BorneModalAdmin(
                         selectedBorne?.id?.let { id ->
                             if (actionType == "delete") {
                                 onDelete(id)
+                                successMessage = "La borne a été supprimée."
                             } else {
                                 onUpdateStatus(id, actionType)
+                                successMessage = "Le statut de la borne a été mis à jour."
                             }
+                            showConfirmationDialog = false
+                            showAlert = true  // Déclenche l'affichage de l'alert
                         }
-                        showConfirmationDialog = false
-                        onClose()
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = darkModeColorGreen)
                 ) {
@@ -153,6 +162,14 @@ fun BorneModalAdmin(
                     Text("Annuler")
                 }
             }
+        )
+    }
+
+    if (showAlert) {
+        Alert(
+            isSuccess = true,
+            message = successMessage,
+            onDismiss = { successMessage = "" }
         )
     }
 }
