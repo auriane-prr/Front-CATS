@@ -90,10 +90,42 @@ class CarteViewModel(private val carteRepository: CarteRepository) : ViewModel()
         }
     }
 
-}
+    fun createCarte(nom: String, onComplete: (Carte?) -> Unit) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val newCarte = carteRepository.createCarte(nom)
+            if (newCarte != null) {
+                _carte.value = _carte.value + newCarte
+                onComplete(newCarte)
+            } else {
+                _errorMessage.value = "Erreur lors de la création de la carte"
+                onComplete(null)
+            }
+            _isLoading.value = false
+        }
+    }
 
+    fun uploadCartePhoto(carte: Carte, photoPath: String, onComplete: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val result = carteRepository.uploadCartePhoto(carte.id, photoPath)
+            if (result) {
+                _selectedCarteImageUrl.value = "https://back-cats.onrender.com/carte/photo/${carte.id}" // Mise à jour de l'URL
+                onComplete(true)
+            } else {
+                _errorMessage.value = "Erreur lors de l'upload de la photo"
+                onComplete(false)
+            }
+            _isLoading.value = false
+        }
+    }
+
+
+}
 
 val LocalCarteViewModel = compositionLocalOf<CarteViewModel> {
     error("CarteViewModel not provided")
 }
+
+
 

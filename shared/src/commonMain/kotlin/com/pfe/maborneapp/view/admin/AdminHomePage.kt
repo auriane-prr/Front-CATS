@@ -21,6 +21,7 @@ import com.pfe.maborneapp.utils.DarkContainerColor
 import com.pfe.maborneapp.utils.DarkModeGreen
 import com.pfe.maborneapp.view.admin.components.AdminMenu
 import com.pfe.maborneapp.view.admin.components.BorneListAdmin
+import com.pfe.maborneapp.view.admin.components.CarteDropdownNewCarte
 import com.pfe.maborneapp.view.components.image.NetworkImage
 import com.pfe.maborneapp.view.components.image.ZoomableImageView
 import com.pfe.maborneapp.viewmodel.factories.BorneViewModelFactory
@@ -53,6 +54,11 @@ fun AdminHomePage(navController: NavHostController) {
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val carteId = CarteId(selectedCarte?.id ?: "")
+
+    fun navigateToAddSitePage() {
+        navController.navigate("newCartePage")
+    }
+
 
     // Charger les cartes au montage
     LaunchedEffect(Unit) {
@@ -121,13 +127,14 @@ fun AdminHomePage(navController: NavHostController) {
                                     modifier = Modifier.align(Alignment.CenterHorizontally),
                                     color = darkModeColorGreen)
                             } else if (!cartes.isNullOrEmpty()) {
-                                CarteDropdownMenu(
+                                CarteDropdownNewCarte(
                                     cartes = cartes,
                                     selectedCarte = selectedCarte,
                                     onCarteSelected = {
                                         carteViewModel.setSelectedCarte(it)
                                         borneViewModel.fetchBornesByEtatAndCarte(CarteId(it.id))
-                                    }
+                                    },
+                                    onAddNewSite = { navigateToAddSitePage() }
                                 )
                             } else {
                                 Text(

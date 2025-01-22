@@ -10,3 +10,8 @@ data class Carte(
     val carte: String,
     @SerialName("lastModified") val lastModified: String
 )
+
+@Serializable
+data class CarteRequest(
+    val carte: String,
+)

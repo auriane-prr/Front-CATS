@@ -22,6 +22,7 @@ import com.pfe.maborneapp.view.LoginPage
 import com.pfe.maborneapp.view.admin.AdminSignalementPage
 import com.pfe.maborneapp.view.admin.AdminStatistiquePage
 import com.pfe.maborneapp.view.admin.NewBornePage
+import com.pfe.maborneapp.view.admin.NewCartePage
 import com.pfe.maborneapp.view.user.AvailableBornesPage
 import com.pfe.maborneapp.view.user.ReservationPage
 import com.pfe.maborneapp.view.user.ProfilPage
@@ -80,10 +81,13 @@ fun AppNavigation(navController: NavHostController) {
         }
 
         composable("adminStatistique") { AdminStatistiquePage(navController) }
+
         composable("newBorne/{carteId}") { backStackEntry ->
             val carteId = backStackEntry.arguments?.getString("carteId") ?: ""
             NewBornePage(navController, defaultCarteId = carteId)
         }
+
+        composable("newCartePage") { NewCartePage(navController) }
 
         // Pages User
         composable("userHome/{userId}") { backStackEntry ->
