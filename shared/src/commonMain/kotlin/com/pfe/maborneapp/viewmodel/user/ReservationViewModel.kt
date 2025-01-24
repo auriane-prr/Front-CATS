@@ -16,8 +16,8 @@ class ReservationViewModel(
 ) {
 
     val selectedDate = MutableStateFlow("")
-    val startTime = MutableStateFlow("")
-    val endTime = MutableStateFlow("")
+    val startTime = mutableStateOf("00:00")
+    val endTime = mutableStateOf("00:00")
     val selectedCarte = MutableStateFlow<Carte?>(null)
 
     private val _reservations = MutableStateFlow<List<Reservation>?>(null)

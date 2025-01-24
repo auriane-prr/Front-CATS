@@ -29,7 +29,6 @@ import com.pfe.maborneapp.viewmodel.UserViewModel
 fun AvailableBornesPage(
     navController: NavController,
     reservationViewModel: ReservationViewModel,
-    carteViewModel: CarteViewModel,
     userViewModel: UserViewModel,
 ) {
 
@@ -38,8 +37,8 @@ fun AvailableBornesPage(
     var selectedBorne by remember { mutableStateOf<Borne?>(null) }
     var selectedCarteName by remember { mutableStateOf<String?>(null) }
 
-    val startDate by reservationViewModel.startTime.collectAsState()
-    val endDate by reservationViewModel.endTime.collectAsState()
+    val startDate by reservationViewModel.startTime
+    val endDate by reservationViewModel.endTime
     val selectedCarte by reservationViewModel.selectedCarte.collectAsState()
 
     var showAlert by remember { mutableStateOf(false) }

@@ -69,8 +69,7 @@ fun AppNavigation(
         "availableBornes" -> AvailableBornesPage(
             navController = navController,
             userViewModel = userViewModel,
-            reservationViewModel = reservationViewModel,
-            carteViewModel = carteViewModel
+            reservationViewModel = reservationViewModel
         )
 
         else -> {

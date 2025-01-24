@@ -19,7 +19,6 @@ import com.pfe.maborneapp.utils.*
 import com.pfe.maborneapp.view.components.Alert
 import com.pfe.maborneapp.view.user.components.TimePickerDialog
 import com.pfe.maborneapp.viewmodel.CarteViewModel
-import com.pfe.maborneapp.viewmodel.UserViewModel
 import com.pfe.maborneapp.viewmodel.user.ReservationViewModel
 import kotlinx.datetime.*
 
@@ -45,8 +44,8 @@ fun NewReservationPage(
     var isAlertSuccess by remember { mutableStateOf(false) }
 
     val selectedDate by reservationViewModel.selectedDate.collectAsState()
-    val startTime by reservationViewModel.startTime.collectAsState()
-    val endTime by reservationViewModel.endTime.collectAsState()
+    val startTime = mutableStateOf("12:00") // Heure par défaut valide
+    val endTime = mutableStateOf("12:00")
 
     val cartes by carteViewModel.carte.collectAsState()
     var showCarteDropdown by remember { mutableStateOf(false) }
@@ -65,9 +64,17 @@ fun NewReservationPage(
             return
         }
 
+        try {
         // Vérification des heures
         val startParts = reservationViewModel.startTime.value.split(":")
         val endParts = reservationViewModel.endTime.value.split(":")
+
+        if (startParts.size != 2 || endParts.size != 2) {
+            alertMessage = "Format de l'heure incorrect."
+            isAlertSuccess = false
+            showAlert = true
+            return
+        }
 
         val startMinutes = startParts[0].toInt() * 60 + startParts[1].toInt()
         val endMinutes = endParts[0].toInt() * 60 + endParts[1].toInt()
@@ -89,6 +96,12 @@ fun NewReservationPage(
 
         // Navigation vers la page "availableBornes"
         navController.navigate("availableBornes")
+            } catch (e: Exception) {
+            alertMessage = "Erreur lors de la validation des heures : ${e.message}"
+            isAlertSuccess = false
+            showAlert = true
+        }
+
     }
 
     // Fonction de validation des dates
@@ -221,7 +234,7 @@ fun NewReservationPage(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = startTime.ifEmpty { "Sélectionnez une heure de début" },
+                        text = reservationViewModel.startTime.value.ifEmpty { "Sélectionnez une heure de début" },
                         modifier = Modifier.weight(1f),
                         color = Color.Black,
                         style = MaterialTheme.typography.bodyLarge
@@ -246,7 +259,7 @@ fun NewReservationPage(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = endTime.ifEmpty { "Sélectionnez une heure de fin" },
+                        text = reservationViewModel.endTime.value.ifEmpty { "Sélectionnez une heure de fin" },
                         modifier = Modifier.weight(1f),
                         color = Color.Black,
                         style = MaterialTheme.typography.bodyLarge
@@ -329,7 +342,11 @@ fun NewReservationPage(
                 }
             }
 
-            val timePickerState = rememberTimePickerState(is24Hour = true)
+            val timePickerState = rememberTimePickerState(
+                initialHour = 12,
+                initialMinute = 0,
+                is24Hour = true
+            )
 
             // TimePickerDialog pour l'heure de début
             if (showStartTimePicker) {
@@ -339,9 +356,20 @@ fun NewReservationPage(
                     darkModeColorGreen = darkModeColorGreen,
                     onCancel = { showStartTimePicker = false },
                     onConfirm = { hour, minute ->
-                        reservationViewModel.startTime.value = "${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}"
-                        println("DEBUG, Heure de début sélectionnée : ${reservationViewModel.startTime.value}")
-                        showStartTimePicker = false
+                        try {
+                            // Assurez-vous que les valeurs sont toujours valides
+                            if (hour in 0..23 && minute in 0..59) {
+                                reservationViewModel.startTime.value = "${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}"
+                                println("DEBUG, Heure sélectionnée : ${reservationViewModel.startTime.value}")
+                            } else {
+                                println("DEBUG, Valeur invalide pour l'heure : $hour:$minute")
+                            }
+                        } catch (e: Exception) {
+                            println("DEBUG, Exception lors de la sélection de l'heure : ${e.message}")
+                        } finally {
+                            // Toujours fermer le dialog
+                            showStartTimePicker = false
+                        }
                     }
                 )
             }

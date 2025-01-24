@@ -55,7 +55,7 @@ fun LoginPage(navController: NavController, viewModel: UserViewModel) {
                     .verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
+/*
                 // Affichage du logo
                 val logoImage by produceState<ImageBitmap?>(initialValue = null) {
                     value = loadImageBitmap("res://images/logo")
@@ -85,7 +85,7 @@ fun LoginPage(navController: NavController, viewModel: UserViewModel) {
                             .padding(bottom = 24.dp)
                     )
                 }
-
+*/
                 // Champ d'email
                 OutlinedTextField(
                     value = mail,
