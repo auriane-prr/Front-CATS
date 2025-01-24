@@ -209,19 +209,17 @@ fun AvailableBornesPage(
             if (it) {
                 isAlertSuccess = true
                 alertMessage = "Votre réservation a bien été prise en compte."
-                reservationViewModel.clearReservationDetailsAndState() // Réinitialise tous les états
-                navController.navigateAndClear("reservations", reservationViewModel)
+                showAlert = true
             } else {
                 isAlertSuccess = false
                 alertMessage = reservationViewModel.lastErrorMessage
                     ?: "Erreur lors de la création de la réservation. Veuillez réessayer."
+                showAlert = true
             }
-            showAlert = true
-            reservationViewModel.resetCreationStatus() // Réinitialise le statut de création
+            reservationViewModel.resetCreationStatus()
         }
     }
 
-    // Afficher l'alerte d'erreur ou de succès
     if (showAlert) {
         Alert(
             isSuccess = isAlertSuccess,
@@ -229,6 +227,7 @@ fun AvailableBornesPage(
             onDismiss = {
                 showAlert = false
                 if (isAlertSuccess) {
+                    reservationViewModel.clearReservationDetailsAndState()
                     navController.navigateAndClear("reservations", reservationViewModel)
                 }
             }
