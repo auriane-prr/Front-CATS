@@ -57,7 +57,7 @@ fun Menu(
                         Text(
                             text = "Accueil",
                             style = MaterialTheme.typography.bodyLarge,
-                            color = if (currentPage == "home") darkModeColorGreen else Color.Black
+                            color = if (currentPage == "userHome") darkModeColorGreen else Color.Black
                         )
                     }
                     Divider(color = darkModeColorGreen, thickness = 1.dp)
