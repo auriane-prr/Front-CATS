@@ -34,4 +34,9 @@ class NavController {
         navigate(route)
     }
 
+    fun navigateWithParams(route: String, params: Map<String, String> = emptyMap()) {
+        argsStack.add(params)
+        currentScreen = route
+    }
+
 }

@@ -21,7 +21,6 @@ import com.pfe.maborneapp.models.CarteId
 import com.pfe.maborneapp.models.Reservation
 import com.pfe.maborneapp.models.User
 import com.pfe.maborneapp.view.components.Alert
-import com.pfe.maborneapp.viewmodel.CarteViewModel
 import com.pfe.maborneapp.viewmodel.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,7 +79,14 @@ fun AvailableBornesPage(
                 title = { Text("Bornes disponibles") },
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.navigateAndClear("newReservation", reservationViewModel)
+                        navController.navigateWithParams(
+                            "newReservation",
+                            mapOf(
+                                "fromAvailableBorne" to "true",
+                                "startTime" to reservationViewModel.startTime.value,
+                                "endTime" to reservationViewModel.endTime.value
+                            )
+                        )
                     }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Retour")
                     }

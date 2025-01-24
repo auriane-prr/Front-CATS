@@ -64,7 +64,8 @@ class ReservationViewModel(
     fun fetchAvailableBornesByCarte(start: String, end: String, carteId: CarteId) {
         viewModelScope.launch {
             try {
-                val response = reservationRepository.fetchAvailableBornesByCarte(start, end, carteId)
+                val response =
+                    reservationRepository.fetchAvailableBornesByCarte(start, end, carteId)
                 println("DEBUG: Bornes disponibles reçues du repository = $response")
                 _availableBornes.value = response?.disponible
             } catch (e: Exception) {
@@ -125,11 +126,13 @@ class ReservationViewModel(
         _deleteStatus.value = null
     }
 
-    fun clearReservationDetailsAndState() {
-        selectedDate.value = ""
-        startTime.value = ""
-        endTime.value = ""
-        selectedCarte.value = null
+    fun clearReservationDetailsAndState(keepFields: Boolean = false) {
+        if (!keepFields) {
+            selectedDate.value = ""
+            startTime.value = ""
+            endTime.value = ""
+            selectedCarte.value = null
+        }
         _availableBornes.value = null
         _creationStatus.value = null
         lastErrorMessage = null
