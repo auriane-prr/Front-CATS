@@ -126,17 +126,16 @@ class ReservationViewModel(
         _deleteStatus.value = null
     }
 
-    fun clearReservationDetailsAndState(keepFields: Boolean = false) {
-        if (!keepFields) {
-            selectedDate.value = ""
-            startTime.value = ""
-            endTime.value = ""
-            selectedCarte.value = null
-        }
+    fun clearReservationDetailsAndState() {
+        selectedDate.value = ""
+        startTime.value = "00:00"
+        endTime.value = "00:00"
+        selectedCarte.value = null
         _availableBornes.value = null
         _creationStatus.value = null
         lastErrorMessage = null
     }
+
 
     fun resetCreationStatus() {
         _creationStatus.value = null

@@ -59,7 +59,6 @@ fun NewReservationPage(
 
         if (fromAvailableBorne == "true") {
             if (startTimeParam.isNotEmpty() && endTimeParam.isNotEmpty()) {
-
                 val startTimeExtracted = startTimeParam.split("T").getOrNull(1)?.split(":")?.let {
                     if (it.size >= 2) "${it[0]}:${it[1]}" else "Format incorrect"
                 } ?: "Format incorrect"

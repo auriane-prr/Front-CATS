@@ -86,7 +86,10 @@ fun ReservationPage(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navController.navigateAndClear("newReservation", reservationViewModel)
+                    navController.navigateWithParams(
+                        route = "newReservation",
+                        params = mapOf("fromAvailableBorne" to "false")
+                    )
                 },
                 containerColor = darkModeColorGreen,
                 contentColor = Color.White,
