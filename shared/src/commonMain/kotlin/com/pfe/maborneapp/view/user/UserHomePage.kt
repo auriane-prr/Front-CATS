@@ -149,7 +149,7 @@ fun UserHomePage(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        Text(text = "Bornes :", fontSize = 20.sp)
+                        Text(text = "Bornes :", fontSize = 16.sp)
 
                         if (isLoadingBornes) {
                             CircularProgressIndicator(

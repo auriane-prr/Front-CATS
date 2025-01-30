@@ -156,8 +156,8 @@ fun AdminHomePage(
                         } else {
                             etatBornes?.let { bornes ->
                                 Text(
-                                    text = "Bornes associées :",
-                                    fontSize = 20.sp
+                                    text = "Bornes :",
+                                    fontSize = 18.sp
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
                                 BorneListAdmin(

@@ -88,7 +88,8 @@ fun BorneListAdmin(
                 Text(
                     text = "Borne ${borne.numero} - $label",
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    fontSize = 14.sp
                 )
 
                 Icon(
