@@ -55,7 +55,7 @@ fun LoginPage(navController: NavController, viewModel: UserViewModel) {
                     .verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-/*
+
                 // Affichage du logo
                 val logoImage by produceState<ImageBitmap?>(initialValue = null) {
                     value = loadImageBitmap("res://images/logo")
@@ -68,7 +68,7 @@ fun LoginPage(navController: NavController, viewModel: UserViewModel) {
                         modifier = Modifier
                             .size(180.dp)
                     )
-                }
+                } ?: println("DEBUG, LoginPage - Logo introuvable")
 
                 // Affichage de l'image
                 val loginImage by produceState<ImageBitmap?>(initialValue = null) {
@@ -84,8 +84,8 @@ fun LoginPage(navController: NavController, viewModel: UserViewModel) {
                             .aspectRatio(it.width.toFloat() / it.height.toFloat())
                             .padding(bottom = 24.dp)
                     )
-                }
-*/
+                } ?: println("DEBUG, LoginPage - Image de connexion introuvable")
+
                 // Champ d'email
                 OutlinedTextField(
                     value = mail,

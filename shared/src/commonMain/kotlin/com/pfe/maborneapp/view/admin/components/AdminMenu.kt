@@ -35,7 +35,7 @@ fun AdminMenu(
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .height(250.dp)
+                    .wrapContentHeight()
                     .width(220.dp)
                     .background(menuBackgroundColor, RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))
                     .padding(vertical = 8.dp, horizontal = 12.dp)
@@ -71,7 +71,7 @@ fun AdminMenu(
                         )
                     }
                     Divider(color = darkModeColorGreen, thickness = 1.dp)
-
+/*
                     // Statistique
                     TextButton(onClick = { navController.navigate("adminStatistique") }) {
                         Text(
@@ -80,7 +80,7 @@ fun AdminMenu(
                             color = if (currentPage == "adminStatistique") darkModeColorGreen else Color.Black
                         )
                     }
-                    Divider(color = darkModeColorGreen, thickness = 1.dp)
+                    Divider(color = darkModeColorGreen, thickness = 1.dp)*/
 
                     // Déconnexion
                     TextButton(onClick = {
@@ -102,8 +102,9 @@ fun AdminMenu(
         IconButton(
             onClick = { onToggleMenu() },
             modifier = Modifier
-                .align(Alignment.TopEnd) // Place l'icône dans le coin supérieur droit
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .align(Alignment.TopEnd)
+                .padding(horizontal = 16.dp)
+                .padding(top = 24.dp)
                 .zIndex(1f)
         ) {
             Icon(

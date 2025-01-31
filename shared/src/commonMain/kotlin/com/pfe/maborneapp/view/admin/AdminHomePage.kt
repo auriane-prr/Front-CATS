@@ -91,21 +91,22 @@ fun AdminHomePage(
                     Icon(imageVector = Icons.Default.Add, contentDescription = "Nouvelle Borne")
                 }
             },
-            content = { paddingValues ->
+            content = {
                 Column(
                     modifier = Modifier
-                        .padding(paddingValues)
                         .padding(horizontal = 16.dp)
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
                 ) {
+                    Spacer(modifier = Modifier.height(32.dp))
                     // Titre
                     Text(
                         text = "Bienvenue sur le tableau de bord administrateur",
                         style = MaterialTheme.typography.titleLarge,
                         color = darkModeColorGreen,
-                        modifier = Modifier.padding(vertical = 8.dp)
+                        modifier = Modifier.padding(horizontal = 12.dp)
                     )
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     // Menu déroulant pour sélectionner une carte
                     if (isLoadingCartes) {
@@ -147,6 +148,8 @@ fun AdminHomePage(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
+                        Text(text = "Bornes :", fontSize = 16.sp)
+
                         // Affichage des bornes associées
                         if (isLoadingBornes) {
                             CircularProgressIndicator(
@@ -155,10 +158,6 @@ fun AdminHomePage(
                             )
                         } else {
                             etatBornes?.let { bornes ->
-                                Text(
-                                    text = "Bornes :",
-                                    fontSize = 18.sp
-                                )
                                 Spacer(modifier = Modifier.height(16.dp))
                                 BorneListAdmin(
                                     etatBornes = bornes,

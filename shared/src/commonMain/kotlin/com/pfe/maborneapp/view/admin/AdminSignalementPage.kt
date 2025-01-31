@@ -59,20 +59,19 @@ fun AdminSignalementPage(
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
-        content = { padding ->
+        content = {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding)
                     .padding(horizontal = 16.dp)
                     .verticalScroll(rememberScrollState())
             ) {
+                Spacer(modifier = Modifier.height(32.dp))
 
                 Text(
                     text = "Signalements des bornes",
                     style = MaterialTheme.typography.titleLarge,
-                    color = darkModeColorGreen,
-                    modifier = Modifier.padding(vertical = 10.dp)
+                    color = darkModeColorGreen
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 // Menu déroulant pour sélectionner une carte

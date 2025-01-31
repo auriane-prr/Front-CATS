@@ -93,8 +93,8 @@ fun UserHomePage(
             content = {
                 Column(
                     modifier = Modifier
-                        .padding(horizontal = 16.dp)
                         .fillMaxSize()
+                        .padding(horizontal = 16.dp)
                         .verticalScroll(rememberScrollState())
                 ) {
                     Spacer(modifier = Modifier.height(32.dp))
@@ -102,7 +102,8 @@ fun UserHomePage(
                     Text(
                         text = if (userEmail.isNotEmpty()) "Bonjour $userEmail" else "Chargement...",
                         style = MaterialTheme.typography.titleLarge,
-                        color = darkModeColorTitle
+                        color = darkModeColorTitle,
+                        modifier = Modifier.padding(horizontal = 12.dp)
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))

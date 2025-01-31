@@ -47,15 +47,16 @@ fun NetworkImage(
     }*/
 
     LaunchedEffect(imageUrl) {
-        if (imageUrl != null ) {
+        if (imageUrl != null) {
             coroutineScope.launch {
                 try {
                     println("DEBUG, NetworkImage - Chargement de l'image depuis : $imageUrl")
                     val bitmap = loadImageBitmap(imageUrl)
                     imageBitmap = bitmap
-                    // Calcul dynamique du ratio largeur/hauteur
-                    imageAspectRatio = bitmap.width.toFloat() / bitmap.height.toFloat()
-                    println("DEBUG, Ratio calculé : $imageAspectRatio")
+                    imageBitmap?.let {
+                        imageAspectRatio = it.width.toFloat() / it.height.toFloat()
+                        println("DEBUG, Ratio calculé : $imageAspectRatio")
+                    } ?: println("DEBUG, NetworkImage - Image introuvable : $imageUrl")
                 } catch (e: Exception) {
                     println("Erreur lors du chargement de l'image : ${e.message}")
                 }
@@ -65,17 +66,17 @@ fun NetworkImage(
 
     Box(
         modifier = modifier
-            .fillMaxWidth() // Remplit toute la largeur de l'écran
-            .aspectRatio(imageAspectRatio) // Respecte le ratio largeur/hauteur
-            .background(Color.LightGray), // Pour déboguer les limites du conteneur
+            .fillMaxWidth()
+            .aspectRatio(imageAspectRatio)
+            .background(Color.LightGray),
         contentAlignment = Alignment.Center
     ) {
         imageBitmap?.let {
             Image(
                 bitmap = it,
                 contentDescription = contentDescription,
-                modifier = Modifier.fillMaxSize(), // L'image remplit le conteneur
-                contentScale = ContentScale.Fit // S'ajuste au conteneur sans être coupée
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Fit
             )
         } ?: run {
             Text(

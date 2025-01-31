@@ -94,27 +94,28 @@ private fun NSData.toByteArray(): ByteArray {
     return byteArray
 }
 */
-actual suspend fun loadImageBitmap(url: String) : ImageBitmap{
-
-    return if (url.startsWith("res://")) {
-        // Chargement des ressources locales
-        println("DEBUG, loadImageBitmap - Chargement d'une image locale (URL: $url)")
-        val resourceName = url.removePrefix("res://images/")
-        val uiImage = UIImage(resourceName)
-            ?: throw IllegalArgumentException("Image resource not found: $resourceName")
-        uiImage.toImageBitmap()
-    } else {
-
-        // Chargement des images du backend
-        println("DEBUG, loadImageBitmap - Chargement d'une image distante (URL: $url)")
-        val nsUrl = NSURL.URLWithString(url) ?: throw IllegalArgumentException("Invalid URL: $url")
-        val imageData = NSData.dataWithContentsOfURL(nsUrl)
-            ?: throw IllegalArgumentException("Failed to load image from URL: $url")
-        val uiImage = UIImage.imageWithData(imageData)
-            ?: throw IllegalArgumentException("Failed to decode image from URL: $url")
-        val imageBitmap = uiImage.toImageBitmap()
-
-        imageBitmap
+actual suspend fun loadImageBitmap(url: String): ImageBitmap? {
+    return try {
+        if (url.startsWith("res://")) {
+            // Chargement des ressources locales
+            println("DEBUG, loadImageBitmap - Chargement d'une image locale (URL: $url)")
+            val resourceName = url.removePrefix("res://images/")
+            val uiImage = UIImage(resourceName)
+                ?: throw IllegalArgumentException("Image resource not found: $resourceName")
+            uiImage.toImageBitmap()
+        } else {
+            // Chargement des images du backend
+            println("DEBUG, loadImageBitmap - Chargement d'une image distante (URL: $url)")
+            val nsUrl = NSURL.URLWithString(url) ?: throw IllegalArgumentException("Invalid URL: $url")
+            val imageData = NSData.dataWithContentsOfURL(nsUrl)
+                ?: throw IllegalArgumentException("Failed to load image from URL: $url")
+            val uiImage = UIImage.imageWithData(imageData)
+                ?: throw IllegalArgumentException("Failed to decode image from URL: $url")
+            uiImage.toImageBitmap()
+        }
+    } catch (e: Exception) {
+        println("Erreur lors du chargement de l'image : ${e.message}")
+        null // Retourne null en cas d'erreur
     }
 }
 

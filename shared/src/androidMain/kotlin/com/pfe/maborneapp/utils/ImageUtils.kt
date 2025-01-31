@@ -60,7 +60,7 @@ lateinit var appContext: android.content.Context // Fournir le contexte de l'app
 }
 */
 
-actual suspend fun loadImageBitmap(url: String): ImageBitmap {
+actual suspend fun loadImageBitmap(url: String): ImageBitmap? {
     println("DEBUG, loadImageBitmap - Chargement de l'image : $url")
 
     return withContext(Dispatchers.IO) {
