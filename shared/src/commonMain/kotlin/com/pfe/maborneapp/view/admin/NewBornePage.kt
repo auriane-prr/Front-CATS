@@ -27,7 +27,6 @@ import com.pfe.maborneapp.viewmodel.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-
 fun NewBornePage(
     navController: NavController,
     defaultCarteId: String,
@@ -39,12 +38,14 @@ fun NewBornePage(
     var coordX by remember { mutableStateOf("") }
     var coordY by remember { mutableStateOf("") }
     var numero by remember { mutableStateOf("") }
-    val selectedCarte by carteViewModel.selectedCarte.collectAsState()
     var selectedTypeBorne by remember { mutableStateOf<TypeBorne?>(null) }
     var isSubmitting by remember { mutableStateOf(false) }
     var showSuccessDialog by remember { mutableStateOf(false) }
     var showZoomableMap by remember { mutableStateOf(false) }
+    var showAlert by remember { mutableStateOf(false) }
+    var alertMessage by remember { mutableStateOf("") }
 
+    val selectedCarte by carteViewModel.selectedCarte.collectAsState()
     val cartes by carteViewModel.carte.collectAsState()
     val typesBorne by typeBorneViewModel.typesBorne.collectAsState()
     val isLoadingCartes by carteViewModel.isLoading.collectAsState()
@@ -138,7 +139,6 @@ fun NewBornePage(
 
                     NetworkImage(
                         imageUrl = selectedCarteImageUrl,
-                        //lastModified = selectedCarteLastModified,
                         contentDescription = "Carte Image",
                         modifier = Modifier
                             .fillMaxWidth()
@@ -187,16 +187,23 @@ fun NewBornePage(
                     Button(
                         onClick = {
                             if (numero.isNotEmpty() && selectedTypeBorne != null && selectedCarte != null) {
-                                borneViewModel.createBorne(
-                                    CreateBorneRequest(
-                                        coord_x = coordX.toIntOrNull(),
-                                        coord_y = coordY.toIntOrNull(),
-                                        numero = numero.toInt(),
-                                        typeBorne = TypeBorneId(selectedTypeBorne?.id ?: ""),
-                                        carte = CarteId(selectedCarte?.id ?: "")
+                                // Vérification si le numéro est valide
+                                if (numero.toIntOrNull() == null) {
+                                    // Afficher une alerte si le numéro n'est pas valide
+                                    showAlert = true
+                                    alertMessage = "Le numéro de la borne n'est pas valide. Veuillez entrer un nombre."
+                                } else {
+                                    borneViewModel.createBorne(
+                                        CreateBorneRequest(
+                                            coord_x = coordX.toIntOrNull(),
+                                            coord_y = coordY.toIntOrNull(),
+                                            numero = numero.toInt(),
+                                            typeBorne = TypeBorneId(selectedTypeBorne?.id ?: ""),
+                                            carte = CarteId(selectedCarte?.id ?: "")
+                                        )
                                     )
-                                )
-                                isSubmitting = true
+                                    isSubmitting = true
+                                }
                             }
                         },
                         enabled = numero.isNotEmpty() && selectedTypeBorne != null && !isSubmitting,
@@ -214,6 +221,14 @@ fun NewBornePage(
 
                 }
             }
+        )
+    }
+
+    if (showAlert) {
+        Alert(
+            isSuccess = false,
+            message = alertMessage,
+            onDismiss = { showAlert = false }
         )
     }
 
